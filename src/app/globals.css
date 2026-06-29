@@ -1,26 +1,91 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #06080f;
+  --foreground: #f0f4ff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), Inter, system-ui, sans-serif;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display), "Barlow Condensed", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+@keyframes blur-in {
+  from { opacity: 0; filter: blur(10px); transform: translateY(10px); }
+  to   { opacity: 1; filter: blur(0);    transform: translateY(0); }
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes bolt-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+.animate-gradient-shift { animation: gradient-shift 4s linear infinite; }
+.animate-bolt-pulse     { animation: bolt-pulse 2s ease-in-out infinite; }
+
+@keyframes hero-crossfade {
+  0%, 42% { opacity: 0; }
+  50%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes hero-label-before {
+  0%, 42% { opacity: 1; }
+  50%, 100% { opacity: 0.35; }
+}
+
+@keyframes hero-label-after {
+  0%, 42% { opacity: 0.35; }
+  50%, 92% { opacity: 1; }
+  100% { opacity: 0.35; }
+}
+
+.animate-hero-crossfade {
+  animation: hero-crossfade 7s ease-in-out infinite;
+}
+
+.animate-hero-label-before {
+  animation: hero-label-before 7s ease-in-out infinite;
+}
+
+.animate-hero-label-after {
+  animation: hero-label-after 7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-crossfade,
+  .animate-hero-label-before,
+  .animate-hero-label-after {
+    animation: none;
+  }
+
+  .animate-hero-crossfade {
+    opacity: 1;
+  }
+
+  .animate-hero-label-before {
+    opacity: 0.35;
+  }
+
+  .animate-hero-label-after {
+    opacity: 1;
+  }
 }
