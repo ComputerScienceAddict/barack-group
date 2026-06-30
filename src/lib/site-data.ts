@@ -107,7 +107,7 @@ export const serviceHighlights: Service[] = [
       "Move-in / move-out work",
       "Photo documentation",
     ],
-    image: "https://barakservices.com/wp-content/uploads/2023/12/6e92e5b4-b82c-46a0-8426-50b49ba178d1.jpg",
+    image: "https://barakservices.com/wp-content/uploads/2023/12/3d09cb4d-5f17-49fe-90e7-14588ef86253.jpeg",
     imageAlt: "Crew preparing a property for turnover",
   },
   {
@@ -118,7 +118,7 @@ export const serviceHighlights: Service[] = [
       "Grounds and common areas",
       "Extra staff when you need it",
     ],
-    image: "https://barakservices.com/wp-content/uploads/2023/12/130bc422-4643-47cb-86ac-8ae84e7d8b1b.jpg",
+    image: "/event-venue.png",
     imageAlt: "Event venue with active cleaning support",
   },
   {
@@ -129,7 +129,7 @@ export const serviceHighlights: Service[] = [
       "Exterior windows",
       "Carpet and water extraction",
     ],
-    image: "https://barakservices.com/wp-content/uploads/2023/12/3d09cb4d-5f17-49fe-90e7-14588ef86253.jpeg",
+    image: "https://barakservices.com/wp-content/uploads/2023/12/6e92e5b4-b82c-46a0-8426-50b49ba178d1.jpg",
     imageAlt: "Exterior cleaning and maintenance crew",
   },
 ];
@@ -138,32 +138,32 @@ export const industries: Industry[] = [
   {
     name: "Apartment Communities",
     summary: "Shared spaces and turnover support.",
-    image: "https://barakservices.com/wp-content/uploads/2023/12/29d82170-b6fc-4b5f-98af-b921f921dd11.jpeg",
+    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
   },
   {
     name: "Office Buildings",
     summary: "Consistent cleaning that protects productivity.",
-    image: "https://barakservices.com/wp-content/uploads/2023/12/2c912d9d-b667-4926-ac2a-d6a6db828a02.jpeg",
+    image: "/office-building.png",
   },
   {
     name: "Construction",
     summary: "Post-build cleaning and quality walkthrough prep.",
-    image: "https://barakservices.com/wp-content/uploads/2023/12/6b4986b8-f21d-4e71-a156-f6d1ba7ce7b1.jpeg",
+    image: "https://barakservices.com/wp-content/uploads/2023/12/3d09cb4d-5f17-49fe-90e7-14588ef86253.jpeg",
   },
   {
     name: "Stadiums & Universities",
     summary: "High-traffic venue maintenance at scale.",
-    image: "https://barakservices.com/wp-content/uploads/2023/12/130bc422-4643-47cb-86ac-8ae84e7d8b1b.jpg",
+    image: "https://barakservices.com/wp-content/uploads/2023/12/80d07e6c-a735-47e3-9fae-c3f2298a8245.jpeg",
   },
   {
     name: "Restaurant Kitchens",
     summary: "Detailed cleaning and sanitation support.",
-    image: "https://barakservices.com/wp-content/uploads/2023/12/97bf00b2-1ed0-4f1d-a283-7d2c28811d29.jpeg",
+    image: "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1200&q=80",
   },
   {
     name: "Airbnb & Vacation Rentals",
     summary: "Fast turnarounds and reliable quality.",
-    image: "https://barakservices.com/wp-content/uploads/2023/12/80d07e6c-a735-47e3-9fae-c3f2298a8245.jpeg",
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
   },
 ];
 
