@@ -1,10 +1,10 @@
 import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 import {
   I9_CITIZENSHIP_CHECKBOXES,
-  W4_FILING_STATUS_CHECKBOXES,
   type RequiredFieldRules,
   isFieldValueFilled
 } from "@/lib/employee-onboarding/requiredFields";
+import { W4_FILING_STATUS_CHECKBOXES } from "@/lib/employee-onboarding/w4Fields";
 import type { PdfFieldValue } from "@/lib/employee-onboarding/fillPdf";
 
 export const CITIZENSHIP_GROUP_KEY = "__citizenship__";
@@ -18,6 +18,10 @@ const PDF_FIELD_LABEL_KEYS: Record<string, MessageKey> = {
   "topmostSubform[0].Page1[0].f1_05[0]": "fieldSsn",
   "topmostSubform[0].Page1[0].f1_13[0]": "fieldEmployeeSignature",
   "topmostSubform[0].Page1[0].f1_14[0]": "fieldEmployeeDate",
+  "topmostSubform[0].Page1[0].Paso1a[0].f1_01[0]": "fieldFirstName",
+  "topmostSubform[0].Page1[0].Paso1a[0].f1_02[0]": "fieldLastName",
+  "topmostSubform[0].Page1[0].Paso1a[0].f1_03[0]": "fieldAddress",
+  "topmostSubform[0].Page1[0].Paso1a[0].f1_04[0]": "fieldCityStateZip",
   "Last Name (Family Name)": "fieldLastName",
   "Last Name Family Name from Section 1": "fieldLastName",
   "First Name Given Name": "fieldFirstName",

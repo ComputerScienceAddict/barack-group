@@ -43,9 +43,12 @@ import {
   readDraftSnapshot,
   DRAFT_KEY,
   PACKET_KEY,
+  EMPTY_W4_BY_LOCALE,
   type EmploymentByLocale,
   type FormValuesState,
+  type W4ByLocale,
 } from "@/lib/employee-onboarding/loadDraft";
+import { mirrorW4FieldValues } from "@/lib/employee-onboarding/w4Fields";
 
 const PACKET_SUMMARY_KEYS: MessageKey[] = [
   "packetItemEmployment",
@@ -74,11 +77,26 @@ function applyApplicantPrefill(
       ? { nombre: name.firstName, apellido: name.lastName }
       : { first_name: name.firstName, last_name: name.lastName };
 
+  const w4Prefill: Record<string, PdfFieldValue> =
+    locale === "es"
+      ? {
+          "topmostSubform[0].Page1[0].Paso1a[0].f1_01[0]": name.firstName,
+          "topmostSubform[0].Page1[0].Paso1a[0].f1_02[0]": name.lastName,
+        }
+      : {
+          "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]": name.firstName,
+          "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]": name.lastName,
+        };
+
   return {
     ...current,
     employment: {
       ...current.employment,
       ...employmentPrefill,
+    },
+    w4: {
+      ...current.w4,
+      ...w4Prefill,
     },
     i9: {
       ...current.i9,
@@ -107,6 +125,7 @@ function OnboardingAppContent() {
   const [initialDraft] = useState(readDraftSnapshot);
   const formConfigs = useMemo(() => getOnboardingFormConfigs(locale), [locale]);
   const employmentByLocaleRef = useRef<EmploymentByLocale>(initialDraft.employmentByLocale);
+  const w4ByLocaleRef = useRef<W4ByLocale>(initialDraft.w4ByLocale);
   const [step, setStep] = useState(initialDraft.step);
   const [formValues, setFormValues] = useState<FormValuesState>(initialDraft.formValues);
   const [directDepositValues, setDirectDepositValues] = useState<DirectDepositValues>(
@@ -156,8 +175,11 @@ function OnboardingAppContent() {
   );
 
   const updateW4Values = useCallback(
-    (values: Record<string, PdfFieldValue>) => updateFormValues("w4", values),
-    [updateFormValues]
+    (values: Record<string, PdfFieldValue>) => {
+      w4ByLocaleRef.current[locale] = values;
+      updateFormValues("w4", values);
+    },
+    [locale, updateFormValues]
   );
   const updateI9Values = useCallback(
     (values: Record<string, PdfFieldValue>) => updateFormValues("i9", values),
@@ -224,6 +246,7 @@ function OnboardingAppContent() {
       JSON.stringify({
         formValues,
         employmentByLocale: employmentByLocaleRef.current,
+        w4ByLocale: w4ByLocaleRef.current,
         directDepositValues,
         applicantName,
         step,
@@ -235,6 +258,8 @@ function OnboardingAppContent() {
   function handleLocaleChange(next: Locale) {
     if (next === locale) return;
     employmentByLocaleRef.current[locale] = formValues.employment;
+    w4ByLocaleRef.current[locale] = formValues.w4;
+
     let nextEmployment = employmentByLocaleRef.current[next];
     if (!nextEmployment || Object.keys(nextEmployment).length === 0) {
       nextEmployment = applyApplicantPrefill(
@@ -244,9 +269,21 @@ function OnboardingAppContent() {
       ).employment;
       employmentByLocaleRef.current[next] = nextEmployment;
     }
-    setFormValues((prev) => ({ ...prev, employment: nextEmployment }));
+
+    let nextW4 = w4ByLocaleRef.current[next];
+    if (!nextW4 || Object.keys(nextW4).length === 0) {
+      nextW4 = applyApplicantPrefill(
+        { ...formValues, w4: mirrorW4FieldValues(formValues.w4) },
+        applicantName,
+        next
+      ).w4;
+      w4ByLocaleRef.current[next] = nextW4;
+    }
+
+    setFormValues((prev) => ({ ...prev, employment: nextEmployment, w4: nextW4 }));
     setLocale(next);
-    if (step === FORM_START_STEP) {
+    const w4Step = FORM_START_STEP + 1;
+    if (step === FORM_START_STEP || step === w4Step) {
       setFormSession((current) => current + 1);
     }
   }
@@ -264,6 +301,7 @@ function OnboardingAppContent() {
     clearStoredOnboardingData();
     setFormValues(EMPTY_FORM_VALUES);
     employmentByLocaleRef.current = { en: {}, es: {} };
+    w4ByLocaleRef.current = { en: {}, es: {} };
     setDirectDepositValues(EMPTY_DIRECT_DEPOSIT_VALUES);
     setApplicantName(EMPTY_APPLICANT_NAME);
     setNameMissingKeys([]);
@@ -710,7 +748,7 @@ function OnboardingAppContent() {
             <h2 className="formHeading">{t("formW4")}</h2>
             <p className="formSubheading">{t("embeddedPdfHint")}</p>
             <FillablePdfForm
-              key={`w4-${formSession}`}
+              key={`w4-${locale}-${formSession}`}
               ref={w4FormRef}
               config={formConfigs[1]}
               values={formValues.w4}

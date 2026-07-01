@@ -16,7 +16,7 @@ import {
   type OnboardingFormId,
 } from "@/lib/employee-onboarding/pdfForms";
 
-export const STORAGE_VERSION = "13";
+export const STORAGE_VERSION = "14";
 export const DRAFT_KEY = "newHireOnboardingDraft";
 export const PACKET_KEY = "newHireOnboardingPacket";
 export const VERSION_KEY = "newHireOnboardingVersion";
@@ -41,9 +41,20 @@ export const EMPTY_EMPLOYMENT_BY_LOCALE: EmploymentByLocale = {
   es: {},
 };
 
+export type W4ByLocale = {
+  en: Record<string, PdfFieldValue>;
+  es: Record<string, PdfFieldValue>;
+};
+
+export const EMPTY_W4_BY_LOCALE: W4ByLocale = {
+  en: {},
+  es: {},
+};
+
 export type DraftSnapshot = {
   formValues: FormValuesState;
   employmentByLocale: EmploymentByLocale;
+  w4ByLocale: W4ByLocale;
   directDepositValues: DirectDepositValues;
   applicantName: ApplicantName;
   step: number;
@@ -61,6 +72,7 @@ export function readDraftSnapshot(): DraftSnapshot {
   const defaults: DraftSnapshot = {
     formValues: EMPTY_FORM_VALUES,
     employmentByLocale: EMPTY_EMPLOYMENT_BY_LOCALE,
+    w4ByLocale: EMPTY_W4_BY_LOCALE,
     directDepositValues: EMPTY_DIRECT_DEPOSIT_VALUES,
     applicantName: EMPTY_APPLICANT_NAME,
     step: NAME_ENTRY_STEP,
@@ -82,12 +94,14 @@ export function readDraftSnapshot(): DraftSnapshot {
     const draft = JSON.parse(raw) as {
       formValues?: FormValuesState;
       employmentByLocale?: EmploymentByLocale;
+      w4ByLocale?: W4ByLocale;
       directDepositValues?: DirectDepositValues;
       applicantName?: ApplicantName;
       step?: number;
     };
 
     const employmentByLocale = draft.employmentByLocale ?? EMPTY_EMPLOYMENT_BY_LOCALE;
+    const w4ByLocale = draft.w4ByLocale ?? EMPTY_W4_BY_LOCALE;
     const locale = readStoredLocale();
     const restoredFormValues = draft.formValues ?? EMPTY_FORM_VALUES;
 
@@ -95,8 +109,10 @@ export function readDraftSnapshot(): DraftSnapshot {
       formValues: {
         ...restoredFormValues,
         employment: employmentByLocale[locale] ?? restoredFormValues.employment ?? {},
+        w4: w4ByLocale[locale] ?? restoredFormValues.w4 ?? {},
       },
       employmentByLocale,
+      w4ByLocale,
       directDepositValues: draft.directDepositValues
         ? normalizeDirectDepositValues(draft.directDepositValues)
         : EMPTY_DIRECT_DEPOSIT_VALUES,

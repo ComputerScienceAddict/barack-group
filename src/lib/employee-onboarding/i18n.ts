@@ -258,7 +258,7 @@ const es: Record<keyof typeof en, string> = {
   formW4: "Formulario W-4",
   formI9: "Formulario I-9",
   formWh151: "WH-151PS",
-  formWh153: "WH-153S Aviso de salarios",
+  formWh153: "Declaración de divulgación (WH-153S)",
   formDirectDeposit: "Autorización de depósito directo",
   fieldDirectDepositChoice: "¿Desea depósito directo?",
   fieldDirectDepositChoiceHelp:

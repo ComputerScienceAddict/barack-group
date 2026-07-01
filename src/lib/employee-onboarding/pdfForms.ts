@@ -3,9 +3,9 @@ import type { RequiredFieldRules } from "@/lib/employee-onboarding/requiredField
 import {
   getMissingRequiredFields,
   i9RequiredRules,
-  w4RequiredRules,
   wh151RequiredRules
 } from "@/lib/employee-onboarding/requiredFields";
+import { w4EnglishRequiredRules, w4SpanishRequiredRules } from "@/lib/employee-onboarding/w4Fields";
 import { employmentEnglishRequiredRules, employmentSpanishRequiredRules } from "@/lib/employee-onboarding/employmentFields";
 import { wh153RequiredRules } from "@/lib/employee-onboarding/wh153Fields";
 import type { Locale } from "@/lib/employee-onboarding/i18n";
@@ -54,22 +54,39 @@ export function getEmploymentFormConfig(locale: Locale): PdfFormConfig {
 export function getOnboardingFormConfigs(locale: Locale): readonly PdfFormConfig[] {
   return [
     getEmploymentFormConfig(locale),
-    w4FormConfig,
+    getW4FormConfig(locale),
     i9FormConfig,
     wh151FormConfig,
     wh153FormConfig,
   ];
 }
 
-export const w4FormConfig: PdfFormConfig = {
+export const w4EnglishFormConfig: PdfFormConfig = {
   id: "w4",
   title: "Form W-4",
   templatePath: "/documents/w-4.pdf",
   downloadFilename: "w-4-filled.pdf",
   pageCount: 5,
   kind: "fillable",
-  requiredRules: w4RequiredRules
+  requiredRules: w4EnglishRequiredRules,
 };
+
+export const w4SpanishFormConfig: PdfFormConfig = {
+  id: "w4",
+  title: "Formulario W-4 (SP)",
+  templatePath: "/documents/w-4-spanish.pdf",
+  downloadFilename: "w-4-filled.pdf",
+  pageCount: 5,
+  kind: "fillable",
+  requiredRules: w4SpanishRequiredRules,
+};
+
+/** @deprecated Use getW4FormConfig(locale) */
+export const w4FormConfig = w4EnglishFormConfig;
+
+export function getW4FormConfig(locale: Locale): PdfFormConfig {
+  return locale === "es" ? w4SpanishFormConfig : w4EnglishFormConfig;
+}
 
 export const i9FormConfig: PdfFormConfig = {
   id: "i9",
@@ -103,7 +120,7 @@ export const wh153FormConfig: PdfFormConfig = {
 
 export const ONBOARDING_FORM_CONFIGS = [
   employmentEnglishFormConfig,
-  w4FormConfig,
+  w4EnglishFormConfig,
   i9FormConfig,
   wh151FormConfig,
   wh153FormConfig,

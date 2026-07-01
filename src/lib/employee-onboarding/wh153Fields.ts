@@ -1,19 +1,11 @@
 import type { RequiredFieldRules } from "@/lib/employee-onboarding/requiredFields";
 
-/** WH-153S employee / wage notice fields to highlight in yellow. */
+/** WH-153S disclosure block (page 2) — printed name, signature line, date. */
 export const WH153_HIGHLIGHT_FIELDS = [
   "nombre del empleado",
-  "nombre del empleador",
-  "nombre del negocio",
   "fecha",
   "renglon",
   "renglón",
-  "Pago por Hora",
-  "Por Pieza",
-  "Condiciones de bonos",
-  "Condiciones de prestamos personales",
-  "Condiciones de servicios de vivienda o cuidado de ninos",
-  "casilla",
 ] as const;
 
 export const WH153_VALIDATE_FIELDS = [
@@ -29,6 +21,7 @@ export const WH153_VALIDATE_FIELD_ALIASES: Readonly<Record<string, readonly stri
 
 export const wh153RequiredRules: RequiredFieldRules = {
   highlightFields: WH153_HIGHLIGHT_FIELDS,
+  highlightPages: [2],
   validateFields: WH153_VALIDATE_FIELDS,
   validateFieldAliases: WH153_VALIDATE_FIELD_ALIASES,
 };

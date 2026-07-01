@@ -31,11 +31,18 @@ export const I9_SECTION1_HIGHLIGHT_FIELDS = [
   "Today's Date mmddyyy"
 ] as const;
 
-/** I-9 SSN — extra-visible yellow box (field label: "U.S. Social Security Number"). */
-export const I9_SOCIAL_SECURITY_EMPHASIS_FIELDS = ["US Social Security Number"] as const;
+/** I-9 SSN and phone — extra-visible yellow box. */
+export const I9_EMPHASIS_FIELDS = [
+  "US Social Security Number",
+  "Telephone Number",
+] as const;
 
 export function isSocialSecurityPdfFieldName(name: string): boolean {
   return /social security/i.test(name);
+}
+
+export function isTelephonePdfFieldName(name: string): boolean {
+  return /telephone number/i.test(name);
 }
 
 /** Must be filled before leaving I-9 (optional-on-form fields excluded). */
@@ -80,7 +87,7 @@ export function mirrorI9FieldValues(values: Record<string, PdfFieldValue>): Reco
   return mirrored;
 }
 
-/** WH-151PS employee signature areas (circled on form). */
+/** WH-151PS employee signature block (page 2 only). */
 export const WH151_HIGHLIGHT_FIELDS = ["Text440", "Text441"] as const;
 
 export const WH151_VALIDATE_FIELDS = ["Text440", "Text441"] as const;
@@ -101,63 +108,19 @@ export type RequiredFieldRules = {
   validateFieldAliases?: Readonly<Record<string, readonly string[]>>;
 };
 
+export const wh151RequiredRules: RequiredFieldRules = {
+  highlightFields: WH151_HIGHLIGHT_FIELDS,
+  highlightPages: [2],
+  validateFields: WH151_VALIDATE_FIELDS
+};
+
 export const i9RequiredRules: RequiredFieldRules = {
   highlightFields: mergeHighlightFields(I9_SECTION1_HIGHLIGHT_FIELDS, I9_CONTACT_HIGHLIGHT_FIELDS),
-  emphasisFields: I9_SOCIAL_SECURITY_EMPHASIS_FIELDS,
+  emphasisFields: I9_EMPHASIS_FIELDS,
   highlightPages: [1],
   validateFields: I9_SECTION1_VALIDATE_FIELDS,
   checkboxGroups: [I9_CITIZENSHIP_CHECKBOXES],
   validateFieldAliases: I9_VALIDATE_FIELD_ALIASES
-};
-
-export const wh151RequiredRules: RequiredFieldRules = {
-  highlightFields: WH151_HIGHLIGHT_FIELDS,
-  validateFields: WH151_VALIDATE_FIELDS
-};
-
-/** W-4 Step 1 — name, address, SSN, filing status, signature, date. */
-export const W4_STEP1_FIELDS = [
-  "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]",
-  "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]",
-  "topmostSubform[0].Page1[0].Step1a[0].f1_03[0]",
-  "topmostSubform[0].Page1[0].Step1a[0].f1_04[0]",
-  "topmostSubform[0].Page1[0].f1_05[0]",
-  "topmostSubform[0].Page1[0].c1_1[0]",
-  "topmostSubform[0].Page1[0].c1_1[1]",
-  "topmostSubform[0].Page1[0].c1_1[2]",
-  "topmostSubform[0].Page1[0].f1_13[0]",
-  "topmostSubform[0].Page1[0].f1_14[0]"
-] as const;
-
-/** W-4 Step 3 — claim dependents (3a, 3b, and line 3 total). */
-export const W4_STEP3_FIELDS = [
-  "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]",
-  "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]",
-  "topmostSubform[0].Page1[0].f1_08[0]",
-] as const;
-
-export const W4_HIGHLIGHT_FIELDS = [...W4_STEP1_FIELDS, ...W4_STEP3_FIELDS] as const;
-
-export const W4_VALIDATE_FIELDS = [
-  "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]",
-  "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]",
-  "topmostSubform[0].Page1[0].Step1a[0].f1_03[0]",
-  "topmostSubform[0].Page1[0].Step1a[0].f1_04[0]",
-  "topmostSubform[0].Page1[0].f1_05[0]",
-  "topmostSubform[0].Page1[0].f1_13[0]",
-  "topmostSubform[0].Page1[0].f1_14[0]"
-] as const;
-
-export const W4_FILING_STATUS_CHECKBOXES = [
-  "topmostSubform[0].Page1[0].c1_1[0]",
-  "topmostSubform[0].Page1[0].c1_1[1]",
-  "topmostSubform[0].Page1[0].c1_1[2]"
-] as const;
-
-export const w4RequiredRules: RequiredFieldRules = {
-  highlightFields: W4_HIGHLIGHT_FIELDS,
-  validateFields: W4_VALIDATE_FIELDS,
-  checkboxGroups: [W4_FILING_STATUS_CHECKBOXES]
 };
 
 export function isFieldValueFilled(value: PdfFieldValue | undefined): boolean {
@@ -223,7 +186,7 @@ function shouldEmphasizePdfField(
   emphasisFields?: readonly string[]
 ): boolean {
   if (emphasisFields?.includes(name)) return true;
-  return isSocialSecurityPdfFieldName(name);
+  return isSocialSecurityPdfFieldName(name) || isTelephonePdfFieldName(name);
 }
 
 export function applyRequiredFieldHighlight(

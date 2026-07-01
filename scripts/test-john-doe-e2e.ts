@@ -8,7 +8,8 @@ import { buildSubmissionPacket } from "../src/lib/employee-onboarding/buildSubmi
 import { sendSubmissionEmail } from "../src/lib/employee-onboarding/sendSubmissionEmail";
 import { employmentEnglishRequiredRules } from "../src/lib/employee-onboarding/employmentFields";
 import { getMissingFieldIssues } from "../src/lib/employee-onboarding/fieldLabels";
-import { w4RequiredRules, i9RequiredRules } from "../src/lib/employee-onboarding/requiredFields";
+import { i9RequiredRules } from "../src/lib/employee-onboarding/requiredFields";
+import { w4EnglishRequiredRules } from "../src/lib/employee-onboarding/w4Fields";
 import { wh151RequiredRules } from "../src/lib/employee-onboarding/requiredFields";
 import { wh153RequiredRules } from "../src/lib/employee-onboarding/wh153Fields";
 import type { FormValuesState } from "../src/lib/employee-onboarding/loadDraft";
@@ -151,7 +152,7 @@ assert(filename === "john-doe-workdocs.pdf", `Expected filename john-doe-workdoc
 // 2. Validation — all forms complete
 const rulesByForm = [
   ["employment", employmentEnglishRequiredRules, johnDoeFormValues.employment],
-  ["w4", w4RequiredRules, johnDoeFormValues.w4],
+  ["w4", w4EnglishRequiredRules, johnDoeFormValues.w4],
   ["i9", i9RequiredRules, johnDoeFormValues.i9],
   ["wh151", wh151RequiredRules, johnDoeFormValues.wh151],
   ["wh153", wh153RequiredRules, johnDoeFormValues.wh153],
