@@ -78,8 +78,8 @@ const payload = {
       "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]": "0",
       "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]": "0",
       "topmostSubform[0].Page1[0].f1_08[0]": "0",
-      "topmostSubform[0].Page1[0].f1_13[0]": "John Doe",
-      "topmostSubform[0].Page1[0].f1_14[0]": TODAY,
+      "topmostSubform[0].Page1[0].f1_12[0]": "John Doe",
+      "topmostSubform[0].Page1[0].f1_13[0]": TODAY,
     },
     i9: {
       "Last Name (Family Name)": "Doe",

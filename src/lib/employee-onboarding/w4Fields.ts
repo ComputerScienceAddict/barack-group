@@ -4,8 +4,8 @@ import { isFieldValueFilled } from "@/lib/employee-onboarding/requiredFields";
 
 /** Employee signature and date only — highlighted in yellow on W-4. */
 export const W4_SIGNATURE_DATE_HIGHLIGHT_FIELDS = [
+  "topmostSubform[0].Page1[0].f1_12[0]",
   "topmostSubform[0].Page1[0].f1_13[0]",
-  "topmostSubform[0].Page1[0].f1_14[0]",
 ] as const;
 
 export const W4_ENGLISH_STEP1_FIELDS = [
