@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "smoke:onboarding": "node scripts/smoke-test-onboarding.mjs"
+    "smoke:onboarding": "node scripts/smoke-test-onboarding.mjs",
+    "verify:onboarding-packet": "node scripts/verify-onboarding-packet.mjs",
+    "test:onboarding": "npm run verify:onboarding-packet && npm run smoke:onboarding"
   },
   "dependencies": {
     "next": "16.2.9",

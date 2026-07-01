@@ -11,7 +11,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Barak Group Inc. — Employee Onboarding",
   description:
-    "Complete employment application, W-4, I-9, WH-151PS, and direct deposit authorization in one guided flow.",
+    "Complete employment application, W-4, I-9, WH-151PS, WH-153S, and direct deposit authorization in one guided flow.",
 };
 
 export const viewport: Viewport = {

@@ -49,6 +49,7 @@ const PACKET_SUMMARY_KEYS: MessageKey[] = [
   "packetItemW4",
   "packetItemI9",
   "packetItemWh151",
+  "packetItemWh153",
   "packetItemDirectDeposit",
 ];
 
@@ -56,7 +57,8 @@ const FORM_TITLE_KEYS: Record<OnboardingFormId, MessageKey> = {
   employment: "formEmployment",
   w4: "formW4",
   i9: "formI9",
-  wh151: "formWh151"
+  wh151: "formWh151",
+  wh153: "formWh153",
 };
 
 function bytesToBase64(bytes: Uint8Array): string {
@@ -84,6 +86,11 @@ function applyApplicantPrefill(
       "First Name Given Name from Section 1": name.firstName,
       "First Name Given Name": name.firstName,
       "Last Name Family Name from Section 1": name.lastName,
+    },
+    wh153: {
+      ...current.wh153,
+      "nombre del empleado": `${name.firstName} ${name.lastName}`,
+      "nombre del empleador": "Barak Group Inc.",
     },
   };
 }
@@ -126,6 +133,7 @@ function OnboardingAppContent() {
   const w4FormRef = useRef<FillablePdfFormHandle>(null);
   const i9FormRef = useRef<FillablePdfFormHandle>(null);
   const wh151FormRef = useRef<FillablePdfFormHandle>(null);
+  const wh153FormRef = useRef<FillablePdfFormHandle>(null);
   const directDepositFormRef = useRef<DirectDepositFormHandle>(null);
 
   const updateFormValues = useCallback((formId: OnboardingFormId, values: Record<string, PdfFieldValue>) => {
@@ -152,12 +160,17 @@ function OnboardingAppContent() {
     (values: Record<string, PdfFieldValue>) => updateFormValues("wh151", values),
     [updateFormValues]
   );
+  const updateWh153Values = useCallback(
+    (values: Record<string, PdfFieldValue>) => updateFormValues("wh153", values),
+    [updateFormValues]
+  );
 
   function getFormRef(formId: OnboardingFormId) {
     if (formId === "employment") return employmentFormRef;
     if (formId === "w4") return w4FormRef;
     if (formId === "i9") return i9FormRef;
     if (formId === "wh151") return wh151FormRef;
+    if (formId === "wh153") return wh153FormRef;
     return null;
   }
 
@@ -210,6 +223,7 @@ function OnboardingAppContent() {
     w4FormRef.current?.clearMissingMarks();
     i9FormRef.current?.clearMissingMarks();
     wh151FormRef.current?.clearMissingMarks();
+    wh153FormRef.current?.clearMissingMarks();
     directDepositFormRef.current?.clearMissingMarks();
   }
 
@@ -381,19 +395,11 @@ function OnboardingAppContent() {
       return;
     }
 
-    const flushedEmployment = flushStepValues(FORM_START_STEP);
-    const flushedW4 = flushStepValues(FORM_START_STEP + 1);
-    const flushedI9 = flushStepValues(FORM_START_STEP + 2);
-    const flushedWh151 = flushStepValues(FORM_START_STEP + 3);
-    const flushedDirectDeposit =
-      directDepositFormRef.current?.flushValues() ?? directDepositValues;
-
-    const flushedByStep = [
-      { formStep: FORM_START_STEP, values: flushedEmployment, id: "employment" as const },
-      { formStep: FORM_START_STEP + 1, values: flushedW4, id: "w4" as const },
-      { formStep: FORM_START_STEP + 2, values: flushedI9, id: "i9" as const },
-      { formStep: FORM_START_STEP + 3, values: flushedWh151, id: "wh151" as const },
-    ];
+    const flushedByStep = ONBOARDING_FORM_CONFIGS.map((config, index) => ({
+      formStep: FORM_START_STEP + index,
+      values: flushStepValues(FORM_START_STEP + index),
+      id: config.id,
+    }));
 
     for (const entry of flushedByStep) {
       const config = ONBOARDING_FORM_CONFIGS[getFormStepIndex(entry.formStep)];
@@ -405,6 +411,9 @@ function OnboardingAppContent() {
       }
     }
 
+    const flushedDirectDeposit =
+      directDepositFormRef.current?.flushValues() ?? directDepositValues;
+
     const directDepositIssues = getMissingDirectDepositIssues(flushedDirectDeposit);
     if (directDepositIssues.length > 0) {
       setDirectDepositValues(flushedDirectDeposit);
@@ -412,13 +421,11 @@ function OnboardingAppContent() {
       return;
     }
 
-    setFormValues((prev) => ({
-      ...prev,
-      employment: flushedEmployment,
-      w4: flushedW4,
-      i9: flushedI9,
-      wh151: flushedWh151
-    }));
+    const flushedFormValues = Object.fromEntries(
+      flushedByStep.map((entry) => [entry.id, entry.values])
+    ) as FormValuesState;
+
+    setFormValues(flushedFormValues);
     setDirectDepositValues(flushedDirectDeposit);
 
     setSubmitting(true);
@@ -434,16 +441,20 @@ function OnboardingAppContent() {
           ? [await buildDirectDepositPdfBytes(flushedDirectDeposit)]
           : undefined;
       const packetResult = await buildOnboardingPacket(
-        [
-          { templatePath: ONBOARDING_FORM_CONFIGS[0].templatePath, values: flushedEmployment },
-          { templatePath: ONBOARDING_FORM_CONFIGS[1].templatePath, values: flushedW4 },
-          { templatePath: ONBOARDING_FORM_CONFIGS[2].templatePath, values: flushedI9 },
-          { templatePath: ONBOARDING_FORM_CONFIGS[3].templatePath, values: flushedWh151 },
-        ],
+        ONBOARDING_FORM_CONFIGS.map((config) => ({
+          templatePath: config.templatePath,
+          values: flushedFormValues[config.id],
+        })),
         { appendPdfBytes }
       );
       downloadPdfBytes(packetResult.pdfBytes, ONBOARDING_PACKET_FILENAME);
-      const [employmentResult, w4Result, i9Result, wh151Result] = packetResult.formResults;
+      const [
+        employmentResult,
+        w4Result,
+        i9Result,
+        wh151Result,
+        wh153Result,
+      ] = packetResult.formResults;
 
       let emailSent = false;
       try {
@@ -473,10 +484,9 @@ function OnboardingAppContent() {
             packetId,
             submittedAt: new Date().toISOString(),
             applicantName: normalizedName,
-            employmentValues: flushedEmployment,
-            w4Values: flushedW4,
-            i9Values: flushedI9,
-            wh151Values: flushedWh151,
+            ...Object.fromEntries(
+              ONBOARDING_FORM_CONFIGS.map((config) => [`${config.id}Values`, flushedFormValues[config.id]])
+            ),
             directDepositValues: flushedDirectDeposit,
             emailSent,
           },
@@ -494,6 +504,7 @@ function OnboardingAppContent() {
               w4Saved: w4Result.filledCount,
               i9Saved: i9Result.filledCount,
               whSaved: wh151Result.filledCount,
+              wh153Saved: wh153Result.filledCount,
               directDepositNote: usesDirectDeposit(flushedDirectDeposit)
                 ? t("submitSuccessDirectDepositIncluded")
                 : t("submitSuccessDirectDepositSkipped"),
@@ -535,10 +546,14 @@ function OnboardingAppContent() {
       <header className="siteHeader">
         <div className="siteBrand">
           <div className="siteLogoStack">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/barak-group-logo.png" alt="Barak Group Inc." className="siteLogo" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/jani-king-logo.png" alt="Jani-King" className="sitePartnerLogo" />
+            <div className="siteLogoSlot">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/barak-group-logo.png" alt="Barak Group Inc." className="siteLogo" />
+            </div>
+            <div className="siteLogoSlot siteLogoSlotPartner">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/jani-king-logo.png" alt="Jani-King" className="sitePartnerLogo" />
+            </div>
           </div>
           <div className="siteBrandText">
             <p className="siteEyebrow">{t("headerEyebrow")}</p>
@@ -697,6 +712,23 @@ function OnboardingAppContent() {
               values={formValues.wh151}
               onChange={updateWh151Values}
               active={step === FORM_START_STEP + 3}
+            />
+          </section>
+
+          <section
+            className="formSection"
+            style={{ display: step === FORM_START_STEP + 4 ? "block" : "none" }}
+            aria-hidden={step !== FORM_START_STEP + 4}
+          >
+            <h2 className="formHeading">{t("formWh153")}</h2>
+            <p className="formSubheading">{t("embeddedPdfHint")}</p>
+            <FillablePdfForm
+              key={`wh153-${formSession}`}
+              ref={wh153FormRef}
+              config={ONBOARDING_FORM_CONFIGS[4]}
+              values={formValues.wh153}
+              onChange={updateWh153Values}
+              active={step === FORM_START_STEP + 4}
             />
           </section>
 

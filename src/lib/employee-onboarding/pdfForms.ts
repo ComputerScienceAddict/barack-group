@@ -7,6 +7,7 @@ import {
   wh151RequiredRules
 } from "@/lib/employee-onboarding/requiredFields";
 import { employmentRequiredRules } from "@/lib/employee-onboarding/employmentFields";
+import { wh153RequiredRules } from "@/lib/employee-onboarding/wh153Fields";
 
 export type PdfFormKind = "fillable";
 
@@ -62,11 +63,22 @@ export const wh151FormConfig: PdfFormConfig = {
   requiredRules: wh151RequiredRules
 };
 
+export const wh153FormConfig: PdfFormConfig = {
+  id: "wh153",
+  title: "WH-153S Wage Notice",
+  templatePath: "/documents/wh-153s-2024.pdf",
+  downloadFilename: "wh-153s-filled.pdf",
+  pageCount: 2,
+  kind: "fillable",
+  requiredRules: wh153RequiredRules,
+};
+
 export const ONBOARDING_FORM_CONFIGS = [
   employmentFormConfig,
   w4FormConfig,
   i9FormConfig,
-  wh151FormConfig
+  wh151FormConfig,
+  wh153FormConfig,
 ] as const;
 
 export type OnboardingFormId = (typeof ONBOARDING_FORM_CONFIGS)[number]["id"];
@@ -77,7 +89,7 @@ export const DIRECT_DEPOSIT_STEP = FORM_START_STEP + ONBOARDING_FORM_CONFIGS.len
 export const SUBMIT_STEP = DIRECT_DEPOSIT_STEP + 1;
 export const TOTAL_STEPS = SUBMIT_STEP + 1;
 
-export function isFormStep(step: number): step is 1 | 2 | 3 | 4 {
+export function isFormStep(step: number): boolean {
   return step >= FORM_START_STEP && step < DIRECT_DEPOSIT_STEP;
 }
 

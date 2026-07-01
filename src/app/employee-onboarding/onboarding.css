@@ -103,25 +103,29 @@ button {
   flex-shrink: 0;
 }
 
-.siteLogo {
-  display: block;
-  width: auto;
-  height: 72px;
-  max-width: min(220px, 36vw);
-  object-fit: contain;
+.siteLogoSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(220px, 40vw);
+  height: 64px;
   flex-shrink: 0;
 }
 
-.sitePartnerLogo {
-  display: block;
-  width: auto;
-  height: 32px;
-  max-width: min(148px, 40vw);
-  object-fit: contain;
-  padding: 6px 12px;
+.siteLogoSlotPartner {
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.siteLogo,
+.sitePartnerLogo {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 .siteBrandText {
@@ -309,7 +313,7 @@ button {
 
 .stepPillList {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
   padding: 0;
@@ -1829,7 +1833,7 @@ label {
 
 @media (max-width: 900px) {
   .stepPillList {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .siteHeader {
@@ -1858,14 +1862,9 @@ label {
     min-width: 0;
   }
 
-  .siteLogo {
-    height: 64px;
-    max-width: min(200px, 34vw);
-  }
-
-  .sitePartnerLogo {
-    height: 28px;
-    max-width: min(132px, 38vw);
+  .siteLogoSlot {
+    width: min(200px, 38vw);
+    height: 58px;
   }
 }
 
@@ -1946,14 +1945,9 @@ label {
     display: none;
   }
 
-  .siteLogo {
-    height: 58px;
-    max-width: min(240px, 78vw);
-  }
-
-  .sitePartnerLogo {
-    height: 26px;
-    max-width: min(128px, 62vw);
+  .siteLogoSlot {
+    width: min(240px, 78vw);
+    height: 54px;
   }
 
   .stepNav {

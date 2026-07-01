@@ -43,7 +43,19 @@ const PDF_FIELD_LABEL_KEYS: Record<string, MessageKey> = {
   estado: "fieldState",
   codigo_postal: "fieldZip",
   firma_solicitante: "fieldEmployeeSignature",
-  fecha_firma: "fieldEmployeeDate"
+  fecha_firma: "fieldEmployeeDate",
+  "nombre del empleado": "fieldWh153EmployeeName",
+  "nombre del empleador": "fieldWh153EmployerName",
+  "nombre del negocio": "fieldWh153BusinessName",
+  fecha: "fieldWh153Date",
+  renglon: "fieldWh153Line",
+  "renglón": "fieldWh153Line",
+  "Pago por Hora": "fieldWh153HourlyPay",
+  "Por Pieza": "fieldWh153PiecePay",
+  "Condiciones de bonos": "fieldWh153BonusTerms",
+  "Condiciones de prestamos personales": "fieldWh153LoanTerms",
+  "Condiciones de servicios de vivienda o cuidado de ninos": "fieldWh153HousingTerms",
+  casilla: "fieldWh153Acknowledgment",
 };
 
 export type MissingFieldIssue = {

@@ -34,7 +34,8 @@ const FORM_TITLE_KEYS: Record<string, MessageKey> = {
   employment: "formEmployment",
   w4: "formW4",
   i9: "formI9",
-  wh151: "formWh151"
+  wh151: "formWh151",
+  wh153: "formWh153",
 };
 
 function delay(ms: number) {
