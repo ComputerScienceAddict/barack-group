@@ -20,6 +20,10 @@ export type Wh153OverlayMapping = {
 
 const OVERLAY_PREFIX = "wh153:";
 
+function isRenderableWh153Field(field: Wh153SourceField): boolean {
+  return Number.isFinite(field.page) && field.page >= 0;
+}
+
 export function isWh153OverlayKey(key: string): boolean {
   return key.startsWith(OVERLAY_PREFIX);
 }
@@ -32,9 +36,15 @@ function buildOverlayKey(pdfFieldName: string, page: number, widgetIndex: number
 export function assignWh153OverlayKeys<T extends Wh153SourceField>(
   fields: T[]
 ): { fields: T[]; mapping: Wh153OverlayMapping } {
+  const renderableFields = fields.filter(isRenderableWh153Field);
   const byPdfName = new Map<string, T[]>();
+  const sourceOrder = new Map<T, number>();
 
-  for (const field of fields) {
+  renderableFields.forEach((field, index) => {
+    sourceOrder.set(field, index);
+  });
+
+  for (const field of renderableFields) {
     const list = byPdfName.get(field.name) ?? [];
     list.push(field);
     byPdfName.set(field.name, list);
@@ -46,7 +56,9 @@ export function assignWh153OverlayKeys<T extends Wh153SourceField>(
   for (const [pdfName, widgets] of byPdfName) {
     const sorted = [...widgets].sort((a, b) => {
       if (a.page !== b.page) return a.page - b.page;
-      return (b.rect[1] ?? 0) - (a.rect[1] ?? 0);
+      const yDelta = (b.rect[1] ?? 0) - (a.rect[1] ?? 0);
+      if (yDelta !== 0) return yDelta;
+      return (sourceOrder.get(a) ?? 0) - (sourceOrder.get(b) ?? 0);
     });
 
     sorted.forEach((field, widgetIndex) => {
@@ -57,7 +69,7 @@ export function assignWh153OverlayKeys<T extends Wh153SourceField>(
   }
 
   return {
-    fields: fields.map((field) => ({
+    fields: renderableFields.map((field) => ({
       ...field,
       name: fieldToOverlayKey.get(field) ?? field.name,
     })),
