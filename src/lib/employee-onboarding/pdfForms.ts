@@ -93,7 +93,7 @@ export const i9FormConfig: PdfFormConfig = {
   title: "Form I-9",
   templatePath: "/documents/i-9.pdf",
   downloadFilename: "i-9-filled.pdf",
-  pageCount: 4,
+  pageCount: 1,
   kind: "fillable",
   requiredRules: i9RequiredRules
 };

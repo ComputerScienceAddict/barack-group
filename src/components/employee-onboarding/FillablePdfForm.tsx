@@ -192,7 +192,8 @@ function ScrollablePdfPages({
     if (!document) return;
 
     let cancelled = false;
-    Promise.all(Array.from({ length: document.numPages }, (_, index) => document.getPage(index + 1)))
+    const pagesToRender = Math.max(1, Math.min(pageCount, document.numPages));
+    Promise.all(Array.from({ length: pagesToRender }, (_, index) => document.getPage(index + 1)))
       .then((loadedPages) => {
         if (!cancelled) setPages(loadedPages);
       })
@@ -201,7 +202,7 @@ function ScrollablePdfPages({
     return () => {
       cancelled = true;
     };
-  }, [document]);
+  }, [document, pageCount]);
 
   const visiblePages = useMemo(() => (document ? pages : []), [document, pages]);
 
