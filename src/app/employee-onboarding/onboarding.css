@@ -50,6 +50,8 @@ body {
   background: transparent;
   color: var(--ink);
   min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 button,
@@ -65,10 +67,11 @@ button {
 .siteLayout {
   width: min(1040px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 0 0 56px;
+  padding: 0 0 calc(56px + env(safe-area-inset-bottom, 0px));
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .siteHeader {
@@ -92,6 +95,14 @@ button {
   flex: 1;
 }
 
+.siteLogoStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .siteLogo {
   display: block;
   width: auto;
@@ -99,6 +110,18 @@ button {
   max-width: min(220px, 36vw);
   object-fit: contain;
   flex-shrink: 0;
+}
+
+.sitePartnerLogo {
+  display: block;
+  width: auto;
+  height: 32px;
+  max-width: min(148px, 40vw);
+  object-fit: contain;
+  padding: 6px 12px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 .siteBrandText {
@@ -454,7 +477,7 @@ button {
   bottom: 0;
   z-index: 20;
   margin-top: 20px;
-  padding: 14px 16px;
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -1467,8 +1490,10 @@ label {
   align-items: center;
   gap: 24px;
   width: 100%;
+  max-width: 100%;
   padding-bottom: 16px;
-  overflow: visible;
+  overflow-x: hidden;
+  overflow-y: visible;
   color-scheme: light only;
   background: #ffffff;
 }
@@ -1816,6 +1841,7 @@ label {
   .siteBrand {
     flex: 1 1 280px;
     min-width: 0;
+    align-items: center;
   }
 
   .siteBrandText {
@@ -1836,63 +1862,178 @@ label {
     height: 64px;
     max-width: min(200px, 34vw);
   }
+
+  .sitePartnerLogo {
+    height: 28px;
+    max-width: min(132px, 38vw);
+  }
 }
 
 @media (max-width: 640px) {
   .siteLayout {
-    width: min(100% - 20px, 1040px);
+    width: min(100% - 16px, 1040px);
+    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .siteMain {
+    padding-top: 16px;
   }
 
   .siteHeader {
     flex-direction: column;
     align-items: stretch;
+    padding: 14px 14px 16px;
   }
 
   .siteBrand {
     flex: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .siteLogoStack {
+    width: 100%;
   }
 
   .siteBrandText {
-    padding-left: 16px;
+    padding-left: 0;
+    border-left: none;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
   }
 
   .siteTitle {
-    font-size: 1.2rem;
+    font-size: 1.125rem;
+  }
+
+  .siteTagline {
+    font-size: 0.75rem;
   }
 
   .siteHeaderToolbar {
     width: 100%;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
     padding-top: 14px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
+  .siteLangToggle {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
   .langButton {
-    padding: 7px 11px;
+    flex: 1;
+    min-height: 44px;
+    padding: 8px 10px;
     font-size: 0.75rem;
   }
 
   .siteUtilityButton {
-    padding: 7px 12px;
+    min-height: 44px;
+    padding: 8px 14px;
     font-size: 0.75rem;
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .siteToolbarDivider {
+    display: none;
+  }
+
+  .siteLogo {
+    height: 58px;
+    max-width: min(240px, 78vw);
+  }
+
+  .sitePartnerLogo {
+    height: 26px;
+    max-width: min(128px, 62vw);
+  }
+
+  .stepNav {
+    padding: 14px 12px;
+    margin-bottom: 16px;
+  }
+
+  .stepNavMeta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .stepPillList {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding-bottom: 4px;
+    grid-template-columns: none;
+  }
+
+  .stepPillItem {
+    flex: 0 0 min(132px, 42vw);
+    scroll-snap-align: start;
+  }
+
+  .stepPill {
+    min-height: 72px;
+    padding: 10px 8px;
+  }
+
+  .stepPillLabel {
+    font-size: 0.65rem;
+    line-height: 1.2;
   }
 
   .formPanel,
   .stepNav {
-    padding: 16px;
+    padding: 14px 12px;
+    border-radius: var(--radius-md);
   }
 
-  .stepPillList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .formPanel {
+    padding-bottom: 20px;
   }
 
-  .stepPillLabel {
-    font-size: 0.62rem;
+  .formHeading {
+    font-size: 1.125rem;
+  }
+
+  .scrollablePdfViewer {
+    gap: 16px;
+  }
+
+  .pdfPageWrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    min-height: 48px;
+    font-size: 0.9375rem;
+  }
+
+  .stickyActionBar {
+    margin-left: -12px;
+    margin-right: -12px;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .stickyActionBar .actionRow {
     flex-direction: column-reverse;
     align-items: stretch;
+    gap: 10px;
   }
 
   .stickyActionBar .primaryButton,
@@ -1909,7 +2050,7 @@ label {
   .formCard,
   .formSection,
   .documentBody {
-    padding: 18px;
+    padding: 14px 12px;
   }
 
   .twoColumns {
@@ -1921,5 +2062,18 @@ label {
   .documentHeader {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .nameEntryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .directDepositChoiceButtons {
+    flex-direction: column;
+  }
+
+  .directDepositChoiceButtons .choiceButton {
+    width: 100%;
+    min-height: 48px;
   }
 }

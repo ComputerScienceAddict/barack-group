@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePDFDocument } from "react-acroform";
 import type { PDFPageProxy } from "pdfjs-dist";
 import LightPdfPage from "@/components/employee-onboarding/LightPdfPage";
@@ -28,10 +28,7 @@ export default function LightPdfViewer({
   const { document, loading, error } = usePDFDocument({ src, workerSrc });
 
   useEffect(() => {
-    if (!document) {
-      setPages([]);
-      return;
-    }
+    if (!document) return;
 
     let cancelled = false;
     Promise.all(Array.from({ length: document.numPages }, (_, index) => document.getPage(index + 1)))
@@ -45,15 +42,17 @@ export default function LightPdfViewer({
     };
   }, [document]);
 
+  const visiblePages = useMemo(() => (document ? pages : []), [document, pages]);
+
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || pages.length === 0) return;
+    if (!container || visiblePages.length === 0) return;
 
     const updateScale = () => {
       if (!active) return;
       const availableWidth = container.clientWidth - 24;
       if (availableWidth <= 0) return;
-      const pageWidth = pages[0].getViewport({ scale: 1 }).width;
+      const pageWidth = visiblePages[0].getViewport({ scale: 1 }).width;
       setScale(clamp(availableWidth / pageWidth, 0.45, 2.5));
     };
 
@@ -66,7 +65,7 @@ export default function LightPdfViewer({
       resizeObserver.disconnect();
       window.removeEventListener("resize", updateScale);
     };
-  }, [active, pages]);
+  }, [active, visiblePages]);
 
   if (loading) {
     return <p className="pdfFormHint">{t("loadingPdf")}</p>;
@@ -78,9 +77,9 @@ export default function LightPdfViewer({
 
   return (
     <div ref={containerRef} className="lightPdfViewer">
-      {pages.map((page, index) => (
+      {visiblePages.map((page, index) => (
         <div key={`light-page-${index + 1}`} className="pdfPageWrap">
-          <p className="pdfPageLabel">{t("pageOf", { current: index + 1, total: pages.length })}</p>
+          <p className="pdfPageLabel">{t("pageOf", { current: index + 1, total: visiblePages.length })}</p>
           <LightPdfPage page={page} scale={scale} />
         </div>
       ))}

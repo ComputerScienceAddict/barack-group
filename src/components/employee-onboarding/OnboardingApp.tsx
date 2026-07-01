@@ -27,7 +27,7 @@ import {
   type OnboardingFormId,
   type PdfFormConfig
 } from "@/lib/employee-onboarding/pdfForms";
-import { buildDirectDepositPdfBytes, getMissingDirectDepositIssues, normalizeDirectDepositValues, usesDirectDeposit, type DirectDepositValues } from "@/lib/employee-onboarding/directDeposit";
+import { buildDirectDepositPdfBytes, getMissingDirectDepositIssues, usesDirectDeposit, type DirectDepositValues } from "@/lib/employee-onboarding/directDeposit";
 import { buildOnboardingPacket, downloadPdfBytes } from "@/lib/employee-onboarding/fillPdf";
 import {
   EMPTY_APPLICANT_NAME,
@@ -35,11 +35,14 @@ import {
   normalizeApplicantName,
   type ApplicantName,
 } from "@/lib/employee-onboarding/applicantName";
-
-const STORAGE_VERSION = "11";
-const DRAFT_KEY = "newHireOnboardingDraft";
-const PACKET_KEY = "newHireOnboardingPacket";
-const VERSION_KEY = "newHireOnboardingVersion";
+import {
+  clearStoredOnboardingData,
+  EMPTY_FORM_VALUES,
+  readDraftSnapshot,
+  DRAFT_KEY,
+  PACKET_KEY,
+  type FormValuesState,
+} from "@/lib/employee-onboarding/loadDraft";
 
 const PACKET_SUMMARY_KEYS: MessageKey[] = [
   "packetItemEmployment",
@@ -54,15 +57,6 @@ const FORM_TITLE_KEYS: Record<OnboardingFormId, MessageKey> = {
   w4: "formW4",
   i9: "formI9",
   wh151: "formWh151"
-};
-
-type FormValuesState = Record<OnboardingFormId, Record<string, PdfFieldValue>>;
-
-const EMPTY_FORM_VALUES: FormValuesState = {
-  employment: {},
-  w4: {},
-  i9: {},
-  wh151: {}
 };
 
 function bytesToBase64(bytes: Uint8Array): string {
@@ -94,12 +88,6 @@ function applyApplicantPrefill(
   };
 }
 
-function clearStoredOnboardingData() {
-  window.localStorage.removeItem(DRAFT_KEY);
-  window.localStorage.removeItem(PACKET_KEY);
-  window.localStorage.setItem(VERSION_KEY, STORAGE_VERSION);
-}
-
 function getConfigForStep(formStep: number): PdfFormConfig | null {
   if (!isFormStep(formStep)) return null;
   return ONBOARDING_FORM_CONFIGS[getFormStepIndex(formStep)] ?? null;
@@ -115,13 +103,17 @@ export default function OnboardingApp() {
 
 function OnboardingAppContent() {
   const { locale, setLocale, t } = useLanguage();
-  const [step, setStep] = useState(0);
-  const [formValues, setFormValues] = useState<FormValuesState>(EMPTY_FORM_VALUES);
-  const [directDepositValues, setDirectDepositValues] = useState<DirectDepositValues>(EMPTY_DIRECT_DEPOSIT_VALUES);
-  const [applicantName, setApplicantName] = useState<ApplicantName>(EMPTY_APPLICANT_NAME);
+  const [initialDraft] = useState(readDraftSnapshot);
+  const [step, setStep] = useState(initialDraft.step);
+  const [formValues, setFormValues] = useState<FormValuesState>(initialDraft.formValues);
+  const [directDepositValues, setDirectDepositValues] = useState<DirectDepositValues>(
+    initialDraft.directDepositValues
+  );
+  const [applicantName, setApplicantName] = useState<ApplicantName>(initialDraft.applicantName);
   const [nameMissingKeys, setNameMissingKeys] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [messageIsError, setMessageIsError] = useState(false);
+  const [showDraftRestoredNotice, setShowDraftRestoredNotice] = useState(initialDraft.draftRestored);
   const [missingIssues, setMissingIssues] = useState<MissingFieldIssue[]>([]);
   const [missingFormStep, setMissingFormStep] = useState<number | null>(null);
   const pendingFocusRef = useRef<{ step: number; highlightKeys: string[]; scrollTarget: string } | null>(
@@ -178,44 +170,6 @@ function OnboardingAppContent() {
   }
 
   useEffect(() => {
-    const savedVersion = window.localStorage.getItem(VERSION_KEY);
-    if (savedVersion !== STORAGE_VERSION) {
-      clearStoredOnboardingData();
-      return;
-    }
-
-    try {
-      const raw = window.localStorage.getItem(DRAFT_KEY);
-      if (!raw) return;
-
-      const draft = JSON.parse(raw) as {
-        formValues?: FormValuesState;
-        directDepositValues?: DirectDepositValues;
-        applicantName?: ApplicantName;
-        step?: number;
-      };
-
-      if (draft.formValues) setFormValues(draft.formValues);
-      if (draft.directDepositValues) {
-        setDirectDepositValues(normalizeDirectDepositValues(draft.directDepositValues));
-      }
-      if (draft.applicantName) {
-        setApplicantName(normalizeApplicantName(draft.applicantName));
-      }
-      if (typeof draft.step === "number" && draft.step >= 0 && draft.step <= SUBMIT_STEP) {
-        setStep(draft.step);
-      }
-
-      setMessage(t("draftRestored"));
-      setMessageIsError(false);
-    } catch {
-      // Ignore corrupt draft payloads.
-    }
-    // Restore draft once on mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     formContentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [step]);
 
@@ -240,6 +194,8 @@ function OnboardingAppContent() {
     }, 150);
 
     return () => window.clearTimeout(timer);
+    // focusStepMissing uses refs; only re-run when navigation step changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   useEffect(() => {
@@ -263,6 +219,7 @@ function OnboardingAppContent() {
     setDirectDepositValues(EMPTY_DIRECT_DEPOSIT_VALUES);
     setApplicantName(EMPTY_APPLICANT_NAME);
     setNameMissingKeys([]);
+    setShowDraftRestoredNotice(false);
     setStep(NAME_ENTRY_STEP);
     setSubmitting(false);
     setMessage(t("hardResetDone"));
@@ -577,8 +534,12 @@ function OnboardingAppContent() {
     <div className="siteLayout">
       <header className="siteHeader">
         <div className="siteBrand">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/barak-group-logo.png" alt="Barak Group Inc." className="siteLogo" />
+          <div className="siteLogoStack">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/barak-group-logo.png" alt="Barak Group Inc." className="siteLogo" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/jani-king-logo.png" alt="Jani-King" className="sitePartnerLogo" />
+          </div>
           <div className="siteBrandText">
             <p className="siteEyebrow">{t("headerEyebrow")}</p>
             <h1 className="siteTitle">{t("headerTitle")}</h1>
@@ -622,6 +583,12 @@ function OnboardingAppContent() {
           totalSteps={TOTAL_STEPS}
           onJumpToStep={jumpToStep}
         />
+
+        {showDraftRestoredNotice && !message && (
+          <div className="notice noticeOk" role="status">
+            <p>{t("draftRestored")}</p>
+          </div>
+        )}
 
         {message && (
           <div className={messageIsError ? "notice noticeError" : "notice noticeOk"} role="status">

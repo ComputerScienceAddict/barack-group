@@ -148,10 +148,7 @@ function ScrollablePdfPages({
   const { fields, loading: fieldsLoading, error: fieldsError, radioGroups } = useFormFields({ document });
 
   useEffect(() => {
-    if (!document) {
-      setPages([]);
-      return;
-    }
+    if (!document) return;
 
     let cancelled = false;
     Promise.all(Array.from({ length: document.numPages }, (_, index) => document.getPage(index + 1)))
@@ -165,9 +162,11 @@ function ScrollablePdfPages({
     };
   }, [document]);
 
+  const visiblePages = useMemo(() => (document ? pages : []), [document, pages]);
+
   useEffect(() => {
     const root = fieldsRootRef.current;
-    if (!root || pages.length === 0) return;
+    if (!root || visiblePages.length === 0) return;
 
     const tuneFields = () => {
       applyRequiredFieldHighlight(root, highlightFields);
@@ -189,17 +188,17 @@ function ScrollablePdfPages({
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [fieldsRootRef, highlightFields, pages, fields]);
+  }, [fieldsRootRef, highlightFields, visiblePages, fields]);
 
   useEffect(() => {
     const container = fieldsRootRef.current;
-    if (!container || pages.length === 0) return;
+    if (!container || visiblePages.length === 0) return;
 
     const updateScale = () => {
       if (!active) return;
       const availableWidth = container.clientWidth - 24;
       if (availableWidth <= 0) return;
-      const pageWidth = pages[0].getViewport({ scale: 1 }).width;
+      const pageWidth = visiblePages[0].getViewport({ scale: 1 }).width;
       setScale(clamp(availableWidth / pageWidth, 0.5, 2.5));
     };
 
@@ -212,7 +211,7 @@ function ScrollablePdfPages({
       resizeObserver.disconnect();
       window.removeEventListener("resize", updateScale);
     };
-  }, [active, fieldsRootRef, pages]);
+  }, [active, fieldsRootRef, visiblePages]);
 
   if (loading) {
     return <p className="pdfFormHint">{t("loadingPdf")}</p>;
@@ -231,9 +230,9 @@ function ScrollablePdfPages({
       {fieldsError && (
         <p className="pdfFormError">{t("fieldsLoadFailed", { message: fieldsError.message })}</p>
       )}
-      {pages.map((page, index) => (
+      {visiblePages.map((page, index) => (
         <div key={`page-wrap-${index + 1}`} className="pdfPageWrap">
-          <p className="pdfPageLabel">{t("pageOf", { current: index + 1, total: pages.length })}</p>
+          <p className="pdfPageLabel">{t("pageOf", { current: index + 1, total: visiblePages.length })}</p>
           <AcroPdfPage
             page={page}
             pageNumber={index + 1}
