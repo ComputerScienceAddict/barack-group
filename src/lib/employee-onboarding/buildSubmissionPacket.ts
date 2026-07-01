@@ -26,7 +26,6 @@ export function normalizeSubmissionFormValues(
     w4: formValues.w4 ?? {},
     i9: formValues.i9 ?? {},
     wh151: formValues.wh151 ?? {},
-    wh153: formValues.wh153 ?? {},
   };
 }
 

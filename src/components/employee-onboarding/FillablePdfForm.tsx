@@ -182,6 +182,17 @@ function ScrollablePdfPages({
     return mapWh153PdfKeysToOverlay(wh153Overlay.mapping, highlightFields);
   }, [highlightFields, wh153Overlay]);
 
+  const highlightConfigKey = useMemo(
+    () =>
+      [
+        resolvedHighlightFields.join("\u0001"),
+        highlightPages?.join(",") ?? "",
+        emphasisFields?.join("\u0001") ?? "",
+        displayFields.length,
+      ].join("|"),
+    [displayFields.length, emphasisFields, highlightPages, resolvedHighlightFields]
+  );
+
   useEffect(() => {
     if (wh153Overlay) {
       onWh153Mapping?.(wh153Overlay.mapping);
@@ -230,7 +241,7 @@ function ScrollablePdfPages({
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [emphasisFields, fieldsRootRef, highlightPages, resolvedHighlightFields, visiblePages, displayFields]);
+  }, [fieldsRootRef, highlightConfigKey, visiblePages.length]);
 
   useEffect(() => {
     const container = fieldsRootRef.current;

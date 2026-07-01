@@ -78,8 +78,8 @@ const payload = {
       "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]": "0",
       "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]": "0",
       "topmostSubform[0].Page1[0].f1_08[0]": "0",
-      "topmostSubform[0].Page1[0].f1_12[0]": "John Doe",
-      "topmostSubform[0].Page1[0].f1_13[0]": TODAY,
+      employee_signature_step5: "John Doe",
+      employee_date_step5: TODAY,
     },
     i9: {
       "Last Name (Family Name)": "Doe",
@@ -99,14 +99,6 @@ const payload = {
     wh151: {
       Text440: "John Doe",
       Text441: TODAY,
-    },
-    wh153: {
-      "nombre del empleado": "John Doe",
-      "nombre del empleador": "Barak Group Inc.",
-      fecha: TODAY,
-      casilla: true,
-      "Pago por Hora": "15.00",
-      renglon: "Line 1 test",
     },
   },
   directDepositValues: { wantsDirectDeposit: false },

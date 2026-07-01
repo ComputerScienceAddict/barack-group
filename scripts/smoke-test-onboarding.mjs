@@ -8,10 +8,8 @@ const requiredFiles = [
   "src/components/employee-onboarding/OnboardingApp.tsx",
   "src/components/employee-onboarding/OnboardingStepNav.tsx",
   "src/lib/employee-onboarding/pdfForms.ts",
-  "src/lib/employee-onboarding/wh153Fields.ts",
   "public/documents/janiking-employment-application-english.pdf",
   "public/documents/janiking-employment-application-spanish.pdf",
-  "public/documents/wh-153s-2024.pdf",
   "package.json",
 ];
 
@@ -37,11 +35,10 @@ const pdfForms = fs.readFileSync(
 
 const checks = [
   ["employee onboarding route", onboardingApp.includes("OnboardingAppContent")],
-  ["wh153 form step", onboardingApp.includes("formWh153")],
-  ["wh153 packet summary", onboardingApp.includes("packetItemWh153")],
-  ["wh153 before direct deposit", onboardingApp.includes("FORM_START_STEP + 4")],
+  ["wh151 form step", onboardingApp.includes("formWh151")],
+  ["wh151 packet summary", onboardingApp.includes("packetItemWh151")],
   ["dynamic packet build", onboardingApp.includes("getOnboardingFormConfigs")],
-  ["step nav wh153", stepNav.includes("stepNameWh153")],
+  ["step nav wh151", stepNav.includes("stepNameWh151")],
   ["hiring redirect", hiringPage.includes('redirect("/employee-onboarding")')],
   ["locale employment configs", pdfForms.includes("getEmploymentFormConfig")],
   ["locale employment switch", onboardingApp.includes("handleLocaleChange")],
@@ -55,4 +52,4 @@ if (failed.length) {
   process.exit(1);
 }
 
-console.log("Onboarding smoke test passed. Employee onboarding flow and WH-153S are wired.");
+console.log("Onboarding smoke test passed. Employee onboarding flow is wired.");

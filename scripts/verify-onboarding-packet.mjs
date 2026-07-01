@@ -14,22 +14,15 @@ const PACKET_TEMPLATES = [
   "w-4.pdf",
   "i-9.pdf",
   "wh-151ps-2024.pdf",
-  "wh-153s-2024.pdf",
 ];
 
-/** One employment form + the shared forms in each submitted packet. */
-const EXPECTED_FORM_PAGE_COUNT = 14;
+/** One employment form + W-4 (5) + I-9 (4) + WH-151 (2) = 12 pages per packet with English employment. */
+const EXPECTED_FORM_PAGE_COUNT = 12;
 
 async function countPdfPages(filePath) {
   const bytes = fs.readFileSync(filePath);
   const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
   return doc.getPageCount();
-}
-
-async function countWh153Fields(filePath) {
-  const bytes = fs.readFileSync(filePath);
-  const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
-  return doc.getForm().getFields().length;
 }
 
 const missingTemplates = [...EMPLOYMENT_TEMPLATES, ...PACKET_TEMPLATES].filter(
@@ -59,13 +52,6 @@ if (formPageCount !== EXPECTED_FORM_PAGE_COUNT) {
   process.exit(1);
 }
 
-const wh153Path = path.join(docsDir, "wh-153s-2024.pdf");
-const wh153FieldCount = await countWh153Fields(wh153Path);
-if (wh153FieldCount < 10) {
-  console.error(`WH-153S PDF has too few fillable fields: ${wh153FieldCount}`);
-  process.exit(1);
-}
-
 const pdfFormsSource = fs.readFileSync(
   path.join(root, "src/lib/employee-onboarding/pdfForms.ts"),
   "utf8"
@@ -79,11 +65,11 @@ const onboardingAppSource = fs.readFileSync(
   path.join(root, "src/components/employee-onboarding/OnboardingApp.tsx"),
   "utf8"
 );
-if (!onboardingAppSource.includes("formWh153") || !onboardingAppSource.includes("packetItemWh153")) {
-  console.error("OnboardingApp.tsx is missing WH-153S packet integration");
+if (!onboardingAppSource.includes("formWh151") || !onboardingAppSource.includes("packetItemWh151")) {
+  console.error("OnboardingApp.tsx is missing WH-151PS packet integration");
   process.exit(1);
 }
 
 console.log(
-  `verify-onboarding-packet passed (${formPageCount} form pages, WH-153S has ${wh153FieldCount} fields).`
+  `verify-onboarding-packet passed (${formPageCount} form pages).`
 );

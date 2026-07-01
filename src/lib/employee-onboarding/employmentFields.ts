@@ -228,9 +228,34 @@ function employmentTextValidateFields(
   return allKeys.filter((key) => !checkboxFields.has(key));
 }
 
+/** "For Company Use Only" fields — filled by employer, not highlighted for the applicant. */
+const EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS = new Set([
+  "interviewed_by",
+  "company_date",
+  "position_offered",
+  "start_date",
+  "company_notes",
+]);
+
+const EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS = new Set([
+  "entrevistado_por",
+  "fecha_entrevista",
+  "puesto_ofrecido",
+  "fecha_inicio",
+  "notas",
+]);
+
+const EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS = EMPLOYMENT_ENGLISH_FIELD_KEYS.filter(
+  (k) => !EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS.has(k)
+);
+
+const EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS = EMPLOYMENT_SPANISH_FIELD_KEYS.filter(
+  (k) => !EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS.has(k)
+);
+
 export const employmentSpanishRequiredRules: RequiredFieldRules = {
   highlightFields: mergeHighlightFields(
-    EMPLOYMENT_SPANISH_FIELD_KEYS,
+    EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS,
     EMPLOYMENT_SPANISH_CONTACT_HIGHLIGHT_FIELDS
   ),
   validateFields: employmentTextValidateFields(
@@ -242,7 +267,7 @@ export const employmentSpanishRequiredRules: RequiredFieldRules = {
 
 export const employmentEnglishRequiredRules: RequiredFieldRules = {
   highlightFields: mergeHighlightFields(
-    EMPLOYMENT_ENGLISH_FIELD_KEYS,
+    EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS,
     EMPLOYMENT_ENGLISH_CONTACT_HIGHLIGHT_FIELDS
   ),
   validateFields: employmentTextValidateFields(

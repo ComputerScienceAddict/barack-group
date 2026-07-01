@@ -11,7 +11,6 @@ import { getMissingFieldIssues } from "../src/lib/employee-onboarding/fieldLabel
 import { i9RequiredRules } from "../src/lib/employee-onboarding/requiredFields";
 import { w4EnglishRequiredRules } from "../src/lib/employee-onboarding/w4Fields";
 import { wh151RequiredRules } from "../src/lib/employee-onboarding/requiredFields";
-import { wh153RequiredRules } from "../src/lib/employee-onboarding/wh153Fields";
 import type { FormValuesState } from "../src/lib/employee-onboarding/loadDraft";
 import type { DirectDepositValues } from "../src/lib/employee-onboarding/directDeposit";
 
@@ -87,8 +86,8 @@ const johnDoeFormValues: FormValuesState = {
     "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]": "0",
     "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]": "0",
     "topmostSubform[0].Page1[0].f1_08[0]": "0",
-    "topmostSubform[0].Page1[0].f1_12[0]": "John Doe",
-    "topmostSubform[0].Page1[0].f1_13[0]": TODAY,
+    employee_signature_step5: "John Doe",
+    employee_date_step5: TODAY,
   },
   i9: {
     "Last Name (Family Name)": "Doe",
@@ -108,14 +107,6 @@ const johnDoeFormValues: FormValuesState = {
   wh151: {
     Text440: "John Doe",
     Text441: TODAY,
-  },
-  wh153: {
-    "nombre del empleado": "John Doe",
-    "nombre del empleador": "Barak Group Inc.",
-    fecha: TODAY,
-    casilla: true,
-    "Pago por Hora": "15.00",
-    renglon: "Line 1 test",
   },
 };
 
@@ -155,7 +146,6 @@ const rulesByForm = [
   ["w4", w4EnglishRequiredRules, johnDoeFormValues.w4],
   ["i9", i9RequiredRules, johnDoeFormValues.i9],
   ["wh151", wh151RequiredRules, johnDoeFormValues.wh151],
-  ["wh153", wh153RequiredRules, johnDoeFormValues.wh153],
 ] as const;
 
 for (const [name, rules, values] of rulesByForm) {
@@ -168,7 +158,7 @@ for (const [name, rules, values] of rulesByForm) {
 const packetResult = await buildSubmissionPacket(johnDoeFormValues, directDeposit, "en");
 console.log(`\n✓ Packet built: ${packetResult.pageCount} pages`);
 
-const formNames = ["employment", "w4", "i9", "wh151", "wh153"] as const;
+const formNames = ["employment", "w4", "i9", "wh151"] as const;
 for (let i = 0; i < packetResult.formResults.length; i++) {
   const result = packetResult.formResults[i];
   const name = formNames[i];
@@ -178,10 +168,10 @@ for (let i = 0; i < packetResult.formResults.length; i++) {
   assert(result.filledCount > 0, `${name} filledCount is 0 — edits not saved to PDF`);
 }
 
-assert(packetResult.pageCount >= 14, `Expected at least 14 pages, got ${packetResult.pageCount}`);
+assert(packetResult.pageCount >= 9, `Expected at least 9 pages, got ${packetResult.pageCount}`);
 
 const totalVerified = packetResult.formResults.reduce((sum, r) => sum + r.verifiedCount, 0);
-assert(totalVerified >= 60, `Expected at least 60 verified fields in packet, got ${totalVerified}`);
+assert(totalVerified >= 40, `Expected at least 40 verified fields in packet, got ${totalVerified}`);
 
 const outPath = path.join(process.cwd(), "scripts", "john-doe-workdocs-test.pdf");
 fs.writeFileSync(outPath, packetResult.pdfBytes);

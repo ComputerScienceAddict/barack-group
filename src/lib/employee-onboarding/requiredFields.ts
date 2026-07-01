@@ -186,6 +186,18 @@ function shouldEmphasizePdfField(
   emphasisFields?: readonly string[]
 ): boolean {
   if (emphasisFields?.includes(name)) return true;
+  if (emphasisFields) return false;
+  return isSocialSecurityPdfFieldName(name) || isTelephonePdfFieldName(name);
+}
+
+function shouldHighlightPdfField(
+  name: string,
+  required: ReadonlySet<string>,
+  emphasisFields?: readonly string[]
+): boolean {
+  if (required.has(name)) return true;
+  if (emphasisFields?.includes(name)) return true;
+  if (emphasisFields) return false;
   return isSocialSecurityPdfFieldName(name) || isTelephonePdfFieldName(name);
 }
 
@@ -203,7 +215,7 @@ export function applyRequiredFieldHighlight(
     const name = fieldEl.getAttribute("data-field-name");
     if (!name) return;
 
-    let shouldHighlight = required.has(name) || shouldEmphasizePdfField(name, emphasisFields);
+    let shouldHighlight = shouldHighlightPdfField(name, required, emphasisFields);
     if (shouldHighlight && pageFilter) {
       const pageNumber = getPdfFieldPageNumber(fieldEl);
       shouldHighlight = pageNumber !== null && pageFilter.has(pageNumber);

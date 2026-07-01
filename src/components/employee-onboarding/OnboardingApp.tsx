@@ -53,7 +53,6 @@ const PACKET_SUMMARY_KEYS: MessageKey[] = [
   "packetItemW4",
   "packetItemI9",
   "packetItemWh151",
-  "packetItemWh153",
   "packetItemDirectDeposit",
 ];
 
@@ -62,7 +61,6 @@ const FORM_TITLE_KEYS: Record<OnboardingFormId, MessageKey> = {
   w4: "formW4",
   i9: "formI9",
   wh151: "formWh151",
-  wh153: "formWh153",
 };
 
 function applyApplicantPrefill(
@@ -81,6 +79,8 @@ function applyApplicantPrefill(
     "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]": name.lastName,
     "topmostSubform[0].Page1[0].Paso1a[0].f1_01[0]": name.firstName,
     "topmostSubform[0].Page1[0].Paso1a[0].f1_02[0]": name.lastName,
+    employee_signature_step5: `${name.firstName} ${name.lastName}`,
+    employee_signature_step5_sp: `${name.firstName} ${name.lastName}`,
   };
 
   return {
@@ -98,11 +98,6 @@ function applyApplicantPrefill(
       "First Name Given Name from Section 1": name.firstName,
       "First Name Given Name": name.firstName,
       "Last Name Family Name from Section 1": name.lastName,
-    },
-    wh153: {
-      ...current.wh153,
-      "nombre del empleado": `${name.firstName} ${name.lastName}`,
-      "nombre del empleador": "Barak Group Inc.",
     },
   };
 }
@@ -141,7 +136,6 @@ function OnboardingAppContent() {
   const w4FormRef = useRef<FillablePdfFormHandle>(null);
   const i9FormRef = useRef<FillablePdfFormHandle>(null);
   const wh151FormRef = useRef<FillablePdfFormHandle>(null);
-  const wh153FormRef = useRef<FillablePdfFormHandle>(null);
   const directDepositFormRef = useRef<DirectDepositFormHandle>(null);
 
   const getConfigForStep = useCallback(
@@ -180,17 +174,12 @@ function OnboardingAppContent() {
     (values: Record<string, PdfFieldValue>) => updateFormValues("wh151", values),
     [updateFormValues]
   );
-  const updateWh153Values = useCallback(
-    (values: Record<string, PdfFieldValue>) => updateFormValues("wh153", values),
-    [updateFormValues]
-  );
 
   function getFormRef(formId: OnboardingFormId) {
     if (formId === "employment") return employmentFormRef;
     if (formId === "w4") return w4FormRef;
     if (formId === "i9") return i9FormRef;
     if (formId === "wh151") return wh151FormRef;
-    if (formId === "wh153") return wh153FormRef;
     return null;
   }
 
@@ -263,7 +252,6 @@ function OnboardingAppContent() {
     w4FormRef.current?.clearMissingMarks();
     i9FormRef.current?.clearMissingMarks();
     wh151FormRef.current?.clearMissingMarks();
-    wh153FormRef.current?.clearMissingMarks();
     directDepositFormRef.current?.clearMissingMarks();
   }
 
@@ -495,7 +483,6 @@ function OnboardingAppContent() {
         w4Result,
         i9Result,
         wh151Result,
-        wh153Result,
       ] = packetResult.formResults;
 
       let emailSent = false;
@@ -548,7 +535,6 @@ function OnboardingAppContent() {
               w4Saved: w4Result.filledCount,
               i9Saved: i9Result.filledCount,
               whSaved: wh151Result.filledCount,
-              wh153Saved: wh153Result.filledCount,
               directDepositNote: usesDirectDeposit(flushedDirectDeposit)
                 ? t("submitSuccessDirectDepositIncluded")
                 : t("submitSuccessDirectDepositSkipped"),
@@ -756,23 +742,6 @@ function OnboardingAppContent() {
               values={formValues.wh151}
               onChange={updateWh151Values}
               active={step === FORM_START_STEP + 3}
-            />
-          </section>
-
-          <section
-            className="formSection"
-            style={{ display: step === FORM_START_STEP + 4 ? "block" : "none" }}
-            aria-hidden={step !== FORM_START_STEP + 4}
-          >
-            <h2 className="formHeading">{t("formWh153")}</h2>
-            <p className="formSubheading">{t("embeddedPdfHint")}</p>
-            <FillablePdfForm
-              key={`wh153-${formSession}`}
-              ref={wh153FormRef}
-              config={formConfigs[4]}
-              values={formValues.wh153}
-              onChange={updateWh153Values}
-              active={step === FORM_START_STEP + 4}
             />
           </section>
 

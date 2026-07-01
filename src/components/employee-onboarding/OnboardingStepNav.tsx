@@ -9,7 +9,6 @@ const STEP_NAV_KEYS: MessageKey[] = [
   "stepNameW4",
   "stepNameI9",
   "stepNameWh151",
-  "stepNameWh153",
   "stepNameDirectDeposit",
   "stepNameSubmit",
 ];

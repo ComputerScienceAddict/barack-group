@@ -15,7 +15,7 @@ import {
   type OnboardingFormId,
 } from "@/lib/employee-onboarding/pdfForms";
 
-export const STORAGE_VERSION = "15";
+export const STORAGE_VERSION = "16";
 export const DRAFT_KEY = "newHireOnboardingDraft";
 export const PACKET_KEY = "newHireOnboardingPacket";
 export const VERSION_KEY = "newHireOnboardingVersion";
@@ -27,7 +27,6 @@ export const EMPTY_FORM_VALUES: FormValuesState = {
   w4: {},
   i9: {},
   wh151: {},
-  wh153: {},
 };
 
 export type DraftSnapshot = {

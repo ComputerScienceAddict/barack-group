@@ -33,6 +33,9 @@ const en = {
   fieldEmployeeDate: "Today's date (employee)",
   fieldCitizenship: "Citizenship / immigration status (pick one checkbox)",
   fieldW4FilingStatus: "Filing status (pick one checkbox)",
+  fieldW4Step3a: "Step 3(a) — qualifying children under age 17",
+  fieldW4Step3b: "Step 3(b) — other dependents",
+  fieldW4Step3Total: "Step 3 — total of 3(a) and 3(b)",
   fieldWorkerSignature: "Worker signature / name",
   fieldDateReceived: "Date received",
   fieldWh153EmployeeName: "Employee name",
@@ -126,7 +129,7 @@ const en = {
   submitting: "Submitting...",
   submitDownload: "Submit and download combined PDF",
   submitSuccess:
-    "Submitted. Confirmation ID: {id}. Combined PDF downloaded and emailed ({pageCount} pages; Employment: {employmentSaved} fields; W-4: {w4Saved}; I-9: {i9Saved}; WH-151PS: {whSaved}; WH-153S: {wh153Saved}{directDepositNote}).",
+    "Submitted. Confirmation ID: {id}. Combined PDF downloaded and emailed ({pageCount} pages; Employment: {employmentSaved} fields; W-4: {w4Saved}; I-9: {i9Saved}; WH-151PS: {whSaved}{directDepositNote}).",
   submitEmailFailed:
     "Your PDF was downloaded, but the email could not be sent. Please contact HR with your downloaded file.",
   nameEntryTitle: "Employee information",
@@ -203,6 +206,9 @@ const es: Record<keyof typeof en, string> = {
   fieldEmployeeDate: "Fecha de hoy (empleado)",
   fieldCitizenship: "Ciudadanía / estatus migratorio (marque una casilla)",
   fieldW4FilingStatus: "Estado civil para retenciones (marque una casilla)",
+  fieldW4Step3a: "Paso 3(a) — hijos calificados menores de 17 años",
+  fieldW4Step3b: "Paso 3(b) — otros dependientes",
+  fieldW4Step3Total: "Paso 3 — total de 3(a) y 3(b)",
   fieldWorkerSignature: "Firma / nombre del trabajador",
   fieldDateReceived: "Fecha recibida",
   fieldWh153EmployeeName: "Nombre del empleado",
@@ -297,7 +303,7 @@ const es: Record<keyof typeof en, string> = {
   submitting: "Enviando...",
   submitDownload: "Enviar y descargar PDF combinado",
   submitSuccess:
-    "Enviado. ID de confirmación: {id}. PDF combinado descargado y enviado por correo ({pageCount} páginas; Solicitud: {employmentSaved} campos; W-4: {w4Saved}; I-9: {i9Saved}; WH-151PS: {whSaved}; WH-153S: {wh153Saved}{directDepositNote}).",
+    "Enviado. ID de confirmación: {id}. PDF combinado descargado y enviado por correo ({pageCount} páginas; Solicitud: {employmentSaved} campos; W-4: {w4Saved}; I-9: {i9Saved}; WH-151PS: {whSaved}{directDepositNote}).",
   submitEmailFailed:
     "Su PDF se descargó, pero no se pudo enviar el correo. Comuníquese con RR. HH. con el archivo descargado.",
   nameEntryTitle: "Información del empleado",

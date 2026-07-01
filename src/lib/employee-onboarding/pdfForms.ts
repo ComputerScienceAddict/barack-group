@@ -7,7 +7,6 @@ import {
 } from "@/lib/employee-onboarding/requiredFields";
 import { w4EnglishRequiredRules, w4SpanishRequiredRules } from "@/lib/employee-onboarding/w4Fields";
 import { employmentEnglishRequiredRules, employmentSpanishRequiredRules } from "@/lib/employee-onboarding/employmentFields";
-import { wh153RequiredRules } from "@/lib/employee-onboarding/wh153Fields";
 import type { Locale } from "@/lib/employee-onboarding/i18n";
 
 export type PdfFormKind = "fillable";
@@ -57,7 +56,6 @@ export function getOnboardingFormConfigs(locale: Locale): readonly PdfFormConfig
     getW4FormConfig(locale),
     i9FormConfig,
     wh151FormConfig,
-    wh153FormConfig,
   ];
 }
 
@@ -108,22 +106,11 @@ export const wh151FormConfig: PdfFormConfig = {
   requiredRules: wh151RequiredRules
 };
 
-export const wh153FormConfig: PdfFormConfig = {
-  id: "wh153",
-  title: "WH-153S Wage Notice",
-  templatePath: "/documents/wh-153s-2024.pdf",
-  downloadFilename: "wh-153s-filled.pdf",
-  pageCount: 2,
-  kind: "fillable",
-  requiredRules: wh153RequiredRules,
-};
-
 export const ONBOARDING_FORM_CONFIGS = [
   employmentEnglishFormConfig,
   w4EnglishFormConfig,
   i9FormConfig,
   wh151FormConfig,
-  wh153FormConfig,
 ] as const;
 
 export type OnboardingFormId = (typeof ONBOARDING_FORM_CONFIGS)[number]["id"];
