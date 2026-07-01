@@ -11,8 +11,30 @@ const navLinks = [
   { href: "/industries", label: "Industries" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
-  { href: "/hiring", label: "New Hire" },
+  { href: "/employee-onboarding", label: "New Hire" },
 ];
+
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <span className="relative block h-4 w-5" aria-hidden>
+      <span
+        className={`absolute left-0 top-0 h-0.5 w-5 rounded-full bg-current transition duration-200 ${
+          open ? "top-[7px] rotate-45" : ""
+        }`}
+      />
+      <span
+        className={`absolute left-0 top-[7px] h-0.5 w-5 rounded-full bg-current transition duration-200 ${
+          open ? "opacity-0" : ""
+        }`}
+      />
+      <span
+        className={`absolute left-0 top-[14px] h-0.5 w-5 rounded-full bg-current transition duration-200 ${
+          open ? "top-[7px] -rotate-45" : ""
+        }`}
+      />
+    </span>
+  );
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -50,7 +72,7 @@ export function SiteHeader() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link href="/" className="flex shrink-0 items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Barak Group Inc." className="h-9 w-auto" />
+            <img src="/logo.png" alt="Barak Group Inc." className="h-12 w-auto sm:h-14" />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
@@ -73,10 +95,15 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-sm text-slate-300 lg:hidden"
-            aria-label="Toggle menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            className={`flex h-11 w-11 items-center justify-center rounded-lg border transition lg:hidden ${
+              open
+                ? "border-amber-300/30 bg-amber-300/10 text-amber-100"
+                : "border-white/12 bg-white/[0.04] text-slate-200 hover:border-white/20 hover:bg-white/[0.07] hover:text-white"
+            }`}
           >
-            {open ? "Close" : "Menu"}
+            <MenuIcon open={open} />
           </button>
         </div>
       </div>

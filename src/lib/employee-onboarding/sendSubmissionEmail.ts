@@ -1,0 +1,68 @@
+import nodemailer from "nodemailer";
+import {
+  buildWorkDocumentsFilename,
+  buildWorkDocumentsSubject,
+  normalizeApplicantName,
+  type ApplicantName,
+} from "@/lib/employee-onboarding/applicantName";
+
+export type SendSubmissionEmailInput = {
+  applicantName: ApplicantName;
+  pdfBytes: Buffer;
+  packetId?: string;
+};
+
+function parseRecipientList(raw: string): string[] {
+  return raw
+    .split(/[,;]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function getSmtpConfig() {
+  const host = process.env.SMTP_HOST ?? "smtp.gmail.com";
+  const port = Number(process.env.SMTP_PORT ?? "587");
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS?.replace(/\s+/g, "");
+  const toRaw = process.env.SMTP_TO;
+
+  if (!user || !pass || !toRaw) {
+    throw new Error("SMTP is not configured. Set SMTP_USER, SMTP_PASS, and SMTP_TO.");
+  }
+
+  const to = parseRecipientList(toRaw);
+  if (to.length === 0) {
+    throw new Error("SMTP_TO must include at least one recipient email.");
+  }
+
+  return { host, port, user, pass, to };
+}
+
+export async function sendSubmissionEmail(input: SendSubmissionEmailInput) {
+  const applicantName = normalizeApplicantName(input.applicantName);
+  const { host, port, user, pass, to } = getSmtpConfig();
+  const subject = buildWorkDocumentsSubject(applicantName);
+  const filename = buildWorkDocumentsFilename(applicantName);
+
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  });
+
+  await transporter.sendMail({
+    from: `"Barak Group Onboarding" <${user}>`,
+    to,
+    replyTo: user,
+    subject,
+    text: "",
+    attachments: [
+      {
+        filename,
+        content: input.pdfBytes,
+        contentType: "application/pdf",
+      },
+    ],
+  });
+}

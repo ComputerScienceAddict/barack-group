@@ -2,47 +2,48 @@
 
 import Image from "next/image";
 import { HeroBeforeAfter } from "@/components/hero-before-after";
-import { Lightning } from "@/components/lightning";
 import { AnimatedContent } from "@/components/reactbits";
 import { ButtonLink } from "@/components/ui/button-link";
 import { heroImage } from "@/lib/site-data";
 
 export function HomeHero() {
   return (
-    <section className="relative overflow-hidden bg-[#06080f] text-white">
-      <Image src={heroImage.src} alt={heroImage.alt} fill priority className="object-cover object-center opacity-[0.08]" />
-      <div className="pointer-events-none absolute inset-0 opacity-90">
-        <Lightning hue={220} xOffset={0} speed={1} intensity={0.9} size={1} />
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-br from-[#06080f]/85 via-[#06080f]/70 to-[#0a1628]/90" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_0%_0%,rgba(37,99,235,0.2),transparent_60%)]" />
+    <section className="hero-vintage-bg relative overflow-hidden text-white">
+      <Image
+        src={heroImage.src}
+        alt={heroImage.alt}
+        fill
+        priority
+        className="hero-vintage-image object-cover object-center"
+      />
 
-      <div className="relative mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
-        <div className="grid w-full gap-10 lg:grid-cols-2 lg:items-center lg:gap-12">
-          <div className="space-y-7">
-            <div className="space-y-5">
-              <p className="font-display text-[11px] font-bold uppercase tracking-[0.2em] text-blue-400">
-                Barak Group · Est. 2018
-              </p>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#06080f]/90 via-[#080a12]/75 to-[#06080f]/95" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_20%_0%,rgba(59,130,246,0.12),transparent_60%)]" />
+      <div className="hero-vintage-grain pointer-events-none absolute inset-0" />
+      <div className="hero-vintage-vignette pointer-events-none absolute inset-0" />
 
-              <h1 className="font-display text-[clamp(2.5rem,6vw,4.75rem)] font-bold leading-[0.92] tracking-tight">
-                <span className="block text-white">CLEANING &</span>
-                <span className="block text-white">MAINTENANCE</span>
-                <span className="mt-2 block text-blue-400 italic">you can count on.</span>
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+        <div className="grid w-full gap-12 lg:grid-cols-2 lg:items-center lg:gap-14">
+          <div className="space-y-8">
+            <div className="max-w-xl space-y-5">
+              <h1 className="font-display text-[clamp(2.25rem,5.5vw,3.5rem)] font-semibold leading-[1.1] tracking-tight text-white">
+                Cleaning & maintenance{" "}
+                <span className="text-blue-400">you can count on.</span>
               </h1>
 
-              <div className="max-w-md space-y-3">
-                <p className="text-lg font-semibold leading-snug text-white">
+              <div className="space-y-2.5">
+                <p className="font-accent text-[1.2rem] font-medium italic leading-snug text-slate-200 sm:text-[1.35rem]">
                   Stadium nights. Job-site mornings. We show up either way.
                 </p>
-                <p className="text-sm leading-6 text-slate-400">
+
+                <p className="text-[15px] leading-relaxed text-slate-400">
                   Commercial janitorial and specialty cleaning across Oregon, Utah, and Idaho.
                 </p>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-3">
+            <div className="space-y-5 pt-1">
+              <div className="flex flex-wrap items-center gap-4">
                 <ButtonLink href="/contact#quote" size="lg">
                   Get a free quote
                 </ButtonLink>
@@ -50,8 +51,8 @@ export function HomeHero() {
                   View services
                 </ButtonLink>
               </div>
-              <p className="text-sm text-slate-500">
-                Background-checked crews · Free walkthrough · Photo reports
+              <p className="text-[13px] leading-5 tracking-wide text-slate-500">
+                Est. 2018 · Background-checked crews · Free walkthrough · Photo reports
               </p>
             </div>
           </div>

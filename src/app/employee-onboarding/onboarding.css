@@ -1,0 +1,1925 @@
+:root {
+  color-scheme: light only;
+  --background: #f4f7fb;
+  --surface: #ffffff;
+  --ink: #0c1b33;
+  --muted: #5b6b82;
+  --line: #d8e0ec;
+  --brand: #0c2340;
+  --brand-mid: #1e4a7a;
+  --brand-soft: #e8f0fa;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --success: #047857;
+  --success-soft: #d1fae5;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --shadow-sm: 0 1px 3px rgba(12, 35, 64, 0.06);
+  --shadow-md: 0 8px 30px rgba(12, 35, 64, 0.08);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --font-sans: var(--font-sans), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light only;
+  background-color: var(--background);
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse 120% 80% at 50% -20%, #dce8f8 0%, transparent 55%), var(--background);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+.onboardingBody {
+  color-scheme: light only;
+  background: transparent;
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.siteLayout {
+  width: min(1040px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 0 0 56px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.siteHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 8px;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #050608 0%, #0c1524 52%, #0f1f38 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px rgba(6, 12, 24, 0.28);
+}
+
+.siteBrand {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-width: 0;
+  flex: 1;
+}
+
+.siteLogo {
+  display: block;
+  width: auto;
+  height: 72px;
+  max-width: min(220px, 36vw);
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.siteBrandText {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding-left: 22px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.siteEyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(96, 165, 250, 0.95);
+}
+
+.siteTitle {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  line-height: 1.15;
+}
+
+.siteTagline {
+  margin: 2px 0 0;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-weight: 400;
+  line-height: 1.4;
+  max-width: 28ch;
+}
+
+.siteHeaderToolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.siteLangToggle {
+  display: inline-flex;
+  align-items: stretch;
+  padding: 3px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+}
+
+.langButton {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.langButton:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.langButtonActive {
+  color: #0c2340;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.langButtonActive:hover {
+  color: #0c2340;
+  background: #f0f4fa;
+}
+
+.siteToolbarDivider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.14);
+  flex-shrink: 0;
+}
+
+.siteUtilityButton {
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.siteUtilityButton:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.headerDivider {
+  display: none;
+}
+
+.textButton {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.textButton:hover {
+  color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.textButtonActive {
+  color: var(--surface);
+  background: var(--brand);
+}
+
+.textButtonActive:hover {
+  color: var(--surface);
+  background: var(--brand-mid);
+}
+
+.siteMain {
+  padding-top: 24px;
+  flex: 1;
+}
+
+.stepNav {
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.stepNavMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.stepNavCount {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.stepNavPercent {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.stepProgressTrack {
+  height: 6px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  background: var(--brand-soft);
+  border-radius: 999px;
+}
+
+.stepProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-mid), var(--accent));
+  border-radius: inherit;
+  transition: width 280ms ease;
+}
+
+.stepPillList {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stepPillItem {
+  min-width: 0;
+}
+
+.stepPill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+  color: var(--muted);
+  text-align: center;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.stepPill:not(:disabled) {
+  cursor: pointer;
+}
+
+.stepPill:disabled:not(.stepPillCurrent) {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.stepPillComplete:not(:disabled):hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--brand);
+  transform: translateY(-1px);
+}
+
+.stepPillCurrent {
+  border-color: var(--brand-mid);
+  background: var(--brand-soft);
+  color: var(--brand);
+  box-shadow: inset 0 0 0 1px rgba(30, 74, 122, 0.12);
+}
+
+.stepPillComplete .stepPillIndex {
+  background: var(--success);
+  border-color: var(--success);
+  color: #ffffff;
+}
+
+.stepPillIndex {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stepPillCurrent .stepPillIndex {
+  border-color: var(--brand-mid);
+  background: var(--brand);
+  color: #ffffff;
+}
+
+.stepPillLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+.formPanel {
+  padding: 22px 24px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.submitPanel {
+  display: grid;
+  gap: 20px;
+}
+
+.packetSummary {
+  padding: 18px 20px;
+  background: var(--brand-soft);
+  border: 1px solid #c7daf3;
+  border-radius: var(--radius-md);
+}
+
+.packetSummaryTitle {
+  margin: 0 0 12px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.packetSummaryList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.packetSummaryList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.packetSummaryList li::before {
+  content: "✓";
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--success-soft);
+  color: var(--success);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.submitAction {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.siteFooter {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.siteFooter p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.siteFooter p + p {
+  margin-top: 4px;
+}
+
+.stickyActionBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -4px 24px rgba(12, 35, 64, 0.08);
+}
+
+.formHeading {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+}
+
+.formSubheading {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.nameEntryForm {
+  max-width: 560px;
+}
+
+.nameEntryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.nameEntryForm .fieldBlock {
+  display: grid;
+  gap: 7px;
+}
+
+.nameEntryForm .fieldLabel {
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.nameEntryForm .fieldGrid input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.nameEntryForm .fieldGrid input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(23, 78, 166, 0.12);
+}
+
+.nameEntryFieldMissing input {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+@media (max-width: 640px) {
+  .nameEntryGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plainText {
+  margin: 0 0 16px;
+  color: #444444;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.notice {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.notice p {
+  margin: 0;
+}
+
+.noticeSub {
+  margin: 10px 0 6px !important;
+  font-size: 0.875rem;
+}
+
+.noticeOk {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: #a7f3d0;
+}
+
+.noticeError {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: #fecaca;
+}
+
+.pageShell {
+  width: min(960px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+.heroCard,
+.sidebarCard,
+.formCard,
+.documentCard,
+.successBanner,
+.errorBanner {
+  background: #ffffff;
+  border: 1px solid #dbe4ef;
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  color: #0f172a;
+}
+
+.heroCard {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: center;
+  padding: 34px;
+}
+
+.languageBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.languageLabel {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.langButton {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f8fafc;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.langButton:hover {
+  border-color: var(--brand);
+}
+
+.langButtonActive {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand-dark);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--brand);
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 12px;
+  font-size: clamp(2.2rem, 5vw, 4.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+}
+
+h2 {
+  margin-bottom: 8px;
+  font-size: 1.35rem;
+  letter-spacing: -0.035em;
+}
+
+h3 {
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.heroText {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 1.06rem;
+  line-height: 1.65;
+}
+
+.progressCard {
+  padding: 22px;
+  border-radius: 22px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+}
+
+.progressCard span {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.055em;
+}
+
+.progressCard p {
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+
+.progressTrack {
+  height: 12px;
+  overflow: hidden;
+  background: #dbe4ef;
+  border-radius: 999px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), #00a3ff);
+  border-radius: inherit;
+  transition: width 220ms ease;
+}
+
+.successBanner,
+.errorBanner {
+  margin-top: 18px;
+  padding: 18px 22px;
+}
+
+.successBanner {
+  color: #064e3b;
+  background: var(--success-soft);
+  border-color: #99f6e4;
+}
+
+.errorBanner {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: #fecdca;
+}
+
+.errorBanner ul {
+  margin: 10px 0 0 18px;
+  padding: 0;
+}
+
+.missingFieldsList {
+  margin: 8px 0 0 18px;
+  padding: 0;
+}
+
+.missingFieldLink {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #991b1b;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.missingFieldLink:hover {
+  color: #7f1d1d;
+}
+
+.workspaceGrid {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.sidebarCard {
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 22px;
+}
+
+.stepList {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.stepButton {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  text-align: left;
+  color: var(--ink);
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.stepButton:hover,
+.activeStep {
+  transform: translateY(-1px);
+  background: var(--brand-soft);
+  border-color: #93c5fd;
+}
+
+.stepButton strong,
+.stepButton small {
+  display: block;
+}
+
+.stepButton small {
+  margin-top: 3px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.stepStatus {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.stepStatus.done {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.formCard {
+  padding: 26px;
+}
+
+.formSection,
+.documentCard {
+  margin-bottom: 28px;
+}
+
+.formSection {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.sectionHeader {
+  margin-bottom: 18px;
+}
+
+.fieldGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.twoColumns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.formSection > .fieldGrid input,
+.formSection > .fieldGrid select,
+.directDepositForm .fieldGrid input,
+.directDepositForm .fieldGrid select,
+.signatureBlock input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.formSection > .fieldGrid input:focus,
+.formSection > .fieldGrid select:focus,
+.directDepositForm .fieldGrid input:focus,
+.directDepositForm .fieldGrid select:focus,
+.signatureBlock input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(23, 78, 166, 0.12);
+}
+
+.noticeBox {
+  margin-bottom: 16px;
+  padding: 13px 15px;
+  color: #7a4d00;
+  background: #fff7e6;
+  border: 1px solid #fedf89;
+  border-radius: 16px;
+  font-size: 0.92rem;
+}
+
+.checkboxStack {
+  display: grid;
+  gap: 12px;
+}
+
+.checkboxStack label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.checkboxStack input {
+  width: 18px;
+  min-height: 18px;
+  margin-top: 1px;
+}
+
+.directDepositForm {
+  margin-top: 4px;
+}
+
+.directDepositQuestionCard {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: var(--brand-soft);
+  border: 1px solid #c7daf3;
+  border-radius: var(--radius-md);
+}
+
+.directDepositQuestionTitle {
+  margin: 0 0 8px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.directDepositQuestionHelp {
+  margin: 0 0 16px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.directDepositChoice {
+  margin: 0 0 18px;
+  padding: 0;
+  border: none;
+}
+
+.directDepositChoiceLegend {
+  margin-bottom: 12px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.directDepositChoiceButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.choiceButtonLarge {
+  flex: 1 1 140px;
+  min-height: 52px;
+  font-size: 1rem;
+}
+
+.directDepositQuestionCard.directDepositFieldMissing {
+  border-color: #b42318;
+  box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.12);
+}
+
+.choiceButton {
+  min-height: 44px;
+  padding: 0 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+  color: var(--brand);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.choiceButton:hover {
+  border-color: var(--brand-mid);
+  background: var(--brand-soft);
+}
+
+.choiceButtonActive {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #ffffff;
+}
+
+.choiceButtonActive:hover {
+  background: var(--brand-mid);
+  border-color: var(--brand-mid);
+  color: #ffffff;
+}
+
+.directDepositSkippedNote {
+  margin-top: 0;
+}
+
+.directDepositSubmitAction {
+  margin-top: 20px;
+}
+
+.directDepositFieldMissing.choiceButton,
+.directDepositChoice.directDepositFieldMissing .choiceButton {
+  border-color: #b42318 !important;
+  box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.12);
+}
+
+.directDepositForm .checkboxStack {
+  margin-top: 16px;
+}
+
+.directDepositFieldMissing input,
+.directDepositFieldMissing select {
+  border-color: #b42318 !important;
+  box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.12) !important;
+}
+
+.authorizationLabel {
+  font-weight: 600;
+}
+
+.documentCard {
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.documentHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px;
+  background: linear-gradient(135deg, #0f172a, #174ea6);
+  color: #ffffff;
+}
+
+.documentHeader .eyebrow {
+  color: #bfdbfe;
+}
+
+.documentHeader h2 {
+  margin-bottom: 0;
+}
+
+.documentBadge {
+  align-self: start;
+  padding: 7px 12px;
+  color: #dbeafe;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.documentBody {
+  padding: 28px;
+  background: #ffffff;
+}
+
+.documentBody article {
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.documentBody p {
+  color: #475569;
+  line-height: 1.65;
+}
+
+.signatureBlock {
+  position: relative;
+  padding: 26px;
+  background: #fbfdff;
+  border: 2px dashed #93c5fd;
+  border-radius: 22px;
+}
+
+.signHereLabel {
+  position: absolute;
+  top: -14px;
+  left: 24px;
+  padding: 5px 12px;
+  color: var(--brand-dark);
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.signaturePad {
+  margin-bottom: 16px;
+}
+
+.signatureCanvas {
+  display: block;
+  width: 100%;
+  height: 175px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 18px;
+  touch-action: none;
+}
+
+.signatureTools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.actionRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.primaryButton,
+.secondaryButton,
+.ghostButton {
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+}
+
+.primaryButton {
+  color: #ffffff;
+  background: linear-gradient(180deg, var(--brand-mid) 0%, var(--brand) 100%);
+  border: 1px solid var(--brand);
+  box-shadow: 0 2px 8px rgba(12, 35, 64, 0.18);
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: linear-gradient(180deg, #255985 0%, #0f2d52 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(12, 35, 64, 0.22);
+}
+
+.primaryButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.secondaryButton,
+.ghostButton {
+  color: var(--brand);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.secondaryButton:hover,
+.ghostButton:hover {
+  border-color: var(--brand-mid);
+  background: var(--brand-soft);
+}
+
+.smallButton {
+  min-height: 34px;
+  padding: 0 13px;
+}
+
+.mobileMenuBar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.mobileStepLabel {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.sidebarBackdrop {
+  display: none;
+}
+
+.pdfFormSection {
+  display: grid;
+  gap: 12px;
+}
+
+.pdfFormToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.pdfFormHint {
+  margin: 0;
+  color: #666666;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.pdfFormError {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.92rem;
+}
+
+.pdfFormSuccess {
+  margin: 0;
+  color: #065f46;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.pdfViewerShell {
+  overflow: visible;
+  max-height: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #f8fafc;
+  padding: 12px;
+  color-scheme: light only;
+}
+
+.embeddedPdfShell {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #e2e8f0;
+  min-height: 72vh;
+}
+
+.embeddedPdfFrame {
+  display: block;
+  width: 100%;
+  min-height: 72vh;
+  border: 0;
+  background: #fff;
+}
+
+.lightPdfViewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 8px 0 16px;
+  background: #ffffff;
+  color-scheme: light only;
+}
+
+.lightPdfPage {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+}
+
+.lightPdfCanvas {
+  display: block;
+  background: #ffffff;
+}
+
+.lightPdfLoading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.employmentPreviewShell {
+  max-height: 520px;
+  overflow: auto;
+  background: #ffffff;
+}
+
+.employmentOverlayRoot {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.employmentOverlayPage {
+  position: relative;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.16);
+}
+
+.employmentOverlayLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.employmentOverlayInput {
+  position: absolute;
+  margin: 0;
+  padding: 0 4px;
+  border: 1px solid rgba(100, 116, 139, 0.75);
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 1.1;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.employmentOverlayInputRequired {
+  background: rgba(254, 249, 195, 0.95);
+  border-color: #a16207;
+}
+
+.employmentOverlayInput:focus {
+  outline: 2px solid #1d4ed8;
+  border-color: #1d4ed8;
+  z-index: 2;
+}
+
+.employmentOverlayMark {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.employmentOverlayMark input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.employmentOverlayMark span {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(100, 116, 139, 0.75);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.employmentOverlayMark input:checked + span::after {
+  content: "X";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.employmentFormFields {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.employmentSection {
+  padding: 18px;
+  border: 1px solid #dbe4ef;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.employmentSection h3 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.employmentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.employmentFieldWide {
+  grid-column: 1 / -1;
+}
+
+.employmentField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: #334155;
+}
+
+.employmentFieldRequired span {
+  font-weight: 700;
+  color: #854d0e;
+}
+
+.employmentInput {
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fffbeb;
+  color: #0f172a;
+}
+
+.employmentField:not(.employmentFieldRequired) .employmentInput {
+  background: #ffffff;
+}
+
+.employmentInput:focus {
+  outline: 2px solid #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.employmentChoiceGroup {
+  margin: 14px 0 0;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.employmentChoiceGroup legend {
+  padding: 0 6px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.employmentChoiceGroup label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+  margin-top: 8px;
+  color: #0f172a;
+}
+
+.employmentEmergencyRow {
+  margin-top: 10px;
+}
+
+@media (max-width: 720px) {
+  .employmentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Never show page-click navigation — scroll only */
+.react-acroform-navigation {
+  display: none !important;
+}
+
+.scrollablePdfViewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  padding-bottom: 16px;
+  overflow: visible;
+  color-scheme: light only;
+  background: #ffffff;
+}
+
+.scrollablePdfViewer .react-acroform-page {
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.pdfPageLabel {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 6px 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.pdfScrollNote {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.pdfPageWrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pdfViewer {
+  min-height: 0;
+}
+
+/* Keep PDF overlay fields aligned with the form boxes */
+.scrollablePdfViewer .react-acroform-field,
+.react-acroform-viewer .react-acroform-field {
+  box-shadow: inset 0 0 0 1px #94a3b8;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Yellow highlight = employee must complete (Section 1 I-9, WH-151 signature areas) */
+.scrollablePdfViewer .react-acroform-field.pdf-field-required,
+.react-acroform-viewer .react-acroform-field.pdf-field-required {
+  box-shadow: inset 0 0 0 2px #ca8a04 !important;
+  background-color: rgba(254, 240, 138, 0.45) !important;
+}
+
+.scrollablePdfViewer .react-acroform-field.pdf-field-required:focus-within,
+.react-acroform-viewer .react-acroform-field.pdf-field-required:focus-within {
+  box-shadow: inset 0 0 0 2px #a16207 !important;
+  background-color: rgba(253, 224, 71, 0.55) !important;
+}
+
+.pdfRequiredLegend {
+  margin: 0;
+  padding: 0;
+  width: auto;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #666666;
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.scrollablePdfViewer .react-acroform-field:focus-within,
+.react-acroform-viewer .react-acroform-field:focus-within {
+  box-shadow: inset 0 0 0 2px #1d4ed8;
+  background-color: rgba(255, 255, 255, 0.28);
+}
+
+.scrollablePdfViewer .react-acroform-field--text > div,
+.react-acroform-viewer .react-acroform-field--text > div {
+  align-items: stretch !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+.scrollablePdfViewer .react-acroform-field input:not(.react-acroform-input--comb):not(.react-acroform-checkbox):not(.react-acroform-radio),
+.scrollablePdfViewer .react-acroform-field textarea,
+.scrollablePdfViewer .react-acroform-field select,
+.react-acroform-viewer .react-acroform-field input:not(.react-acroform-input--comb):not(.react-acroform-checkbox):not(.react-acroform-radio),
+.react-acroform-viewer .react-acroform-field textarea,
+.react-acroform-viewer .react-acroform-field select {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+  border-radius: 0 !important;
+  border: 1px solid #64748b !important;
+  box-shadow: none !important;
+  outline: none !important;
+  line-height: 1.2 !important;
+  box-sizing: border-box !important;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+.scrollablePdfViewer .react-acroform-field.pdf-field-required input:not(.react-acroform-input--comb):not(.react-acroform-checkbox):not(.react-acroform-radio),
+.scrollablePdfViewer .react-acroform-field.pdf-field-required textarea,
+.scrollablePdfViewer .react-acroform-field.pdf-field-required select,
+.react-acroform-viewer .react-acroform-field.pdf-field-required input:not(.react-acroform-input--comb):not(.react-acroform-checkbox):not(.react-acroform-radio),
+.react-acroform-viewer .react-acroform-field.pdf-field-required textarea,
+.react-acroform-viewer .react-acroform-field.pdf-field-required select {
+  background-color: rgba(254, 249, 195, 0.96) !important;
+  border-color: #ca8a04 !important;
+}
+
+.scrollablePdfViewer .react-acroform-field.pdf-field-required.react-acroform-field--checkbox label,
+.scrollablePdfViewer .react-acroform-field.pdf-field-required.react-acroform-field--radio label,
+.react-acroform-viewer .react-acroform-field.pdf-field-required.react-acroform-field--checkbox label,
+.react-acroform-viewer .react-acroform-field.pdf-field-required.react-acroform-field--radio label {
+  background: #fef9c3 !important;
+  border-color: #ca8a04 !important;
+}
+
+.scrollablePdfViewer .react-acroform-field.pdf-field-missing,
+.react-acroform-viewer .react-acroform-field.pdf-field-missing {
+  box-shadow: inset 0 0 0 3px #dc2626 !important;
+  animation: pdf-field-missing-pulse 1.2s ease-in-out 3;
+}
+
+@keyframes pdf-field-missing-pulse {
+  0%,
+  100% {
+    background-color: rgba(254, 240, 138, 0.55);
+  }
+  50% {
+    background-color: rgba(254, 202, 202, 0.85);
+  }
+}
+
+.scrollablePdfViewer .react-acroform-field textarea,
+.react-acroform-viewer .react-acroform-field textarea {
+  resize: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  vertical-align: top !important;
+}
+
+/* I-9 page 4 "Addtl Info" rows are single-line in the printed form */
+.scrollablePdfViewer .react-acroform-field[data-field-name^="Addtl Info"],
+.react-acroform-viewer .react-acroform-field[data-field-name^="Addtl Info"] {
+  overflow: hidden !important;
+}
+
+.scrollablePdfViewer .react-acroform-field[data-field-name^="Addtl Info"] textarea,
+.react-acroform-viewer .react-acroform-field[data-field-name^="Addtl Info"] textarea {
+  overflow-y: hidden !important;
+  line-height: 1.2 !important;
+}
+
+.scrollablePdfViewer .react-acroform-input--comb,
+.react-acroform-viewer .react-acroform-input--comb {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+  border-radius: 0 !important;
+  border: 1px solid #64748b !important;
+  box-shadow: none !important;
+  outline: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+.react-acroform-viewer .react-acroform-field input:focus,
+.react-acroform-viewer .react-acroform-field textarea:focus,
+.react-acroform-viewer .react-acroform-field select:focus {
+  border-color: #1d4ed8 !important;
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: none !important;
+}
+
+.react-acroform-viewer .react-acroform-field--checkbox,
+.react-acroform-viewer .react-acroform-field--radio {
+  box-shadow: inset 0 0 0 1px #2563eb;
+  background-color: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+}
+
+.react-acroform-viewer .react-acroform-field--checkbox:focus-within,
+.react-acroform-viewer .react-acroform-field--radio:focus-within {
+  box-shadow: inset 0 0 0 2px #1d4ed8;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.react-acroform-viewer .react-acroform-field--checkbox label,
+.react-acroform-viewer .react-acroform-field--radio label {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  background: #ffffff !important;
+  border: 2px solid #334155 !important;
+  box-sizing: border-box !important;
+}
+
+.react-acroform-viewer .react-acroform-field--checkbox label:has(input:checked),
+.react-acroform-viewer .react-acroform-field--radio label:has(input:checked) {
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+
+.react-acroform-viewer .react-acroform-field--checkbox label:has(input:checked)::after {
+  content: "✓";
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.react-acroform-viewer .react-acroform-field--radio label:has(input:checked)::after {
+  content: "";
+  width: 42%;
+  height: 42%;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.react-acroform-viewer .react-acroform-field label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  font-weight: 400 !important;
+  color: inherit !important;
+  font-size: inherit !important;
+}
+
+.react-acroform-viewer .react-acroform-checkbox,
+.react-acroform-viewer .react-acroform-radio {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.react-acroform-viewer .react-acroform-navigation input {
+  width: 50px;
+  min-height: 0;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+@media (max-width: 900px) {
+  .heroCard,
+  .workspaceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mobileMenuBar {
+    display: flex;
+  }
+
+  .sidebarBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    border: 0;
+    background: rgba(15, 23, 42, 0.45);
+    cursor: pointer;
+  }
+
+  .sidebarCard {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    z-index: 50;
+    width: min(320px, 88vw);
+    height: 100vh;
+    max-height: none;
+    margin: 0;
+    border-radius: 0 24px 24px 0;
+    transition: left 220ms ease;
+    overflow-y: auto;
+  }
+
+  .sidebarCard.open {
+    left: 0;
+  }
+
+  .formCard {
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .stepPillList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .siteHeader {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 18px;
+  }
+
+  .siteBrand {
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+
+  .siteBrandText {
+    max-width: none;
+  }
+
+  .siteTagline {
+    max-width: none;
+  }
+
+  .siteHeaderToolbar {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .siteLogo {
+    height: 64px;
+    max-width: min(200px, 34vw);
+  }
+}
+
+@media (max-width: 640px) {
+  .siteLayout {
+    width: min(100% - 20px, 1040px);
+  }
+
+  .siteHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .siteBrand {
+    flex: none;
+  }
+
+  .siteBrandText {
+    padding-left: 16px;
+  }
+
+  .siteTitle {
+    font-size: 1.2rem;
+  }
+
+  .siteHeaderToolbar {
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .langButton {
+    padding: 7px 11px;
+    font-size: 0.75rem;
+  }
+
+  .siteUtilityButton {
+    padding: 7px 12px;
+    font-size: 0.75rem;
+  }
+
+  .formPanel,
+  .stepNav {
+    padding: 16px;
+  }
+
+  .stepPillList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stepPillLabel {
+    font-size: 0.62rem;
+  }
+
+  .stickyActionBar .actionRow {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .stickyActionBar .primaryButton,
+  .stickyActionBar .secondaryButton {
+    width: 100%;
+  }
+
+  .pageShell {
+    width: min(100% - 20px, 1180px);
+    padding-top: 12px;
+  }
+
+  .heroCard,
+  .formCard,
+  .formSection,
+  .documentBody {
+    padding: 18px;
+  }
+
+  .twoColumns {
+    grid-template-columns: 1fr;
+  }
+
+  .actionRow,
+  .signatureTools,
+  .documentHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
