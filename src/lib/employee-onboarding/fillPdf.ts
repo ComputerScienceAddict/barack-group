@@ -208,6 +208,8 @@ export async function fillAndDownloadPdf(
 export type OnboardingPacketEntry = {
   templatePath: string;
   values: Record<string, PdfFieldValue>;
+  /** Pages to include in the merged packet (from page 1). Defaults to all template pages. */
+  pageCount?: number;
 };
 
 export type OnboardingPacketResult = {
@@ -239,7 +241,10 @@ export async function buildOnboardingPacket(
     if (form.getFields().length > 0) {
       form.flatten();
     }
-    const copiedPages = await mergedDoc.copyPages(filledDoc, filledDoc.getPageIndices());
+    const totalPages = filledDoc.getPageCount();
+    const pagesToInclude = Math.max(1, Math.min(entry.pageCount ?? totalPages, totalPages));
+    const pageIndices = Array.from({ length: pagesToInclude }, (_, index) => index);
+    const copiedPages = await mergedDoc.copyPages(filledDoc, pageIndices);
     for (const page of copiedPages) {
       mergedDoc.addPage(page);
     }

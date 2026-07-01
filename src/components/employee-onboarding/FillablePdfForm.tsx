@@ -492,7 +492,11 @@ export async function downloadOnboardingPacket(
       ? [await buildDirectDepositPdfBytes(directDeposit)]
       : undefined;
   return downloadMergedPacket(
-    entries.map((entry) => ({ templatePath: entry.config.templatePath, values: entry.values })),
+    entries.map((entry) => ({
+      templatePath: entry.config.templatePath,
+      values: entry.values,
+      pageCount: entry.config.pageCount,
+    })),
     ONBOARDING_PACKET_FILENAME,
     { appendPdfBytes }
   );

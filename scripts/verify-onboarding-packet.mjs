@@ -16,8 +16,8 @@ const PACKET_TEMPLATES = [
   "wh-151ps-2024.pdf",
 ];
 
-/** One employment form + W-4 (5) + I-9 (4) + WH-151 (2) = 12 pages per packet with English employment. */
-const EXPECTED_FORM_PAGE_COUNT = 12;
+/** Merged packet: employment (1) + W-4 (5) + I-9 page 1 only (1) + WH-151 (2) = 9 pages. */
+const EXPECTED_PACKET_PAGE_COUNT = 9;
 
 async function countPdfPages(filePath) {
   const bytes = fs.readFileSync(filePath);
@@ -33,21 +33,28 @@ if (missingTemplates.length) {
   process.exit(1);
 }
 
-let formPageCount = 0;
+let templatePageCount = 0;
+let packetPageCount = 0;
 for (const name of EMPLOYMENT_TEMPLATES) {
   const pages = await countPdfPages(path.join(docsDir, name));
   console.log(`${name}: ${pages} page(s)`);
 }
-formPageCount += await countPdfPages(path.join(docsDir, EMPLOYMENT_TEMPLATES[0]));
+templatePageCount += await countPdfPages(path.join(docsDir, EMPLOYMENT_TEMPLATES[0]));
+packetPageCount += 1;
 for (const name of PACKET_TEMPLATES) {
   const pages = await countPdfPages(path.join(docsDir, name));
-  formPageCount += pages;
+  templatePageCount += pages;
   console.log(`${name}: ${pages} page(s)`);
+  if (name === "i-9.pdf") {
+    packetPageCount += 1;
+  } else {
+    packetPageCount += pages;
+  }
 }
 
-if (formPageCount !== EXPECTED_FORM_PAGE_COUNT) {
+if (packetPageCount !== EXPECTED_PACKET_PAGE_COUNT) {
   console.error(
-    `Expected ${EXPECTED_FORM_PAGE_COUNT} combined form pages, got ${formPageCount}`
+    `Expected ${EXPECTED_PACKET_PAGE_COUNT} merged packet pages, got ${packetPageCount}`
   );
   process.exit(1);
 }
@@ -71,5 +78,5 @@ if (!onboardingAppSource.includes("formWh151") || !onboardingAppSource.includes(
 }
 
 console.log(
-  `verify-onboarding-packet passed (${formPageCount} form pages).`
+  `verify-onboarding-packet passed (${packetPageCount} packet pages; ${templatePageCount} template pages).`
 );

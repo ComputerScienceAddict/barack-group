@@ -168,7 +168,7 @@ for (let i = 0; i < packetResult.formResults.length; i++) {
   assert(result.filledCount > 0, `${name} filledCount is 0 — edits not saved to PDF`);
 }
 
-assert(packetResult.pageCount >= 9, `Expected at least 9 pages, got ${packetResult.pageCount}`);
+assert(packetResult.pageCount === 9, `Expected 9 pages in packet, got ${packetResult.pageCount}`);
 
 const totalVerified = packetResult.formResults.reduce((sum, r) => sum + r.verifiedCount, 0);
 assert(totalVerified >= 40, `Expected at least 40 verified fields in packet, got ${totalVerified}`);

@@ -43,6 +43,7 @@ export async function buildSubmissionPacket(
     getOnboardingFormConfigs(locale).map((config) => ({
       templatePath: config.templatePath,
       values: formValues[config.id] ?? {},
+      pageCount: config.pageCount,
     })),
     { appendPdfBytes, loadTemplate: loadPublicTemplate }
   );

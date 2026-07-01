@@ -474,6 +474,7 @@ function OnboardingAppContent() {
         formConfigs.map((config) => ({
           templatePath: config.templatePath,
           values: flushedFormValues[config.id],
+          pageCount: config.pageCount,
         })),
         { appendPdfBytes }
       );
