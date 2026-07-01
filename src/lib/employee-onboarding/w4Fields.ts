@@ -79,12 +79,14 @@ export function mirrorW4FieldValues(values: Record<string, PdfFieldValue>): Reco
 
 export const w4EnglishRequiredRules: RequiredFieldRules = {
   highlightFields: W4_SIGNATURE_DATE_HIGHLIGHT_FIELDS,
+  emphasisFields: W4_SIGNATURE_DATE_HIGHLIGHT_FIELDS,
   validateFields: W4_ENGLISH_VALIDATE_FIELDS,
   checkboxGroups: [W4_FILING_STATUS_CHECKBOXES],
 };
 
 export const w4SpanishRequiredRules: RequiredFieldRules = {
   highlightFields: W4_SIGNATURE_DATE_HIGHLIGHT_FIELDS,
+  emphasisFields: W4_SIGNATURE_DATE_HIGHLIGHT_FIELDS,
   validateFields: W4_SPANISH_VALIDATE_FIELDS,
   checkboxGroups: [W4_FILING_STATUS_CHECKBOXES],
 };

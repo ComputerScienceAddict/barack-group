@@ -1667,6 +1667,25 @@ label {
     0 0 0 2px #f59e0b !important;
 }
 
+/* W-4 Step 5 (employee signature/date): force visibly boxed sign/date fields. */
+.scrollablePdfViewer .react-acroform-field[data-field-name="topmostSubform[0].Page1[0].f1_12[0]"].pdf-field-required,
+.scrollablePdfViewer .react-acroform-field[data-field-name="topmostSubform[0].Page1[0].f1_13[0]"].pdf-field-required,
+.react-acroform-viewer .react-acroform-field[data-field-name="topmostSubform[0].Page1[0].f1_12[0]"].pdf-field-required,
+.react-acroform-viewer .react-acroform-field[data-field-name="topmostSubform[0].Page1[0].f1_13[0]"].pdf-field-required {
+  box-shadow:
+    inset 0 0 0 3px #a16207,
+    0 0 0 2px #fbbf24 !important;
+  background-color: rgba(254, 240, 138, 0.88) !important;
+}
+
+.scrollablePdfViewer .react-acroform-field[data-field-name="topmostSubform[0].Page1[0].f1_12[0]"].pdf-field-required input,
+.scrollablePdfViewer .react-acroform-field[data-field-name="topmostSubform[0].Page1[0].f1_13[0]"].pdf-field-required input,
+.react-acroform-viewer .react-acroform-field[data-field-name="topmostSubform[0].Page1[0].f1_12[0]"].pdf-field-required input,
+.react-acroform-viewer .react-acroform-field[data-field-name="topmostSubform[0].Page1[0].f1_13[0]"].pdf-field-required input {
+  border: 2px solid #a16207 !important;
+  background-color: rgba(254, 240, 138, 0.95) !important;
+}
+
 @keyframes pdf-field-missing-pulse {
   0%,
   100% {
