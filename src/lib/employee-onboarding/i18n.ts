@@ -2,12 +2,18 @@ export type Locale = "en" | "es";
 
 export const LOCALE_STORAGE_KEY = "newHireOnboardingLocale";
 
+export function readStoredLocale(): Locale {
+  if (typeof window === "undefined") return "en";
+  const saved = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+  return saved === "en" || saved === "es" ? saved : "en";
+}
+
 const en = {
   appTitle: "New Hire Forms",
   appDescription: "Fill employment application, W-4, I-9, and WH-151PS PDF forms in your browser.",
   eyebrowSimple: "Simple flow",
   heroText:
-    "Yellow fields must be completed. Other fields are optional. You can switch language anytime.",
+    "Every yellow field must be completed before you continue. You can switch language anytime.",
   requiredLegend: "Yellow = required",
   missingRequired: "Please complete all yellow required fields before continuing.",
   missingIntro: "Still missing on {form}:",
@@ -40,6 +46,22 @@ const en = {
   fieldWh153LoanTerms: "Personal loan conditions",
   fieldWh153HousingTerms: "Housing / childcare conditions",
   fieldWh153Acknowledgment: "Acknowledgment checkbox",
+  fieldApplicationDate: "Application date",
+  fieldMiddleInitial: "Middle initial",
+  fieldEmergencyName: "Emergency contact name",
+  fieldEmergencyRelationship: "Emergency contact relationship",
+  fieldAltPhone: "Alternate phone number",
+  fieldEmploymentAge18: "Age 18 or older (select one)",
+  fieldEmploymentPosition: "Position type (select one)",
+  fieldEmploymentShift: "Shift preference (select one)",
+  fieldEmploymentTravel: "Willing to travel (select one)",
+  fieldEmploymentOvertime: "Willing to work overtime (select one)",
+  fieldEmploymentWorkAuth: "Authorized to work in the U.S. (select one)",
+  fieldInterviewedBy: "Interviewed by",
+  fieldInterviewDate: "Interview date",
+  fieldPositionOffered: "Position offered",
+  fieldStartDate: "Start date",
+  fieldCompanyNotes: "Company notes",
   hardReset: "Hard reset — clear all drafts",
   hardResetShort: "Clear progress",
   langEnglish: "English",
@@ -161,7 +183,7 @@ const es: Record<keyof typeof en, string> = {
     "Complete la solicitud de empleo, W-4, I-9 y WH-151PS en su navegador.",
   eyebrowSimple: "Flujo simple",
   heroText:
-    "Los campos en amarillo son obligatorios. Los demás son opcionales. Puede cambiar el idioma en cualquier momento.",
+    "Todos los campos en amarillo son obligatorios antes de continuar. Puede cambiar el idioma en cualquier momento.",
   requiredLegend: "Amarillo = obligatorio",
   missingRequired: "Complete todos los campos obligatorios en amarillo antes de continuar.",
   missingIntro: "Aún falta en {form}:",
@@ -194,6 +216,22 @@ const es: Record<keyof typeof en, string> = {
   fieldWh153LoanTerms: "Condiciones de préstamos personales",
   fieldWh153HousingTerms: "Condiciones de vivienda o cuidado de niños",
   fieldWh153Acknowledgment: "Casilla de reconocimiento",
+  fieldApplicationDate: "Fecha de solicitud",
+  fieldMiddleInitial: "Inicial del segundo nombre",
+  fieldEmergencyName: "Nombre de contacto de emergencia",
+  fieldEmergencyRelationship: "Relación del contacto de emergencia",
+  fieldAltPhone: "Teléfono alterno",
+  fieldEmploymentAge18: "Mayor de 18 años (seleccione una)",
+  fieldEmploymentPosition: "Tipo de puesto (seleccione una)",
+  fieldEmploymentShift: "Turno preferido (seleccione una)",
+  fieldEmploymentTravel: "Dispuesto a viajar (seleccione una)",
+  fieldEmploymentOvertime: "Dispuesto a horas extra (seleccione una)",
+  fieldEmploymentWorkAuth: "Autorizado para trabajar en EE. UU. (seleccione una)",
+  fieldInterviewedBy: "Entrevistado por",
+  fieldInterviewDate: "Fecha de entrevista",
+  fieldPositionOffered: "Puesto ofrecido",
+  fieldStartDate: "Fecha de inicio",
+  fieldCompanyNotes: "Notas de la empresa",
   hardReset: "Reinicio total — borrar borradores",
   hardResetShort: "Borrar progreso",
   langEnglish: "English",

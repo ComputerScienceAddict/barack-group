@@ -9,13 +9,14 @@ import {
   type DirectDepositValues,
 } from "@/lib/employee-onboarding/directDeposit";
 import type { PdfFieldValue } from "@/lib/employee-onboarding/fillPdf";
+import { readStoredLocale } from "@/lib/employee-onboarding/i18n";
 import {
   NAME_ENTRY_STEP,
   SUBMIT_STEP,
   type OnboardingFormId,
 } from "@/lib/employee-onboarding/pdfForms";
 
-export const STORAGE_VERSION = "12";
+export const STORAGE_VERSION = "13";
 export const DRAFT_KEY = "newHireOnboardingDraft";
 export const PACKET_KEY = "newHireOnboardingPacket";
 export const VERSION_KEY = "newHireOnboardingVersion";
@@ -30,8 +31,19 @@ export const EMPTY_FORM_VALUES: FormValuesState = {
   wh153: {},
 };
 
+export type EmploymentByLocale = {
+  en: Record<string, PdfFieldValue>;
+  es: Record<string, PdfFieldValue>;
+};
+
+export const EMPTY_EMPLOYMENT_BY_LOCALE: EmploymentByLocale = {
+  en: {},
+  es: {},
+};
+
 export type DraftSnapshot = {
   formValues: FormValuesState;
+  employmentByLocale: EmploymentByLocale;
   directDepositValues: DirectDepositValues;
   applicantName: ApplicantName;
   step: number;
@@ -48,6 +60,7 @@ export function clearStoredOnboardingData() {
 export function readDraftSnapshot(): DraftSnapshot {
   const defaults: DraftSnapshot = {
     formValues: EMPTY_FORM_VALUES,
+    employmentByLocale: EMPTY_EMPLOYMENT_BY_LOCALE,
     directDepositValues: EMPTY_DIRECT_DEPOSIT_VALUES,
     applicantName: EMPTY_APPLICANT_NAME,
     step: NAME_ENTRY_STEP,
@@ -68,13 +81,22 @@ export function readDraftSnapshot(): DraftSnapshot {
 
     const draft = JSON.parse(raw) as {
       formValues?: FormValuesState;
+      employmentByLocale?: EmploymentByLocale;
       directDepositValues?: DirectDepositValues;
       applicantName?: ApplicantName;
       step?: number;
     };
 
+    const employmentByLocale = draft.employmentByLocale ?? EMPTY_EMPLOYMENT_BY_LOCALE;
+    const locale = readStoredLocale();
+    const restoredFormValues = draft.formValues ?? EMPTY_FORM_VALUES;
+
     return {
-      formValues: draft.formValues ?? EMPTY_FORM_VALUES,
+      formValues: {
+        ...restoredFormValues,
+        employment: employmentByLocale[locale] ?? restoredFormValues.employment ?? {},
+      },
+      employmentByLocale,
       directDepositValues: draft.directDepositValues
         ? normalizeDirectDepositValues(draft.directDepositValues)
         : EMPTY_DIRECT_DEPOSIT_VALUES,

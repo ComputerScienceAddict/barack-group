@@ -29,6 +29,14 @@ import type { PdfFormConfig } from "@/lib/employee-onboarding/pdfForms";
 import { ONBOARDING_PACKET_FILENAME } from "@/lib/employee-onboarding/pdfForms";
 import { buildDirectDepositPdfBytes, usesDirectDeposit, type DirectDepositValues } from "@/lib/employee-onboarding/directDeposit";
 import { applyRequiredFieldHighlight, clearMissingPdfFieldMarks, markMissingPdfFields, scrollToPdfField } from "@/lib/employee-onboarding/requiredFields";
+import {
+  assignWh153OverlayKeys,
+  collapseWh153FormValues,
+  expandWh153FormValues,
+  mapWh153PdfKeysToOverlay,
+  resolveWh153ScrollTarget,
+  type Wh153OverlayMapping,
+} from "@/lib/employee-onboarding/wh153FieldOverlay";
 
 const FORM_TITLE_KEYS: Record<string, MessageKey> = {
   employment: "formEmployment",
@@ -67,11 +75,13 @@ function clamp(value: number, min: number, max: number) {
 function FormValuesBridge({
   valuesRef,
   fieldsRootRef,
-  valuesStoreRef
+  valuesStoreRef,
+  normalizeValues,
 }: {
   valuesRef: MutableRefObject<(() => Record<string, PdfFieldValue>) | null>;
   fieldsRootRef: RefObject<HTMLElement | null>;
   valuesStoreRef: MutableRefObject<Record<string, PdfFieldValue>>;
+  normalizeValues?: (values: Record<string, PdfFieldValue>) => Record<string, PdfFieldValue>;
 }) {
   const formState = useFormStateContext();
 
@@ -79,12 +89,13 @@ function FormValuesBridge({
     valuesRef.current = () => {
       const root = fieldsRootRef.current;
       const domValues = root ? collectDomFieldValues(root) : {};
-      return mergePdfFieldValues(
+      const merged = mergePdfFieldValues(
         mergePdfFieldValues(formState.getAllValues() as Record<string, PdfFieldValue>, valuesStoreRef.current),
         domValues
       );
+      return normalizeValues ? normalizeValues(merged) : merged;
     };
-  }, [fieldsRootRef, formState, valuesRef, valuesStoreRef]);
+  }, [fieldsRootRef, formState, normalizeValues, valuesRef, valuesStoreRef]);
 
   return null;
 }
@@ -92,10 +103,12 @@ function FormValuesBridge({
 /** Keeps valuesStoreRef in sync with DOM edits without notifying the parent (avoids update loops). */
 function DomSyncBridge({
   fieldsRootRef,
-  valuesStoreRef
+  valuesStoreRef,
+  normalizeValues,
 }: {
   fieldsRootRef: RefObject<HTMLElement | null>;
   valuesStoreRef: MutableRefObject<Record<string, PdfFieldValue>>;
+  normalizeValues?: (values: Record<string, PdfFieldValue>) => Record<string, PdfFieldValue>;
 }) {
   useEffect(() => {
     const root = fieldsRootRef.current;
@@ -111,7 +124,8 @@ function DomSyncBridge({
         domValues[eventValue.name] = eventValue.value;
       }
 
-      valuesStoreRef.current = mergePdfFieldValues(valuesStoreRef.current, domValues);
+      const merged = mergePdfFieldValues(valuesStoreRef.current, domValues);
+      valuesStoreRef.current = normalizeValues ? normalizeValues(merged) : merged;
     };
 
     root.addEventListener("input", sync, true);
@@ -121,7 +135,7 @@ function DomSyncBridge({
       root.removeEventListener("input", sync, true);
       root.removeEventListener("change", sync, true);
     };
-  }, [fieldsRootRef, valuesStoreRef]);
+  }, [fieldsRootRef, normalizeValues, valuesStoreRef]);
 
   return null;
 }
@@ -132,6 +146,10 @@ function ScrollablePdfPages({
   pageCount,
   fieldsRootRef,
   highlightFields,
+  highlightPages,
+  emphasisFields,
+  useWh153Overlay = false,
+  onWh153Mapping,
   active = true
 }: {
   src: string;
@@ -139,6 +157,10 @@ function ScrollablePdfPages({
   pageCount: number;
   fieldsRootRef: RefObject<HTMLDivElement | null>;
   highlightFields: readonly string[];
+  highlightPages?: readonly number[];
+  emphasisFields?: readonly string[];
+  useWh153Overlay?: boolean;
+  onWh153Mapping?: (mapping: Wh153OverlayMapping) => void;
   active?: boolean;
 }) {
   const { t } = useLanguage();
@@ -147,6 +169,24 @@ function ScrollablePdfPages({
 
   const { document, loading, error } = usePDFDocument({ src, workerSrc });
   const { fields, loading: fieldsLoading, error: fieldsError, radioGroups } = useFormFields({ document });
+
+  const wh153Overlay = useMemo(() => {
+    if (!useWh153Overlay || fields.length === 0) return null;
+    return assignWh153OverlayKeys(fields);
+  }, [fields, useWh153Overlay]);
+
+  const displayFields = wh153Overlay?.fields ?? fields;
+
+  const resolvedHighlightFields = useMemo(() => {
+    if (!wh153Overlay) return highlightFields;
+    return mapWh153PdfKeysToOverlay(wh153Overlay.mapping, highlightFields);
+  }, [highlightFields, wh153Overlay]);
+
+  useEffect(() => {
+    if (wh153Overlay) {
+      onWh153Mapping?.(wh153Overlay.mapping);
+    }
+  }, [onWh153Mapping, wh153Overlay]);
 
   useEffect(() => {
     if (!document) return;
@@ -170,7 +210,7 @@ function ScrollablePdfPages({
     if (!root || visiblePages.length === 0) return;
 
     const tuneFields = () => {
-      applyRequiredFieldHighlight(root, highlightFields);
+      applyRequiredFieldHighlight(root, resolvedHighlightFields, highlightPages, emphasisFields);
 
       root.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
         ".react-acroform-field textarea, .react-acroform-field input:not([type='checkbox']):not([type='radio'])"
@@ -189,7 +229,7 @@ function ScrollablePdfPages({
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [fieldsRootRef, highlightFields, visiblePages, fields]);
+  }, [emphasisFields, fieldsRootRef, highlightPages, resolvedHighlightFields, visiblePages, displayFields]);
 
   useEffect(() => {
     const container = fieldsRootRef.current;
@@ -238,7 +278,7 @@ function ScrollablePdfPages({
             page={page}
             pageNumber={index + 1}
             scale={scale}
-            fields={fields}
+            fields={displayFields}
             radioGroups={radioGroups}
           />
         </div>
@@ -260,39 +300,58 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
   const valuesStoreRef = useRef<Record<string, PdfFieldValue>>({});
   const onChangeRef = useRef(onChange);
   const fieldsRootRef = useRef<HTMLDivElement>(null);
-  const mergedDefaults = useMemo(
-    () => ({ ...defaultValues, ...values }),
-    [defaultValues, values]
+  const isWh153 = config.id === "wh153";
+  const wh153MappingRef = useRef<Wh153OverlayMapping | null>(null);
+  const [wh153Mapping, setWh153Mapping] = useState<Wh153OverlayMapping | null>(null);
+  const mergedDefaults = useMemo(() => {
+    const base = { ...defaultValues, ...values };
+    if (!isWh153 || !wh153Mapping) return base;
+    return { ...base, ...expandWh153FormValues(wh153Mapping, base) };
+  }, [defaultValues, isWh153, values, wh153Mapping]);
+
+  const collapseOverlayValues = useCallback(
+    (overlayValues: Record<string, PdfFieldValue>) => {
+      if (!isWh153 || !wh153MappingRef.current) return overlayValues;
+      return collapseWh153FormValues(wh153MappingRef.current, overlayValues);
+    },
+    [isWh153]
   );
+
+  useEffect(() => {
+    wh153MappingRef.current = wh153Mapping;
+  }, [wh153Mapping]);
 
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
 
   useEffect(() => {
-    valuesStoreRef.current = mergePdfFieldValues(valuesStoreRef.current, values);
-  }, [values]);
+    valuesStoreRef.current = isWh153 ? values : mergePdfFieldValues(valuesStoreRef.current, values);
+  }, [isWh153, values]);
 
   const readMergedValues = useCallback((): Record<string, PdfFieldValue> => {
     const root = fieldsRootRef.current;
     const domValues = root ? collectDomFieldValues(root) : {};
-    const merged = mergePdfFieldValues(
-      mergePdfFieldValues(mergePdfFieldValues(valuesStoreRef.current, values), latestValuesRef.current?.() ?? {}),
-      domValues
-    );
-    valuesStoreRef.current = merged;
-    return merged;
-  }, [values]);
+    const stateValues =
+      latestValuesRef.current?.() ??
+      (isWh153 && wh153Mapping ? expandWh153FormValues(wh153Mapping, values) : values);
+    const merged = mergePdfFieldValues(stateValues, domValues);
+    const normalized = collapseOverlayValues(merged);
+    valuesStoreRef.current = normalized;
+    return normalized;
+  }, [collapseOverlayValues, isWh153, values, wh153Mapping]);
 
   const handleChange = useCallback(
     (_fieldName: string, _value: FormFieldValue, allValues: Record<string, FormFieldValue>) => {
       const root = fieldsRootRef.current;
       const domValues = root ? collectDomFieldValues(root) : {};
-      const merged = mergePdfFieldValues(allValues as Record<string, PdfFieldValue>, domValues);
+      const merged = collapseOverlayValues(
+        mergePdfFieldValues(allValues as Record<string, PdfFieldValue>, domValues)
+      );
       valuesStoreRef.current = merged;
       onChangeRef.current(merged);
     },
-    []
+    [collapseOverlayValues]
   );
 
   useImperativeHandle(
@@ -306,15 +365,19 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
       focusMissingFields: (fieldKeys: string[]) => {
         const root = fieldsRootRef.current;
         if (!root || fieldKeys.length === 0) return false;
-        markMissingPdfFields(root, fieldKeys);
-        return scrollToPdfField(root, fieldKeys[0]);
+        const resolvedKeys =
+          isWh153 && wh153MappingRef.current
+            ? fieldKeys.map((key) => resolveWh153ScrollTarget(wh153MappingRef.current!, key))
+            : fieldKeys;
+        markMissingPdfFields(root, resolvedKeys);
+        return scrollToPdfField(root, resolvedKeys[0]);
       },
       clearMissingMarks: () => {
         const root = fieldsRootRef.current;
         if (root) clearMissingPdfFieldMarks(root);
       }
     }),
-    [readMergedValues]
+    [isWh153, readMergedValues]
   );
 
   async function handleDownload() {
@@ -360,14 +423,23 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
             valuesRef={latestValuesRef}
             fieldsRootRef={fieldsRootRef}
             valuesStoreRef={valuesStoreRef}
+            normalizeValues={isWh153 ? collapseOverlayValues : undefined}
           />
-          <DomSyncBridge fieldsRootRef={fieldsRootRef} valuesStoreRef={valuesStoreRef} />
+          <DomSyncBridge
+            fieldsRootRef={fieldsRootRef}
+            valuesStoreRef={valuesStoreRef}
+            normalizeValues={isWh153 ? collapseOverlayValues : undefined}
+          />
           <ScrollablePdfPages
             src={config.templatePath}
             workerSrc="/pdf.worker.min.mjs"
             pageCount={config.pageCount}
             fieldsRootRef={fieldsRootRef}
             highlightFields={config.requiredRules.highlightFields}
+            highlightPages={config.requiredRules.highlightPages}
+            emphasisFields={config.requiredRules.emphasisFields}
+            useWh153Overlay={isWh153}
+            onWh153Mapping={setWh153Mapping}
             active={active}
           />
         </FormStateProvider>

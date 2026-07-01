@@ -9,6 +9,8 @@ const requiredFiles = [
   "src/components/employee-onboarding/OnboardingStepNav.tsx",
   "src/lib/employee-onboarding/pdfForms.ts",
   "src/lib/employee-onboarding/wh153Fields.ts",
+  "public/documents/janiking-employment-application-english.pdf",
+  "public/documents/janiking-employment-application-spanish.pdf",
   "public/documents/wh-153s-2024.pdf",
   "package.json",
 ];
@@ -38,10 +40,11 @@ const checks = [
   ["wh153 form step", onboardingApp.includes("formWh153")],
   ["wh153 packet summary", onboardingApp.includes("packetItemWh153")],
   ["wh153 before direct deposit", onboardingApp.includes("FORM_START_STEP + 4")],
-  ["dynamic packet build", onboardingApp.includes("ONBOARDING_FORM_CONFIGS.map")],
+  ["dynamic packet build", onboardingApp.includes("getOnboardingFormConfigs")],
   ["step nav wh153", stepNav.includes("stepNameWh153")],
   ["hiring redirect", hiringPage.includes('redirect("/employee-onboarding")')],
-  ["wh153 config", pdfForms.includes("wh153FormConfig")],
+  ["locale employment configs", pdfForms.includes("getEmploymentFormConfig")],
+  ["locale employment switch", onboardingApp.includes("handleLocaleChange")],
   ["submit and download", onboardingApp.includes("submitAndDownload")],
   ["local storage draft", onboardingApp.includes("localStorage")],
 ];

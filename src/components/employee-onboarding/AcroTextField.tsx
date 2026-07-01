@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useState, type CSSProperties } from "react";
 import {
   BaseField,
   useFormStateContext,
@@ -109,25 +109,12 @@ function buildTextInputStyle(
  */
 export default function AcroTextField({ field, scale, pageHeight, className }: AcroTextFieldProps) {
   const [focused, setFocused] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formState = useFormStateContext();
 
   const handleFocus = useCallback(() => setFocused(true), []);
   const handleBlur = useCallback(() => setFocused(false), []);
 
   const { width: fieldWidth, height: fieldHeight } = pdfRectToScreen(field.rect, pageHeight, scale);
-
-  useEffect(() => {
-    const value = formState.getValue(field.name);
-    const stringValue = String(value ?? "");
-    if (inputRef.current && inputRef.current.value !== stringValue) {
-      inputRef.current.value = stringValue;
-    }
-    if (textareaRef.current && textareaRef.current.value !== stringValue) {
-      textareaRef.current.value = stringValue;
-    }
-  }, [formState.version, formState, field.name]);
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -137,7 +124,7 @@ export default function AcroTextField({ field, scale, pageHeight, className }: A
   );
 
   const inputStyle = buildTextInputStyle(field, fieldWidth, fieldHeight, scale, focused);
-  const initialValue = String(formState.getValue(field.name) ?? "");
+  const value = String(formState.getValue(field.name) ?? "");
 
   const commonProps = {
     onFocus: handleFocus,
@@ -149,7 +136,7 @@ export default function AcroTextField({ field, scale, pageHeight, className }: A
     style: inputStyle,
     "aria-label": field.name,
     className: `react-acroform-input${field.comb ? " react-acroform-input--comb" : ""}`,
-    defaultValue: initialValue,
+    value,
   };
 
   return (
@@ -163,9 +150,9 @@ export default function AcroTextField({ field, scale, pageHeight, className }: A
         }}
       >
         {field.multiline ? (
-          <textarea ref={textareaRef} {...commonProps} />
+          <textarea {...commonProps} />
         ) : (
-          <input ref={inputRef} type="text" {...commonProps} />
+          <input type="text" {...commonProps} />
         )}
       </div>
     </BaseField>

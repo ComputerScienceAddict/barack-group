@@ -5,14 +5,19 @@ import { PDFDocument } from "pdf-lib";
 const root = process.cwd();
 const docsDir = path.join(root, "public", "documents");
 
-const PACKET_TEMPLATES = [
+const EMPLOYMENT_TEMPLATES = [
+  "janiking-employment-application-english.pdf",
   "janiking-employment-application-spanish.pdf",
+];
+
+const PACKET_TEMPLATES = [
   "w-4.pdf",
   "i-9.pdf",
   "wh-151ps-2024.pdf",
   "wh-153s-2024.pdf",
 ];
 
+/** One employment form + the shared forms in each submitted packet. */
 const EXPECTED_FORM_PAGE_COUNT = 14;
 
 async function countPdfPages(filePath) {
@@ -27,7 +32,7 @@ async function countWh153Fields(filePath) {
   return doc.getForm().getFields().length;
 }
 
-const missingTemplates = PACKET_TEMPLATES.filter(
+const missingTemplates = [...EMPLOYMENT_TEMPLATES, ...PACKET_TEMPLATES].filter(
   (name) => !fs.existsSync(path.join(docsDir, name))
 );
 if (missingTemplates.length) {
@@ -36,6 +41,11 @@ if (missingTemplates.length) {
 }
 
 let formPageCount = 0;
+for (const name of EMPLOYMENT_TEMPLATES) {
+  const pages = await countPdfPages(path.join(docsDir, name));
+  console.log(`${name}: ${pages} page(s)`);
+}
+formPageCount += await countPdfPages(path.join(docsDir, EMPLOYMENT_TEMPLATES[0]));
 for (const name of PACKET_TEMPLATES) {
   const pages = await countPdfPages(path.join(docsDir, name));
   formPageCount += pages;
@@ -60,8 +70,8 @@ const pdfFormsSource = fs.readFileSync(
   path.join(root, "src/lib/employee-onboarding/pdfForms.ts"),
   "utf8"
 );
-if (!pdfFormsSource.includes("wh153FormConfig")) {
-  console.error("pdfForms.ts is missing wh153FormConfig");
+if (!pdfFormsSource.includes("employmentEnglishFormConfig") || !pdfFormsSource.includes("employmentSpanishFormConfig")) {
+  console.error("pdfForms.ts is missing locale-specific employment form configs");
   process.exit(1);
 }
 

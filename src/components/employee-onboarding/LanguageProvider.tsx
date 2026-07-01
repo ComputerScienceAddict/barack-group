@@ -1,12 +1,10 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { LOCALE_STORAGE_KEY, type Locale, type MessageKey, translate } from "@/lib/employee-onboarding/i18n";
+import { LOCALE_STORAGE_KEY, readStoredLocale, type Locale, type MessageKey, translate } from "@/lib/employee-onboarding/i18n";
 
-function readStoredLocale(): Locale {
-  if (typeof window === "undefined") return "en";
-  const saved = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-  return saved === "en" || saved === "es" ? saved : "en";
+function readInitialLocale(): Locale {
+  return readStoredLocale();
 }
 
 type LanguageContextValue = {
@@ -18,7 +16,7 @@ type LanguageContextValue = {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(readStoredLocale);
+  const [locale, setLocaleState] = useState<Locale>(readInitialLocale);
 
   useEffect(() => {
     document.documentElement.lang = locale;

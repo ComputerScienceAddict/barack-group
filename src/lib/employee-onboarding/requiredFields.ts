@@ -1,14 +1,13 @@
 import type { PdfFieldValue } from "@/lib/employee-onboarding/fillPdf";
 import { getMissingFieldIssues } from "@/lib/employee-onboarding/fieldLabels";
+import { I9_CONTACT_HIGHLIGHT_FIELDS, mergeHighlightFields } from "@/lib/employee-onboarding/contactFields";
+import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 
-/** I-9 Section 1 — employee info & attestation (circled area on page 1). */
+/** I-9 Section 1 — employee info & attestation (page 1 only). */
 export const I9_SECTION1_HIGHLIGHT_FIELDS = [
   "Last Name (Family Name)",
-  "Last Name Family Name from Section 1",
   "First Name Given Name",
-  "First Name Given Name from Section 1",
   "Employee Middle Initial (if any)",
-  "Middle initial if any from Section 1",
   "Employee Other Last Names Used (if any)",
   "Address Street Number and Name",
   "Apt Number (if any)",
@@ -31,6 +30,13 @@ export const I9_SECTION1_HIGHLIGHT_FIELDS = [
   "Signature of Employee",
   "Today's Date mmddyyy"
 ] as const;
+
+/** I-9 SSN — extra-visible yellow box (field label: "U.S. Social Security Number"). */
+export const I9_SOCIAL_SECURITY_EMPHASIS_FIELDS = ["US Social Security Number"] as const;
+
+export function isSocialSecurityPdfFieldName(name: string): boolean {
+  return /social security/i.test(name);
+}
 
 /** Must be filled before leaving I-9 (optional-on-form fields excluded). */
 export const I9_SECTION1_VALIDATE_FIELDS = [
@@ -81,13 +87,24 @@ export const WH151_VALIDATE_FIELDS = ["Text440", "Text441"] as const;
 
 export type RequiredFieldRules = {
   highlightFields: readonly string[];
+  /** Stronger yellow box for critical fields (e.g. I-9 SSN). */
+  emphasisFields?: readonly string[];
+  /** When set, yellow highlights apply only on these PDF page numbers (1-based). */
+  highlightPages?: readonly number[];
   validateFields: readonly string[];
   checkboxGroups?: readonly (readonly string[])[];
+  labeledCheckboxGroups?: readonly {
+    groupKey: string;
+    fields: readonly string[];
+    labelKey: MessageKey;
+  }[];
   validateFieldAliases?: Readonly<Record<string, readonly string[]>>;
 };
 
 export const i9RequiredRules: RequiredFieldRules = {
-  highlightFields: I9_SECTION1_HIGHLIGHT_FIELDS,
+  highlightFields: mergeHighlightFields(I9_SECTION1_HIGHLIGHT_FIELDS, I9_CONTACT_HIGHLIGHT_FIELDS),
+  emphasisFields: I9_SOCIAL_SECURITY_EMPHASIS_FIELDS,
+  highlightPages: [1],
   validateFields: I9_SECTION1_VALIDATE_FIELDS,
   checkboxGroups: [I9_CITIZENSHIP_CHECKBOXES],
   validateFieldAliases: I9_VALIDATE_FIELD_ALIASES
@@ -112,6 +129,15 @@ export const W4_STEP1_FIELDS = [
   "topmostSubform[0].Page1[0].f1_14[0]"
 ] as const;
 
+/** W-4 Step 3 — claim dependents (3a, 3b, and line 3 total). */
+export const W4_STEP3_FIELDS = [
+  "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]",
+  "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]",
+  "topmostSubform[0].Page1[0].f1_08[0]",
+] as const;
+
+export const W4_HIGHLIGHT_FIELDS = [...W4_STEP1_FIELDS, ...W4_STEP3_FIELDS] as const;
+
 export const W4_VALIDATE_FIELDS = [
   "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]",
   "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]",
@@ -129,7 +155,7 @@ export const W4_FILING_STATUS_CHECKBOXES = [
 ] as const;
 
 export const w4RequiredRules: RequiredFieldRules = {
-  highlightFields: W4_STEP1_FIELDS,
+  highlightFields: W4_HIGHLIGHT_FIELDS,
   validateFields: W4_VALIDATE_FIELDS,
   checkboxGroups: [W4_FILING_STATUS_CHECKBOXES]
 };
@@ -185,19 +211,55 @@ export function clearMissingPdfFieldMarks(root: ParentNode) {
   });
 }
 
-export function applyRequiredFieldHighlight(root: ParentNode, highlightFields: readonly string[]) {
+function getPdfFieldPageNumber(fieldEl: HTMLElement): number | null {
+  const pageEl = fieldEl.closest<HTMLElement>(".react-acroform-page[data-page-number]");
+  if (!pageEl) return null;
+  const pageNumber = Number(pageEl.getAttribute("data-page-number"));
+  return Number.isFinite(pageNumber) ? pageNumber : null;
+}
+
+function shouldEmphasizePdfField(
+  name: string,
+  emphasisFields?: readonly string[]
+): boolean {
+  if (emphasisFields?.includes(name)) return true;
+  return isSocialSecurityPdfFieldName(name);
+}
+
+export function applyRequiredFieldHighlight(
+  root: ParentNode,
+  highlightFields: readonly string[],
+  highlightPages?: readonly number[],
+  emphasisFields?: readonly string[]
+) {
   const required = new Set(highlightFields);
+  const pageFilter =
+    highlightPages && highlightPages.length > 0 ? new Set(highlightPages) : null;
 
   root.querySelectorAll<HTMLElement>(".react-acroform-field[data-field-name]").forEach((fieldEl) => {
     const name = fieldEl.getAttribute("data-field-name");
     if (!name) return;
 
-    if (required.has(name)) {
+    let shouldHighlight = required.has(name) || shouldEmphasizePdfField(name, emphasisFields);
+    if (shouldHighlight && pageFilter) {
+      const pageNumber = getPdfFieldPageNumber(fieldEl);
+      shouldHighlight = pageNumber !== null && pageFilter.has(pageNumber);
+    }
+
+    if (shouldHighlight) {
       fieldEl.classList.add("pdf-field-required");
       fieldEl.setAttribute("data-required-highlight", "true");
+      if (shouldEmphasizePdfField(name, emphasisFields)) {
+        fieldEl.classList.add("pdf-field-emphasis");
+        fieldEl.setAttribute("data-emphasis-highlight", "true");
+      } else {
+        fieldEl.classList.remove("pdf-field-emphasis");
+        fieldEl.removeAttribute("data-emphasis-highlight");
+      }
     } else {
-      fieldEl.classList.remove("pdf-field-required");
+      fieldEl.classList.remove("pdf-field-required", "pdf-field-emphasis");
       fieldEl.removeAttribute("data-required-highlight");
+      fieldEl.removeAttribute("data-emphasis-highlight");
     }
   });
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import FillablePdfForm, { type FillablePdfFormHandle } from "@/components/employee-onboarding/FillablePdfForm";
 import NameEntryStep from "@/components/employee-onboarding/NameEntryStep";
 import OnboardingStepNav from "@/components/employee-onboarding/OnboardingStepNav";
@@ -13,6 +13,7 @@ import type { PdfFieldValue } from "@/lib/employee-onboarding/fillPdf";
 import type { MissingFieldIssue } from "@/lib/employee-onboarding/fieldLabels";
 import { getHighlightKeysForIssues, getMissingFieldIssues } from "@/lib/employee-onboarding/fieldLabels";
 import type { MessageKey } from "@/lib/employee-onboarding/i18n";
+import type { Locale } from "@/lib/employee-onboarding/i18n";
 import { pdfFieldValuesEqual, mergePdfFieldValues } from "@/lib/employee-onboarding/pdfFieldValues";
 import {
   DIRECT_DEPOSIT_STEP,
@@ -23,6 +24,7 @@ import {
   SUBMIT_STEP,
   TOTAL_STEPS,
   getFormStepIndex,
+  getOnboardingFormConfigs,
   isFormStep,
   type OnboardingFormId,
   type PdfFormConfig
@@ -41,6 +43,7 @@ import {
   readDraftSnapshot,
   DRAFT_KEY,
   PACKET_KEY,
+  type EmploymentByLocale,
   type FormValuesState,
 } from "@/lib/employee-onboarding/loadDraft";
 
@@ -61,25 +64,21 @@ const FORM_TITLE_KEYS: Record<OnboardingFormId, MessageKey> = {
   wh153: "formWh153",
 };
 
-function bytesToBase64(bytes: Uint8Array): string {
-  let binary = "";
-  const chunkSize = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-  }
-  return btoa(binary);
-}
-
 function applyApplicantPrefill(
   current: FormValuesState,
-  name: ApplicantName
+  name: ApplicantName,
+  locale: Locale
 ): FormValuesState {
+  const employmentPrefill: Record<string, PdfFieldValue> =
+    locale === "es"
+      ? { nombre: name.firstName, apellido: name.lastName }
+      : { first_name: name.firstName, last_name: name.lastName };
+
   return {
     ...current,
     employment: {
       ...current.employment,
-      nombre: name.firstName,
-      apellido: name.lastName,
+      ...employmentPrefill,
     },
     i9: {
       ...current.i9,
@@ -95,11 +94,6 @@ function applyApplicantPrefill(
   };
 }
 
-function getConfigForStep(formStep: number): PdfFormConfig | null {
-  if (!isFormStep(formStep)) return null;
-  return ONBOARDING_FORM_CONFIGS[getFormStepIndex(formStep)] ?? null;
-}
-
 export default function OnboardingApp() {
   return (
     <LanguageProvider>
@@ -111,6 +105,8 @@ export default function OnboardingApp() {
 function OnboardingAppContent() {
   const { locale, setLocale, t } = useLanguage();
   const [initialDraft] = useState(readDraftSnapshot);
+  const formConfigs = useMemo(() => getOnboardingFormConfigs(locale), [locale]);
+  const employmentByLocaleRef = useRef<EmploymentByLocale>(initialDraft.employmentByLocale);
   const [step, setStep] = useState(initialDraft.step);
   const [formValues, setFormValues] = useState<FormValuesState>(initialDraft.formValues);
   const [directDepositValues, setDirectDepositValues] = useState<DirectDepositValues>(
@@ -136,6 +132,14 @@ function OnboardingAppContent() {
   const wh153FormRef = useRef<FillablePdfFormHandle>(null);
   const directDepositFormRef = useRef<DirectDepositFormHandle>(null);
 
+  const getConfigForStep = useCallback(
+    (formStep: number): PdfFormConfig | null => {
+      if (!isFormStep(formStep)) return null;
+      return formConfigs[getFormStepIndex(formStep)] ?? null;
+    },
+    [formConfigs]
+  );
+
   const updateFormValues = useCallback((formId: OnboardingFormId, values: Record<string, PdfFieldValue>) => {
     setFormValues((prev) => {
       if (pdfFieldValuesEqual(prev[formId], values)) return prev;
@@ -144,8 +148,11 @@ function OnboardingAppContent() {
   }, []);
 
   const updateEmploymentValues = useCallback(
-    (values: Record<string, PdfFieldValue>) => updateFormValues("employment", values),
-    [updateFormValues]
+    (values: Record<string, PdfFieldValue>) => {
+      employmentByLocaleRef.current[locale] = values;
+      updateFormValues("employment", values);
+    },
+    [locale, updateFormValues]
   );
 
   const updateW4Values = useCallback(
@@ -214,9 +221,35 @@ function OnboardingAppContent() {
   useEffect(() => {
     window.localStorage.setItem(
       DRAFT_KEY,
-      JSON.stringify({ formValues, directDepositValues, applicantName, step, savedAt: new Date().toISOString() })
+      JSON.stringify({
+        formValues,
+        employmentByLocale: employmentByLocaleRef.current,
+        directDepositValues,
+        applicantName,
+        step,
+        savedAt: new Date().toISOString(),
+      })
     );
   }, [applicantName, directDepositValues, formValues, step]);
+
+  function handleLocaleChange(next: Locale) {
+    if (next === locale) return;
+    employmentByLocaleRef.current[locale] = formValues.employment;
+    let nextEmployment = employmentByLocaleRef.current[next];
+    if (!nextEmployment || Object.keys(nextEmployment).length === 0) {
+      nextEmployment = applyApplicantPrefill(
+        { ...formValues, employment: {} },
+        applicantName,
+        next
+      ).employment;
+      employmentByLocaleRef.current[next] = nextEmployment;
+    }
+    setFormValues((prev) => ({ ...prev, employment: nextEmployment }));
+    setLocale(next);
+    if (step === FORM_START_STEP) {
+      setFormSession((current) => current + 1);
+    }
+  }
 
   function clearMissingMarks() {
     employmentFormRef.current?.clearMissingMarks();
@@ -230,6 +263,7 @@ function OnboardingAppContent() {
   function hardReset() {
     clearStoredOnboardingData();
     setFormValues(EMPTY_FORM_VALUES);
+    employmentByLocaleRef.current = { en: {}, es: {} };
     setDirectDepositValues(EMPTY_DIRECT_DEPOSIT_VALUES);
     setApplicantName(EMPTY_APPLICANT_NAME);
     setNameMissingKeys([]);
@@ -246,7 +280,8 @@ function OnboardingAppContent() {
   }
 
   function showMissingFields(formStep: number, issues: MissingFieldIssue[]) {
-    const highlightKeys = getHighlightKeysForIssues(issues);
+    const rules = getConfigForStep(formStep)?.requiredRules;
+    const highlightKeys = getHighlightKeysForIssues(issues, rules);
     const scrollTarget = issues[0]?.scrollTarget ?? highlightKeys[0];
 
     setMissingFormStep(formStep);
@@ -268,7 +303,8 @@ function OnboardingAppContent() {
   }
 
   function jumpToMissingField(formStep: number, issue: MissingFieldIssue) {
-    const highlightKeys = getHighlightKeysForIssues([issue]);
+    const rules = getConfigForStep(formStep)?.requiredRules;
+    const highlightKeys = getHighlightKeysForIssues([issue], rules);
     if (step !== formStep) {
       pendingFocusRef.current = {
         step: formStep,
@@ -296,7 +332,7 @@ function OnboardingAppContent() {
         return false;
       }
       setNameMissingKeys([]);
-      setFormValues((prev) => applyApplicantPrefill(prev, normalized));
+      setFormValues((prev) => applyApplicantPrefill(prev, normalized, locale));
       return true;
     }
 
@@ -395,14 +431,14 @@ function OnboardingAppContent() {
       return;
     }
 
-    const flushedByStep = ONBOARDING_FORM_CONFIGS.map((config, index) => ({
+    const flushedByStep = formConfigs.map((config, index) => ({
       formStep: FORM_START_STEP + index,
       values: flushStepValues(FORM_START_STEP + index),
       id: config.id,
     }));
 
     for (const entry of flushedByStep) {
-      const config = ONBOARDING_FORM_CONFIGS[getFormStepIndex(entry.formStep)];
+      const config = formConfigs[getFormStepIndex(entry.formStep)];
       const issues = getMissingFieldIssues(config.requiredRules, entry.values);
       if (issues.length > 0) {
         setFormValues((prev) => ({ ...prev, [entry.id]: entry.values }));
@@ -441,7 +477,7 @@ function OnboardingAppContent() {
           ? [await buildDirectDepositPdfBytes(flushedDirectDeposit)]
           : undefined;
       const packetResult = await buildOnboardingPacket(
-        ONBOARDING_FORM_CONFIGS.map((config) => ({
+        formConfigs.map((config) => ({
           templatePath: config.templatePath,
           values: flushedFormValues[config.id],
         })),
@@ -465,7 +501,9 @@ function OnboardingAppContent() {
             firstName: normalizedName.firstName,
             lastName: normalizedName.lastName,
             packetId,
-            pdfBase64: bytesToBase64(packetResult.pdfBytes),
+            locale,
+            formValues: flushedFormValues,
+            directDepositValues: flushedDirectDeposit,
           }),
         });
         emailSent = emailResponse.ok;
@@ -485,7 +523,7 @@ function OnboardingAppContent() {
             submittedAt: new Date().toISOString(),
             applicantName: normalizedName,
             ...Object.fromEntries(
-              ONBOARDING_FORM_CONFIGS.map((config) => [`${config.id}Values`, flushedFormValues[config.id]])
+              formConfigs.map((config) => [`${config.id}Values`, flushedFormValues[config.id]])
             ),
             directDepositValues: flushedDirectDeposit,
             emailSent,
@@ -566,7 +604,7 @@ function OnboardingAppContent() {
             <button
               type="button"
               className={`langButton${locale === "en" ? " langButtonActive" : ""}`}
-              onClick={() => setLocale("en")}
+              onClick={() => handleLocaleChange("en")}
               aria-pressed={locale === "en"}
             >
               {t("langEnglish")}
@@ -574,7 +612,7 @@ function OnboardingAppContent() {
             <button
               type="button"
               className={`langButton${locale === "es" ? " langButtonActive" : ""}`}
-              onClick={() => setLocale("es")}
+              onClick={() => handleLocaleChange("es")}
               aria-pressed={locale === "es"}
             >
               {t("langSpanish")}
@@ -655,9 +693,9 @@ function OnboardingAppContent() {
             <h2 className="formHeading">{t("formEmployment")}</h2>
             <p className="formSubheading">{t("employmentFormHint")}</p>
             <FillablePdfForm
-              key={`employment-${formSession}`}
+              key={`employment-${locale}-${formSession}`}
               ref={employmentFormRef}
-              config={ONBOARDING_FORM_CONFIGS[0]}
+              config={formConfigs[0]}
               values={formValues.employment}
               onChange={updateEmploymentValues}
               active={step === FORM_START_STEP}
@@ -674,7 +712,7 @@ function OnboardingAppContent() {
             <FillablePdfForm
               key={`w4-${formSession}`}
               ref={w4FormRef}
-              config={ONBOARDING_FORM_CONFIGS[1]}
+              config={formConfigs[1]}
               values={formValues.w4}
               onChange={updateW4Values}
               active={step === FORM_START_STEP + 1}
@@ -691,7 +729,7 @@ function OnboardingAppContent() {
             <FillablePdfForm
               key={`i9-${formSession}`}
               ref={i9FormRef}
-              config={ONBOARDING_FORM_CONFIGS[2]}
+              config={formConfigs[2]}
               values={formValues.i9}
               onChange={updateI9Values}
               active={step === FORM_START_STEP + 2}
@@ -708,7 +746,7 @@ function OnboardingAppContent() {
             <FillablePdfForm
               key={`wh151-${formSession}`}
               ref={wh151FormRef}
-              config={ONBOARDING_FORM_CONFIGS[3]}
+              config={formConfigs[3]}
               values={formValues.wh151}
               onChange={updateWh151Values}
               active={step === FORM_START_STEP + 3}
@@ -725,7 +763,7 @@ function OnboardingAppContent() {
             <FillablePdfForm
               key={`wh153-${formSession}`}
               ref={wh153FormRef}
-              config={ONBOARDING_FORM_CONFIGS[4]}
+              config={formConfigs[4]}
               values={formValues.wh153}
               onChange={updateWh153Values}
               active={step === FORM_START_STEP + 4}

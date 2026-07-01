@@ -170,8 +170,16 @@ export async function verifyFilledPdf(
   return verified;
 }
 
-export async function fillPdf(templatePath: string, fieldValues: Record<string, PdfFieldValue>): Promise<FillPdfResult> {
-  const templateBytes = await loadPdfBytes(templatePath);
+export type LoadTemplateBytes = (templatePath: string) => Promise<ArrayBuffer>;
+
+export async function fillPdf(
+  templatePath: string,
+  fieldValues: Record<string, PdfFieldValue>,
+  loadTemplate?: LoadTemplateBytes
+): Promise<FillPdfResult> {
+  const templateBytes = loadTemplate
+    ? await loadTemplate(templatePath)
+    : await loadPdfBytes(templatePath);
   return fillPdfFromBytes(templateBytes, fieldValues);
 }
 
@@ -214,13 +222,13 @@ function hasNonEmptyValues(values: Record<string, PdfFieldValue>): boolean {
 
 export async function buildOnboardingPacket(
   entries: OnboardingPacketEntry[],
-  options?: { appendPdfBytes?: Uint8Array[] }
+  options?: { appendPdfBytes?: Uint8Array[]; loadTemplate?: LoadTemplateBytes }
 ): Promise<OnboardingPacketResult> {
   const mergedDoc = await PDFDocument.create();
   const formResults: FillPdfResult[] = [];
 
   for (const entry of entries) {
-    const result = await fillPdf(entry.templatePath, entry.values);
+    const result = await fillPdf(entry.templatePath, entry.values, options?.loadTemplate);
     if (hasNonEmptyValues(entry.values) && result.filledCount === 0) {
       throw new Error(`Could not save field values into ${entry.templatePath}.`);
     }

@@ -6,8 +6,9 @@ import {
   w4RequiredRules,
   wh151RequiredRules
 } from "@/lib/employee-onboarding/requiredFields";
-import { employmentRequiredRules } from "@/lib/employee-onboarding/employmentFields";
+import { employmentEnglishRequiredRules, employmentSpanishRequiredRules } from "@/lib/employee-onboarding/employmentFields";
 import { wh153RequiredRules } from "@/lib/employee-onboarding/wh153Fields";
+import type { Locale } from "@/lib/employee-onboarding/i18n";
 
 export type PdfFormKind = "fillable";
 
@@ -23,15 +24,42 @@ export type PdfFormConfig = {
 
 export const ONBOARDING_PACKET_FILENAME = "new-hire-onboarding-packet.pdf";
 
-export const employmentFormConfig: PdfFormConfig = {
+export const employmentSpanishFormConfig: PdfFormConfig = {
   id: "employment",
   title: "JaniKing Employment Application (Spanish)",
   templatePath: "/documents/janiking-employment-application-spanish.pdf",
   downloadFilename: "janiking-employment-application-filled.pdf",
   pageCount: 1,
   kind: "fillable",
-  requiredRules: employmentRequiredRules
+  requiredRules: employmentSpanishRequiredRules,
 };
+
+export const employmentEnglishFormConfig: PdfFormConfig = {
+  id: "employment",
+  title: "JaniKing Employment Application (English)",
+  templatePath: "/documents/janiking-employment-application-english.pdf",
+  downloadFilename: "janiking-employment-application-filled.pdf",
+  pageCount: 1,
+  kind: "fillable",
+  requiredRules: employmentEnglishRequiredRules,
+};
+
+/** @deprecated Use getEmploymentFormConfig(locale) */
+export const employmentFormConfig = employmentEnglishFormConfig;
+
+export function getEmploymentFormConfig(locale: Locale): PdfFormConfig {
+  return locale === "es" ? employmentSpanishFormConfig : employmentEnglishFormConfig;
+}
+
+export function getOnboardingFormConfigs(locale: Locale): readonly PdfFormConfig[] {
+  return [
+    getEmploymentFormConfig(locale),
+    w4FormConfig,
+    i9FormConfig,
+    wh151FormConfig,
+    wh153FormConfig,
+  ];
+}
 
 export const w4FormConfig: PdfFormConfig = {
   id: "w4",
@@ -74,7 +102,7 @@ export const wh153FormConfig: PdfFormConfig = {
 };
 
 export const ONBOARDING_FORM_CONFIGS = [
-  employmentFormConfig,
+  employmentEnglishFormConfig,
   w4FormConfig,
   i9FormConfig,
   wh151FormConfig,

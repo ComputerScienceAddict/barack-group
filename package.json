@@ -9,7 +9,10 @@
     "lint": "eslint",
     "smoke:onboarding": "node scripts/smoke-test-onboarding.mjs",
     "verify:onboarding-packet": "node scripts/verify-onboarding-packet.mjs",
-    "test:onboarding": "npm run verify:onboarding-packet && npm run smoke:onboarding"
+    "test:onboarding": "npm run verify:onboarding-packet && npm run smoke:onboarding",
+    "test:smtp": "node scripts/test-smtp.mjs",
+    "test:submit-api": "node scripts/test-submit-api.mjs",
+    "test:john-doe": "npx tsx scripts/test-john-doe-e2e.ts"
   },
   "dependencies": {
     "next": "16.2.9",

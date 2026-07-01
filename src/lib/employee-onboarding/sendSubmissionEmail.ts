@@ -49,7 +49,12 @@ export async function sendSubmissionEmail(input: SendSubmissionEmailInput) {
     port,
     secure: port === 465,
     auth: { user, pass },
+    connectionTimeout: 30_000,
+    greetingTimeout: 30_000,
+    socketTimeout: 60_000,
   });
+
+  await transporter.verify();
 
   await transporter.sendMail({
     from: `"Barak Group Onboarding" <${user}>`,

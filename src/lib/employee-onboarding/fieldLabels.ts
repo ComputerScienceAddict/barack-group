@@ -44,6 +44,51 @@ const PDF_FIELD_LABEL_KEYS: Record<string, MessageKey> = {
   codigo_postal: "fieldZip",
   firma_solicitante: "fieldEmployeeSignature",
   fecha_firma: "fieldEmployeeDate",
+  last_name: "fieldLastName",
+  first_name: "fieldFirstName",
+  phone_number: "fieldPhone",
+  address: "fieldAddress",
+  city: "fieldCity",
+  state: "fieldState",
+  zip_code: "fieldZip",
+  applicant_signature: "fieldEmployeeSignature",
+  applicant_signature_date: "fieldEmployeeDate",
+  date_of_application: "fieldApplicationDate",
+  middle_initial: "fieldMiddleInitial",
+  ssn: "fieldSsn",
+  ssn_1: "fieldSsn",
+  ssn_2: "fieldSsn",
+  ssn_3: "fieldSsn",
+  email_address: "fieldEmail",
+  correo_electronico: "fieldEmail",
+  fecha_solicitud: "fieldApplicationDate",
+  inicial_segundo_nombre: "fieldMiddleInitial",
+  emergencia_nombre_1: "fieldEmergencyName",
+  emergencia_relacion_1: "fieldEmergencyRelationship",
+  emergencia_telefono_1: "fieldPhone",
+  emergencia_telefono_alterno_1: "fieldAltPhone",
+  emergencia_nombre_2: "fieldEmergencyName",
+  emergencia_relacion_2: "fieldEmergencyRelationship",
+  emergencia_telefono_2: "fieldPhone",
+  emergencia_telefono_alterno_2: "fieldAltPhone",
+  emergency_1_full_name: "fieldEmergencyName",
+  emergency_1_relationship: "fieldEmergencyRelationship",
+  emergency_1_phone: "fieldPhone",
+  emergency_1_alt_phone: "fieldAltPhone",
+  emergency_2_full_name: "fieldEmergencyName",
+  emergency_2_relationship: "fieldEmergencyRelationship",
+  emergency_2_phone: "fieldPhone",
+  emergency_2_alt_phone: "fieldAltPhone",
+  entrevistado_por: "fieldInterviewedBy",
+  fecha_entrevista: "fieldInterviewDate",
+  puesto_ofrecido: "fieldPositionOffered",
+  fecha_inicio: "fieldStartDate",
+  notas: "fieldCompanyNotes",
+  interviewed_by: "fieldInterviewedBy",
+  company_date: "fieldInterviewDate",
+  position_offered: "fieldPositionOffered",
+  start_date: "fieldStartDate",
+  company_notes: "fieldCompanyNotes",
   "nombre del empleado": "fieldWh153EmployeeName",
   "nombre del empleador": "fieldWh153EmployerName",
   "nombre del negocio": "fieldWh153BusinessName",
@@ -87,6 +132,17 @@ export function getMissingFieldIssues(
     }
   }
 
+  for (const group of rules.labeledCheckboxGroups ?? []) {
+    const anyChecked = group.fields.some((name) => values[name] === true);
+    if (!anyChecked) {
+      issues.push({
+        fieldKey: group.groupKey,
+        labelKey: group.labelKey,
+        scrollTarget: group.fields[0],
+      });
+    }
+  }
+
   for (const group of rules.checkboxGroups ?? []) {
     const anyChecked = group.some((name) => values[name] === true);
     if (!anyChecked) {
@@ -104,7 +160,10 @@ export function getMissingFieldIssues(
   return issues;
 }
 
-export function getHighlightKeysForIssues(issues: MissingFieldIssue[]): string[] {
+export function getHighlightKeysForIssues(
+  issues: MissingFieldIssue[],
+  rules?: RequiredFieldRules
+): string[] {
   const keys = new Set<string>();
   for (const issue of issues) {
     keys.add(issue.scrollTarget);
@@ -116,6 +175,14 @@ export function getHighlightKeysForIssues(issues: MissingFieldIssue[]): string[]
     if (issue.fieldKey === W4_FILING_STATUS_GROUP_KEY) {
       for (const box of W4_FILING_STATUS_CHECKBOXES) {
         keys.add(box);
+      }
+    }
+    const labeledGroup = rules?.labeledCheckboxGroups?.find(
+      (entry) => entry.groupKey === issue.fieldKey
+    );
+    if (labeledGroup) {
+      for (const field of labeledGroup.fields) {
+        keys.add(field);
       }
     }
   }
