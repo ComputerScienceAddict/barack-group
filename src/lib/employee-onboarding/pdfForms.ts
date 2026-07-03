@@ -98,7 +98,7 @@ export const i9FormConfig: PdfFormConfig = {
 
 export const wh151FormConfig: PdfFormConfig = {
   id: "wh151",
-  title: "WH-151PS Michigan Withholding",
+  title: "BOLI Michigan Withholding",
   templatePath: "/documents/wh-151ps-2024.pdf",
   downloadFilename: "wh-151ps-filled.pdf",
   pageCount: 2,
@@ -115,8 +115,9 @@ export const ONBOARDING_FORM_CONFIGS = [
 
 export type OnboardingFormId = (typeof ONBOARDING_FORM_CONFIGS)[number]["id"];
 
-export const NAME_ENTRY_STEP = 0;
-export const FORM_START_STEP = 1;
+export const TUTORIAL_STEP = 0;
+export const NAME_ENTRY_STEP = 1;
+export const FORM_START_STEP = 2;
 export const DIRECT_DEPOSIT_STEP = FORM_START_STEP + ONBOARDING_FORM_CONFIGS.length;
 export const SUBMIT_STEP = DIRECT_DEPOSIT_STEP + 1;
 export const TOTAL_STEPS = SUBMIT_STEP + 1;

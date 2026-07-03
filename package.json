@@ -10,6 +10,9 @@
     "smoke:onboarding": "node scripts/smoke-test-onboarding.mjs",
     "verify:onboarding-packet": "node scripts/verify-onboarding-packet.mjs",
     "test:onboarding": "npm run verify:onboarding-packet && npm run smoke:onboarding",
+    "test:signatures": "npx tsx scripts/test-signature-and-w4.ts",
+    "test:w4-spanish": "npx tsx scripts/test-w4-spanish-e2e.ts",
+    "test:all": "npm run build && npm run lint && npm run test:onboarding && npm run test:signatures && npm run test:john-doe",
     "test:smtp": "node scripts/test-smtp.mjs",
     "test:submit-api": "node scripts/test-submit-api.mjs",
     "test:john-doe": "npx tsx scripts/test-john-doe-e2e.ts"

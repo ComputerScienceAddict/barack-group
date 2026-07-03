@@ -22,6 +22,7 @@ import {
   ONBOARDING_FORM_CONFIGS,
   ONBOARDING_PACKET_FILENAME,
   SUBMIT_STEP,
+  TUTORIAL_STEP,
   TOTAL_STEPS,
   getFormStepIndex,
   getOnboardingFormConfigs,
@@ -74,13 +75,20 @@ function applyApplicantPrefill(
     apellido: name.lastName,
   };
 
+  const today = (() => {
+    const d = new Date();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${mm}/${dd}/${d.getFullYear()}`;
+  })();
+
   const w4Prefill: Record<string, PdfFieldValue> = {
     "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]": name.firstName,
     "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]": name.lastName,
     "topmostSubform[0].Page1[0].Paso1a[0].f1_01[0]": name.firstName,
     "topmostSubform[0].Page1[0].Paso1a[0].f1_02[0]": name.lastName,
-    employee_signature_step5: `${name.firstName} ${name.lastName}`,
-    employee_signature_step5_sp: `${name.firstName} ${name.lastName}`,
+    employee_date_step5: today,
+    employee_date_step5_sp: today,
   };
 
   return {
@@ -162,9 +170,9 @@ function OnboardingAppContent() {
 
   const updateW4Values = useCallback(
     (values: Record<string, PdfFieldValue>) => {
-      updateFormValues("w4", mirrorW4FieldValues(values));
+      updateFormValues("w4", mirrorW4FieldValues(values, locale));
     },
-    [updateFormValues]
+    [locale, updateFormValues]
   );
   const updateI9Values = useCallback(
     (values: Record<string, PdfFieldValue>) => updateFormValues("i9", values),
@@ -238,7 +246,7 @@ function OnboardingAppContent() {
     setFormValues((prev) => ({
       ...prev,
       employment: mirrorEmploymentFieldValues(prev.employment),
-      w4: mirrorW4FieldValues(prev.w4),
+      w4: mirrorW4FieldValues(prev.w4, next),
     }));
     setLocale(next);
     const w4Step = FORM_START_STEP + 1;
@@ -313,6 +321,10 @@ function OnboardingAppContent() {
   }
 
   function validateCurrentStep(): boolean {
+    if (step === TUTORIAL_STEP) {
+      return true;
+    }
+
     if (step === NAME_ENTRY_STEP) {
       const normalized = normalizeApplicantName(applicantName);
       setApplicantName(normalized);
@@ -663,6 +675,23 @@ function OnboardingAppContent() {
         <div className="formPanel">
           <section
             className="formSection"
+            style={{ display: step === TUTORIAL_STEP ? "block" : "none" }}
+            aria-hidden={step !== TUTORIAL_STEP}
+          >
+            <h2 className="formHeading">{t("tutorialTitle")}</h2>
+            <div className="tutorialCard">
+              <p className="tutorialLine">{t("tutorialStep1")}</p>
+              <p className="tutorialLine">{t("tutorialStep2")}</p>
+              <p className="tutorialLine">{t("tutorialStep3")}</p>
+              <p className="tutorialLine">{t("tutorialStep4")}</p>
+              <p className="tutorialLine">{t("tutorialStep5")}</p>
+              <p className="tutorialLine">{t("tutorialStep6")}</p>
+              <p className="tutorialTip">{t("tutorialTip")}</p>
+            </div>
+          </section>
+
+          <section
+            className="formSection"
             style={{ display: step === NAME_ENTRY_STEP ? "block" : "none" }}
             aria-hidden={step !== NAME_ENTRY_STEP}
           >
@@ -793,7 +822,7 @@ function OnboardingAppContent() {
 
         <div className="stickyActionBar">
           <div className="actionRow">
-            {step > NAME_ENTRY_STEP ? (
+            {step > TUTORIAL_STEP ? (
               <button type="button" className="secondaryButton" onClick={prevStep}>
                 {t("back")}
               </button>

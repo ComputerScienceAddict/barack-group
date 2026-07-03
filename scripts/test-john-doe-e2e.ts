@@ -13,6 +13,7 @@ import { w4EnglishRequiredRules } from "../src/lib/employee-onboarding/w4Fields"
 import { wh151RequiredRules } from "../src/lib/employee-onboarding/requiredFields";
 import type { FormValuesState } from "../src/lib/employee-onboarding/loadDraft";
 import type { DirectDepositValues } from "../src/lib/employee-onboarding/directDeposit";
+import { blockDrawnSignatureValue } from "./onboardingTestFixtures";
 
 function loadEnvFile(filePath: string) {
   if (!fs.existsSync(filePath)) return;
@@ -41,6 +42,8 @@ loadEnvFile(path.join(process.cwd(), ".env.local"));
 const JOHN_DOE = { firstName: "John", lastName: "Doe" };
 const TODAY = "06/01/2026";
 
+const DRAWN_SIGNATURE = blockDrawnSignatureValue();
+
 const johnDoeFormValues: FormValuesState = {
   employment: {
     date_of_application: TODAY,
@@ -68,7 +71,7 @@ const johnDoeFormValues: FormValuesState = {
     emergency_2_relationship: "Brother",
     emergency_2_phone: "555-333-4444",
     emergency_2_alt_phone: "555-555-6666",
-    applicant_signature: "John Doe",
+    applicant_signature: DRAWN_SIGNATURE,
     applicant_signature_date: TODAY,
     interviewed_by: "HR Rep",
     company_date: TODAY,
@@ -86,7 +89,7 @@ const johnDoeFormValues: FormValuesState = {
     "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]": "0",
     "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]": "0",
     "topmostSubform[0].Page1[0].f1_08[0]": "0",
-    employee_signature_step5: "John Doe",
+    employee_signature_step5: DRAWN_SIGNATURE,
     employee_date_step5: TODAY,
   },
   i9: {
@@ -101,11 +104,11 @@ const johnDoeFormValues: FormValuesState = {
     "Employees E-mail Address": "john.doe@example.com",
     "Telephone Number": "555-123-4567",
     CB_1: true,
-    "Signature of Employee": "John Doe",
+    "Signature of Employee": DRAWN_SIGNATURE,
     "Today's Date mmddyyy": TODAY,
   },
   wh151: {
-    Text440: "John Doe",
+    Text440: DRAWN_SIGNATURE,
     Text441: TODAY,
   },
 };
@@ -170,8 +173,14 @@ for (let i = 0; i < packetResult.formResults.length; i++) {
 
 assert(packetResult.pageCount === 9, `Expected 9 pages in packet, got ${packetResult.pageCount}`);
 
-const totalVerified = packetResult.formResults.reduce((sum, r) => sum + r.verifiedCount, 0);
-assert(totalVerified >= 40, `Expected at least 40 verified fields in packet, got ${totalVerified}`);
+const totalFilled = packetResult.formResults.reduce((sum, r) => sum + r.filledCount, 0);
+assert(totalFilled >= 50, `Expected at least 50 filled fields in packet, got ${totalFilled}`);
+
+const totalSignatures = packetResult.formResults.reduce(
+  (sum, r) => sum + (r.verifiedCount > 0 ? r.verifiedCount : 0),
+  0
+);
+assert(totalSignatures >= 4, `Expected at least 4 drawn signatures verified, got ${totalSignatures}`);
 
 const outPath = path.join(process.cwd(), "scripts", "john-doe-workdocs-test.pdf");
 fs.writeFileSync(outPath, packetResult.pdfBytes);

@@ -44,6 +44,9 @@ const checks = [
   ["locale employment switch", onboardingApp.includes("handleLocaleChange")],
   ["submit and download", onboardingApp.includes("submitAndDownload")],
   ["local storage draft", onboardingApp.includes("localStorage")],
+  ["tutorial step", onboardingApp.includes("TUTORIAL_STEP")],
+  ["signature overlay component", fs.existsSync(path.join(root, "src/components/employee-onboarding/AcroSignatureField.tsx"))],
+  ["signature field registry", fs.existsSync(path.join(root, "src/lib/employee-onboarding/signatureFields.ts"))],
 ];
 
 const failed = checks.filter(([, passed]) => !passed).map(([name]) => name);

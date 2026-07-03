@@ -4,6 +4,7 @@ import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 import { useLanguage } from "@/components/employee-onboarding/LanguageProvider";
 
 const STEP_NAV_KEYS: MessageKey[] = [
+  "stepNameTutorial",
   "stepNameApplicant",
   "stepNameEmployment",
   "stepNameW4",

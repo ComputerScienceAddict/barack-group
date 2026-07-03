@@ -259,7 +259,7 @@ export const employmentSpanishRequiredRules: RequiredFieldRules = {
     EMPLOYMENT_SPANISH_CONTACT_HIGHLIGHT_FIELDS
   ),
   validateFields: employmentTextValidateFields(
-    EMPLOYMENT_SPANISH_FIELD_KEYS,
+    EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS,
     EMPLOYMENT_SPANISH_CHECKBOX_FIELDS
   ),
   labeledCheckboxGroups: EMPLOYMENT_SPANISH_CHECKBOX_GROUPS,
@@ -271,7 +271,7 @@ export const employmentEnglishRequiredRules: RequiredFieldRules = {
     EMPLOYMENT_ENGLISH_CONTACT_HIGHLIGHT_FIELDS
   ),
   validateFields: employmentTextValidateFields(
-    EMPLOYMENT_ENGLISH_FIELD_KEYS,
+    EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS,
     EMPLOYMENT_ENGLISH_CHECKBOX_FIELDS
   ),
   labeledCheckboxGroups: EMPLOYMENT_ENGLISH_CHECKBOX_GROUPS,

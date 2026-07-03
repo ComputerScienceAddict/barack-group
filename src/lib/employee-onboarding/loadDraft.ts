@@ -10,12 +10,12 @@ import {
 } from "@/lib/employee-onboarding/directDeposit";
 import type { PdfFieldValue } from "@/lib/employee-onboarding/fillPdf";
 import {
-  NAME_ENTRY_STEP,
+  TUTORIAL_STEP,
   SUBMIT_STEP,
   type OnboardingFormId,
 } from "@/lib/employee-onboarding/pdfForms";
 
-export const STORAGE_VERSION = "16";
+export const STORAGE_VERSION = "17";
 export const DRAFT_KEY = "newHireOnboardingDraft";
 export const PACKET_KEY = "newHireOnboardingPacket";
 export const VERSION_KEY = "newHireOnboardingVersion";
@@ -49,7 +49,7 @@ export function readDraftSnapshot(): DraftSnapshot {
     formValues: EMPTY_FORM_VALUES,
     directDepositValues: EMPTY_DIRECT_DEPOSIT_VALUES,
     applicantName: EMPTY_APPLICANT_NAME,
-    step: NAME_ENTRY_STEP,
+    step: TUTORIAL_STEP,
     draftRestored: false,
   };
 
@@ -84,7 +84,7 @@ export function readDraftSnapshot(): DraftSnapshot {
       step:
         typeof draft.step === "number" && draft.step >= 0 && draft.step <= SUBMIT_STEP
           ? draft.step
-          : NAME_ENTRY_STEP,
+          : TUTORIAL_STEP,
       draftRestored: true,
     };
   } catch {

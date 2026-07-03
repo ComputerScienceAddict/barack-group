@@ -21,7 +21,7 @@ import {
 import type { PDFPageProxy } from "pdfjs-dist";
 import "react-acroform/styles.css";
 import AcroPdfPage from "@/components/employee-onboarding/AcroPdfPage";
-import { downloadOnboardingPacket as downloadMergedPacket, downloadPdfBytes, fillPdf, type PdfFieldValue } from "@/lib/employee-onboarding/fillPdf";
+import { downloadOnboardingPacket as downloadMergedPacket, downloadPdfBytes, fillPdf, type PdfFieldValue, type PdfStampField } from "@/lib/employee-onboarding/fillPdf";
 import { collectDomFieldValues, countNonEmptyFieldValues, mergePdfFieldValues, valueFromFieldEvent } from "@/lib/employee-onboarding/pdfFieldValues";
 import { useLanguage } from "@/components/employee-onboarding/LanguageProvider";
 import type { MessageKey } from "@/lib/employee-onboarding/i18n";
@@ -150,6 +150,7 @@ function ScrollablePdfPages({
   emphasisFields,
   useWh153Overlay = false,
   onWh153Mapping,
+  onStampFields,
   active = true
 }: {
   src: string;
@@ -161,6 +162,7 @@ function ScrollablePdfPages({
   emphasisFields?: readonly string[];
   useWh153Overlay?: boolean;
   onWh153Mapping?: (mapping: Wh153OverlayMapping) => void;
+  onStampFields?: (fields: PdfStampField[]) => void;
   active?: boolean;
 }) {
   const { t } = useLanguage();
@@ -198,6 +200,17 @@ function ScrollablePdfPages({
       onWh153Mapping?.(wh153Overlay.mapping);
     }
   }, [onWh153Mapping, wh153Overlay]);
+
+  useEffect(() => {
+    if (!onStampFields || displayFields.length === 0) return;
+    onStampFields(
+      displayFields.map((field) => ({
+        name: field.name,
+        page: field.page,
+        rect: field.rect,
+      }))
+    );
+  }, [displayFields, onStampFields]);
 
   useEffect(() => {
     if (!document) return;
@@ -312,6 +325,7 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
   const valuesStoreRef = useRef<Record<string, PdfFieldValue>>({});
   const onChangeRef = useRef(onChange);
   const fieldsRootRef = useRef<HTMLDivElement>(null);
+  const stampFieldsRef = useRef<PdfStampField[]>([]);
   const isWh153 = config.id === "wh153";
   const wh153MappingRef = useRef<Wh153OverlayMapping | null>(null);
   const [wh153Mapping, setWh153Mapping] = useState<Wh153OverlayMapping | null>(null);
@@ -399,7 +413,7 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
     try {
       const latestValues = readMergedValues();
       onChangeRef.current(latestValues);
-      const result = await fillPdf(config.templatePath, latestValues);
+      const result = await fillPdf(config.templatePath, latestValues, undefined, stampFieldsRef.current);
       if (countNonEmptyFieldValues(latestValues) > 0 && result.filledCount === 0) {
         throw new Error(t("downloadFailed"));
       }
@@ -452,6 +466,9 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
             emphasisFields={config.requiredRules.emphasisFields}
             useWh153Overlay={isWh153}
             onWh153Mapping={setWh153Mapping}
+            onStampFields={(fields) => {
+              stampFieldsRef.current = fields;
+            }}
             active={active}
           />
         </FormStateProvider>

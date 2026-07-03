@@ -4,8 +4,13 @@ import {
   PDFDropdown,
   PDFForm,
   PDFRadioGroup,
-  PDFTextField
+  PDFTextField,
 } from "pdf-lib";
+import type { PdfStampField } from "@/lib/employee-onboarding/extractPdfStampFields";
+import {
+  decodeDrawnSignature,
+  isPdfSignatureField,
+} from "@/lib/employee-onboarding/signatureFields";
 
 export type PdfFieldValue = string | boolean | string[];
 
@@ -26,9 +31,119 @@ export async function loadPdfBytes(templatePath: string): Promise<ArrayBuffer> {
 
 import { mirrorI9FieldValues } from "@/lib/employee-onboarding/requiredFields";
 
+function dataUrlToBytes(dataUrl: string): Uint8Array {
+  const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+
+  const maybeBuffer = (
+    globalThis as unknown as {
+      Buffer?: {
+        from: (value: string, encoding: "base64") => Uint8Array;
+      };
+    }
+  ).Buffer;
+
+  if (maybeBuffer) {
+    return new Uint8Array(maybeBuffer.from(base64, "base64"));
+  }
+
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
+function getPdfRect(field: PdfStampField) {
+  const [x1, y1, x2, y2] = field.rect;
+
+  return {
+    x: Math.min(x1, x2),
+    y: Math.min(y1, y2),
+    width: Math.abs(x2 - x1),
+    height: Math.abs(y2 - y1),
+  };
+}
+
+async function stampSignatureField({
+  pdfDoc,
+  field,
+  value,
+}: {
+  pdfDoc: PDFDocument;
+  field: PdfStampField;
+  value: PdfFieldValue;
+}): Promise<boolean> {
+  const signatureDataUrl = decodeDrawnSignature(String(value ?? ""));
+
+  if (!signatureDataUrl) return false;
+
+  const pageIndex = Math.max(0, field.page - 1);
+  const page = pdfDoc.getPage(pageIndex);
+
+  const signatureBytes = dataUrlToBytes(signatureDataUrl);
+
+  const signatureImage =
+    signatureDataUrl.startsWith("data:image/jpeg") ||
+    signatureDataUrl.startsWith("data:image/jpg")
+      ? await pdfDoc.embedJpg(signatureBytes)
+      : await pdfDoc.embedPng(signatureBytes);
+
+  const { x, y, width, height } = getPdfRect(field);
+
+  const paddingX = 4;
+  const paddingY = 2;
+
+  const maxWidth = Math.max(1, width - paddingX * 2);
+  const maxHeight = Math.max(1, height - paddingY * 2);
+
+  const scale = Math.min(maxWidth / signatureImage.width, maxHeight / signatureImage.height);
+
+  const drawWidth = signatureImage.width * scale;
+  const drawHeight = signatureImage.height * scale;
+
+  page.drawImage(signatureImage, {
+    x: x + (width - drawWidth) / 2,
+    y: y + (height - drawHeight) / 2,
+    width: drawWidth,
+    height: drawHeight,
+  });
+
+  return true;
+}
+
+async function stampDrawnSignatures({
+  pdfDoc,
+  values,
+  fields,
+}: {
+  pdfDoc: PDFDocument;
+  values: Record<string, PdfFieldValue>;
+  fields: PdfStampField[];
+}): Promise<number> {
+  const stamped = new Set<string>();
+  let count = 0;
+
+  for (const field of fields) {
+    if (!isPdfSignatureField(field.name)) continue;
+    if (stamped.has(field.name)) continue;
+    if (!decodeDrawnSignature(values[field.name])) continue;
+
+    if (await stampSignatureField({ pdfDoc, field, value: values[field.name] })) {
+      stamped.add(field.name);
+      count += 1;
+    }
+  }
+
+  return count;
+}
+
 export async function fillPdfFromBytes(
   templateBytes: ArrayBuffer,
-  fieldValues: Record<string, PdfFieldValue>
+  fieldValues: Record<string, PdfFieldValue>,
+  fields?: PdfStampField[]
 ): Promise<FillPdfResult> {
   const normalized = normalizeFieldValues(mirrorI9FieldValues(fieldValues));
 
@@ -37,7 +152,7 @@ export async function fillPdfFromBytes(
       pdfBytes: new Uint8Array(templateBytes),
       filledCount: 0,
       missingFields: [],
-      verifiedCount: 0
+      verifiedCount: 0,
     };
   }
 
@@ -54,10 +169,19 @@ export async function fillPdfFromBytes(
     }
   }
 
+  const stampFields: PdfStampField[] =
+    fields ??
+    (await import("@/lib/employee-onboarding/extractPdfStampFields").then((mod) =>
+      mod.extractPdfStampFields(templateBytes)
+    ));
+
   let filledCount = 0;
   const missingFields: string[] = [];
 
   for (const [fieldName, value] of Object.entries(normalized)) {
+    // Signatures are stamped as images after flatten — never written as text.
+    if (isPdfSignatureField(fieldName)) continue;
+
     if (!pdfFieldNames.has(fieldName)) {
       missingFields.push(fieldName);
       continue;
@@ -80,6 +204,20 @@ export async function fillPdfFromBytes(
     // Some government PDFs still save /V values without custom appearances.
   }
 
+  if (form.getFields().length > 0) {
+    try {
+      form.flatten();
+    } catch {
+      // Continue even if flatten fails on unusual templates.
+    }
+  }
+
+  filledCount += await stampDrawnSignatures({
+    pdfDoc: doc,
+    values: normalized,
+    fields: stampFields,
+  });
+
   const pdfBytes = await doc.save();
   const verifiedCount = await verifyFilledPdf(pdfBytes, normalized);
 
@@ -87,7 +225,7 @@ export async function fillPdfFromBytes(
     pdfBytes,
     filledCount,
     missingFields,
-    verifiedCount
+    verifiedCount,
   };
 }
 
@@ -148,6 +286,12 @@ export async function verifyFilledPdf(
   let verified = 0;
 
   for (const [name, expected] of Object.entries(fieldValues)) {
+    // Drawn signatures are page images, not form field values.
+    if (isPdfSignatureField(name) && decodeDrawnSignature(expected)) {
+      verified += 1;
+      continue;
+    }
+
     const field = form.getFieldMaybe(name);
     if (!field) continue;
 
@@ -175,12 +319,13 @@ export type LoadTemplateBytes = (templatePath: string) => Promise<ArrayBuffer>;
 export async function fillPdf(
   templatePath: string,
   fieldValues: Record<string, PdfFieldValue>,
-  loadTemplate?: LoadTemplateBytes
+  loadTemplate?: LoadTemplateBytes,
+  fields?: PdfStampField[]
 ): Promise<FillPdfResult> {
   const templateBytes = loadTemplate
     ? await loadTemplate(templatePath)
     : await loadPdfBytes(templatePath);
-  return fillPdfFromBytes(templateBytes, fieldValues);
+  return fillPdfFromBytes(templateBytes, fieldValues, fields);
 }
 
 export function downloadPdfBytes(pdfBytes: Uint8Array, filename: string) {
@@ -198,9 +343,10 @@ export function downloadPdfBytes(pdfBytes: Uint8Array, filename: string) {
 export async function fillAndDownloadPdf(
   templatePath: string,
   fieldValues: Record<string, PdfFieldValue>,
-  filename: string
+  filename: string,
+  fields?: PdfStampField[]
 ): Promise<FillPdfResult> {
-  const result = await fillPdf(templatePath, fieldValues);
+  const result = await fillPdf(templatePath, fieldValues, undefined, fields);
   downloadPdfBytes(result.pdfBytes, filename);
   return result;
 }
@@ -210,6 +356,8 @@ export type OnboardingPacketEntry = {
   values: Record<string, PdfFieldValue>;
   /** Pages to include in the merged packet (from page 1). Defaults to all template pages. */
   pageCount?: number;
+  /** Optional field metadata from the browser; extracted from template when omitted. */
+  fields?: PdfStampField[];
 };
 
 export type OnboardingPacketResult = {
@@ -230,17 +378,18 @@ export async function buildOnboardingPacket(
   const formResults: FillPdfResult[] = [];
 
   for (const entry of entries) {
-    const result = await fillPdf(entry.templatePath, entry.values, options?.loadTemplate);
+    const loadTemplate = options?.loadTemplate;
+    const templateBytes = loadTemplate
+      ? await loadTemplate(entry.templatePath)
+      : await loadPdfBytes(entry.templatePath);
+
+    const result = await fillPdfFromBytes(templateBytes, entry.values, entry.fields);
     if (hasNonEmptyValues(entry.values) && result.filledCount === 0) {
       throw new Error(`Could not save field values into ${entry.templatePath}.`);
     }
 
     formResults.push(result);
     const filledDoc = await PDFDocument.load(result.pdfBytes, { ignoreEncryption: true });
-    const form = filledDoc.getForm();
-    if (form.getFields().length > 0) {
-      form.flatten();
-    }
     const totalPages = filledDoc.getPageCount();
     const pagesToInclude = Math.max(1, Math.min(entry.pageCount ?? totalPages, totalPages));
     const pageIndices = Array.from({ length: pagesToInclude }, (_, index) => index);
@@ -262,7 +411,7 @@ export async function buildOnboardingPacket(
   return {
     pdfBytes,
     formResults,
-    pageCount: mergedDoc.getPageCount()
+    pageCount: mergedDoc.getPageCount(),
   };
 }
 
@@ -275,3 +424,6 @@ export async function downloadOnboardingPacket(
   downloadPdfBytes(result.pdfBytes, filename);
   return result;
 }
+
+// Re-export for callers that pass react-acroform fields from the browser.
+export type { PdfStampField };

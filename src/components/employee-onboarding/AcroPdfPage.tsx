@@ -9,6 +9,9 @@ import {
   type FormField
 } from "react-acroform";
 import AcroTextField from "@/components/employee-onboarding/AcroTextField";
+import AcroSignatureField from "@/components/employee-onboarding/AcroSignatureField";
+import { isPdfSignatureField } from "@/lib/employee-onboarding/signatureFields";
+import { W4_LEGACY_STEP5_FIELDS } from "@/lib/employee-onboarding/w4Fields";
 import { AnnotationMode } from "pdfjs-dist";
 import type { PDFPageProxy } from "pdfjs-dist";
 
@@ -121,7 +124,7 @@ export default function AcroPdfPage({
   }, [page, scale]);
 
   const pageFields = useMemo(
-    () => fields.filter((field) => field.page === pageNumber),
+    () => fields.filter((field) => field.page === pageNumber && !W4_LEGACY_STEP5_FIELDS.has(field.name)),
     [fields, pageNumber]
   );
 
@@ -166,6 +169,9 @@ export default function AcroPdfPage({
 
               switch (field.type) {
                 case "text":
+                  if (isPdfSignatureField(field.name)) {
+                    return <AcroSignatureField key={key} {...commonProps} />;
+                  }
                   return <AcroTextField key={key} {...commonProps} />;
                 case "checkbox":
                   return <CheckboxField key={key} {...commonProps} />;
