@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { PDFDocument } from "pdf-lib";
+import { PDFDict, PDFDocument, PDFName, PDFRawStream } from "pdf-lib";
 import { fillPdf, verifyFilledPdf } from "../src/lib/employee-onboarding/fillPdf";
 import { getMissingFieldIssues } from "../src/lib/employee-onboarding/fieldLabels";
 import {
@@ -92,15 +92,25 @@ function testDrawnSignatureValidation() {
   console.log("✓ drawn signature satisfies W-4 validation");
 }
 
-async function countPageImageXObjects(doc: Awaited<ReturnType<typeof PDFDocument.load>>, pageIndex: number) {
+function countPageImageXObjects(doc: PDFDocument, pageIndex: number) {
   const page = doc.getPage(pageIndex);
   const resources = page.node.Resources();
-  const xObject = resources?.lookup(page.doc.context.obj("XObject"));
-  const entries = (xObject as unknown as { entries?: () => Iterable<unknown> })?.entries;
-  if (typeof entries === "function") {
-    return [...entries()].length;
+  if (!resources) return 0;
+
+  const xObject = resources.lookup(PDFName.of("XObject"));
+  if (!(xObject instanceof PDFDict)) return 0;
+
+  let count = 0;
+  for (const [, value] of xObject.entries()) {
+    const stream = doc.context.lookup(value);
+    if (stream instanceof PDFRawStream) {
+      const subtype = stream.dict.lookup(PDFName.of("Subtype"));
+      if (subtype === PDFName.of("Image")) {
+        count += 1;
+      }
+    }
   }
-  return 0;
+  return count;
 }
 
 async function testDrawnSignaturePdfFill() {
@@ -135,7 +145,7 @@ async function testDrawnSignaturePdfFill() {
   );
 
   // Confirm a signature image was stamped onto page content.
-  const imageCount = await countPageImageXObjects(doc, 0);
+  const imageCount = countPageImageXObjects(doc, 0);
   assert(imageCount > 0, `W-4 page should contain stamped signature image XObjects (got ${imageCount})`);
   console.log("✓ drawn signature fills English W-4 PDF correctly");
 }
@@ -190,7 +200,7 @@ async function testSpanishDrawnSignaturePdfFill() {
     "Spanish W-4 signature field should be flattened before image stamp"
   );
 
-  const imageCount = await countPageImageXObjects(doc, 0);
+  const imageCount = countPageImageXObjects(doc, 0);
   assert(imageCount > 0, `Spanish W-4 page should contain stamped signature image XObjects (got ${imageCount})`);
   console.log("✓ drawn signature fills Spanish W-4 PDF correctly");
 }

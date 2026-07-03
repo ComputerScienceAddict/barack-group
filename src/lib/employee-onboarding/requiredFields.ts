@@ -94,6 +94,10 @@ export const WH151_VALIDATE_FIELDS = ["Text440", "Text441"] as const;
 
 export type RequiredFieldRules = {
   highlightFields: readonly string[];
+  /** Never show yellow required highlight on these PDF field names. */
+  excludeHighlightFields?: readonly string[];
+  /** Do not render HTML overlays for these fields (PDF print lines remain visible). */
+  hiddenOverlayFields?: readonly string[];
   /** Stronger yellow box for critical fields (e.g. I-9 SSN). */
   emphasisFields?: readonly string[];
   /** When set, yellow highlights apply only on these PDF page numbers (1-based). */
@@ -205,15 +209,24 @@ export function applyRequiredFieldHighlight(
   root: ParentNode,
   highlightFields: readonly string[],
   highlightPages?: readonly number[],
-  emphasisFields?: readonly string[]
+  emphasisFields?: readonly string[],
+  excludeHighlightFields?: readonly string[]
 ) {
   const required = new Set(highlightFields);
+  const excluded = new Set(excludeHighlightFields ?? []);
   const pageFilter =
     highlightPages && highlightPages.length > 0 ? new Set(highlightPages) : null;
 
   root.querySelectorAll<HTMLElement>(".react-acroform-field[data-field-name]").forEach((fieldEl) => {
     const name = fieldEl.getAttribute("data-field-name");
     if (!name) return;
+
+    if (excluded.has(name)) {
+      fieldEl.classList.remove("pdf-field-required", "pdf-field-emphasis");
+      fieldEl.removeAttribute("data-required-highlight");
+      fieldEl.removeAttribute("data-emphasis-highlight");
+      return;
+    }
 
     let shouldHighlight = shouldHighlightPdfField(name, required, emphasisFields);
     if (shouldHighlight && pageFilter) {

@@ -157,6 +157,26 @@ for (const [name, rules, values] of rulesByForm) {
   console.log(`✓ ${name}: all required fields present`);
 }
 
+const employmentWithoutCompany = { ...johnDoeFormValues.employment };
+for (const key of [
+  "interviewed_by",
+  "company_date",
+  "position_offered",
+  "start_date",
+  "company_notes",
+] as const) {
+  delete employmentWithoutCompany[key];
+}
+const employmentCompanyMissing = getMissingFieldIssues(
+  employmentEnglishRequiredRules,
+  employmentWithoutCompany
+);
+assert(
+  employmentCompanyMissing.length === 0,
+  `employment should not require company-only fields (${employmentCompanyMissing.map((issue) => issue.fieldKey).join(", ")})`
+);
+console.log("✓ employment: company-only fields are optional");
+
 // 3. Build combined packet and verify fills saved
 const packetResult = await buildSubmissionPacket(johnDoeFormValues, directDeposit, "en");
 console.log(`\n✓ Packet built: ${packetResult.pageCount} pages`);

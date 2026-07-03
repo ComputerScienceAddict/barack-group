@@ -23,6 +23,7 @@ type AcroPdfPageProps = {
   radioGroups: Map<string, FormField[]>;
   className?: string;
   onSignatureClick?: (field: FormField) => void;
+  hiddenFieldNames?: ReadonlySet<string>;
 };
 
 /**
@@ -36,7 +37,8 @@ export default function AcroPdfPage({
   fields,
   radioGroups,
   className = "",
-  onSignatureClick
+  onSignatureClick,
+  hiddenFieldNames
 }: AcroPdfPageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const renderTaskRef = useRef<{ cancel: () => void } | null>(null);
@@ -124,8 +126,14 @@ export default function AcroPdfPage({
   }, [page, scale]);
 
   const pageFields = useMemo(
-    () => fields.filter((field) => field.page === pageNumber && !W4_LEGACY_STEP5_FIELDS.has(field.name)),
-    [fields, pageNumber]
+    () =>
+      fields.filter(
+        (field) =>
+          field.page === pageNumber &&
+          !W4_LEGACY_STEP5_FIELDS.has(field.name) &&
+          !(hiddenFieldNames?.has(field.name) ?? false)
+      ),
+    [fields, hiddenFieldNames, pageNumber]
   );
 
   if (error) {

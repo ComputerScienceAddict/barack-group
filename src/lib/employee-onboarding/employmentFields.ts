@@ -228,29 +228,42 @@ function employmentTextValidateFields(
   return allKeys.filter((key) => !checkboxFields.has(key));
 }
 
-/** "For Company Use Only" fields — filled by employer, not highlighted for the applicant. */
-const EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS = new Set([
+/** "For Company Use Only" — employer fills these; applicants must not see or complete them. */
+export const EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS = [
   "interviewed_by",
   "company_date",
   "position_offered",
   "start_date",
   "company_notes",
-]);
+] as const;
 
-const EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS = new Set([
+export const EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS = [
   "entrevistado_por",
   "fecha_entrevista",
   "puesto_ofrecido",
   "fecha_inicio",
   "notas",
+] as const;
+
+const EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELD_SET = new Set<string>(
+  EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS
+);
+
+const EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELD_SET = new Set<string>(
+  EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS
+);
+
+export const EMPLOYMENT_COMPANY_ONLY_FIELD_NAMES = new Set<string>([
+  ...EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS,
+  ...EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS,
 ]);
 
 const EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS = EMPLOYMENT_ENGLISH_FIELD_KEYS.filter(
-  (k) => !EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS.has(k)
+  (k) => !EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELD_SET.has(k)
 );
 
 const EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS = EMPLOYMENT_SPANISH_FIELD_KEYS.filter(
-  (k) => !EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS.has(k)
+  (k) => !EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELD_SET.has(k)
 );
 
 export const employmentSpanishRequiredRules: RequiredFieldRules = {
@@ -258,6 +271,8 @@ export const employmentSpanishRequiredRules: RequiredFieldRules = {
     EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS,
     EMPLOYMENT_SPANISH_CONTACT_HIGHLIGHT_FIELDS
   ),
+  excludeHighlightFields: EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS,
+  hiddenOverlayFields: EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS,
   validateFields: employmentTextValidateFields(
     EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS,
     EMPLOYMENT_SPANISH_CHECKBOX_FIELDS
@@ -270,6 +285,8 @@ export const employmentEnglishRequiredRules: RequiredFieldRules = {
     EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS,
     EMPLOYMENT_ENGLISH_CONTACT_HIGHLIGHT_FIELDS
   ),
+  excludeHighlightFields: EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS,
+  hiddenOverlayFields: EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS,
   validateFields: employmentTextValidateFields(
     EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS,
     EMPLOYMENT_ENGLISH_CHECKBOX_FIELDS

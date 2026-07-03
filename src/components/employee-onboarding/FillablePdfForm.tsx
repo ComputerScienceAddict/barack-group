@@ -146,6 +146,8 @@ function ScrollablePdfPages({
   pageCount,
   fieldsRootRef,
   highlightFields,
+  excludeHighlightFields,
+  hiddenOverlayFields,
   highlightPages,
   emphasisFields,
   useWh153Overlay = false,
@@ -158,6 +160,8 @@ function ScrollablePdfPages({
   pageCount: number;
   fieldsRootRef: RefObject<HTMLDivElement | null>;
   highlightFields: readonly string[];
+  excludeHighlightFields?: readonly string[];
+  hiddenOverlayFields?: readonly string[];
   highlightPages?: readonly number[];
   emphasisFields?: readonly string[];
   useWh153Overlay?: boolean;
@@ -184,15 +188,29 @@ function ScrollablePdfPages({
     return mapWh153PdfKeysToOverlay(wh153Overlay.mapping, highlightFields);
   }, [highlightFields, wh153Overlay]);
 
+  const hiddenFieldNames = useMemo(
+    () => (hiddenOverlayFields?.length ? new Set(hiddenOverlayFields) : undefined),
+    [hiddenOverlayFields]
+  );
+
   const highlightConfigKey = useMemo(
     () =>
       [
         resolvedHighlightFields.join("\u0001"),
+        excludeHighlightFields?.join("\u0001") ?? "",
+        hiddenOverlayFields?.join("\u0001") ?? "",
         highlightPages?.join(",") ?? "",
         emphasisFields?.join("\u0001") ?? "",
         displayFields.length,
       ].join("|"),
-    [displayFields.length, emphasisFields, highlightPages, resolvedHighlightFields]
+    [
+      displayFields.length,
+      emphasisFields,
+      excludeHighlightFields,
+      hiddenOverlayFields,
+      highlightPages,
+      resolvedHighlightFields,
+    ]
   );
 
   useEffect(() => {
@@ -235,7 +253,13 @@ function ScrollablePdfPages({
     if (!root || visiblePages.length === 0) return;
 
     const tuneFields = () => {
-      applyRequiredFieldHighlight(root, resolvedHighlightFields, highlightPages, emphasisFields);
+      applyRequiredFieldHighlight(
+        root,
+        resolvedHighlightFields,
+        highlightPages,
+        emphasisFields,
+        excludeHighlightFields
+      );
 
       root.querySelectorAll<HTMLTextAreaElement | HTMLInputElement>(
         ".react-acroform-field textarea, .react-acroform-field input:not([type='checkbox']):not([type='radio'])"
@@ -305,6 +329,7 @@ function ScrollablePdfPages({
             scale={scale}
             fields={displayFields}
             radioGroups={radioGroups}
+            hiddenFieldNames={hiddenFieldNames}
           />
         </div>
       ))}
@@ -462,6 +487,8 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
             pageCount={config.pageCount}
             fieldsRootRef={fieldsRootRef}
             highlightFields={config.requiredRules.highlightFields}
+            excludeHighlightFields={config.requiredRules.excludeHighlightFields}
+            hiddenOverlayFields={config.requiredRules.hiddenOverlayFields}
             highlightPages={config.requiredRules.highlightPages}
             emphasisFields={config.requiredRules.emphasisFields}
             useWh153Overlay={isWh153}
