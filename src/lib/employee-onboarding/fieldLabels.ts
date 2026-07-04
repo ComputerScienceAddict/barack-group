@@ -1,8 +1,10 @@
 import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 import {
   I9_CITIZENSHIP_CHECKBOXES,
+  I9_SSN_FIELD,
   type RequiredFieldRules,
-  isFieldValueFilled
+  isFieldValueFilled,
+  resolveSocialSecurityValue,
 } from "@/lib/employee-onboarding/requiredFields";
 import { W4_FILING_STATUS_CHECKBOXES } from "@/lib/employee-onboarding/w4Fields";
 import type { PdfFieldValue } from "@/lib/employee-onboarding/fillPdf";
@@ -131,7 +133,8 @@ export function getMissingFieldIssues(
     const candidates = rules.validateFieldAliases?.[fieldName] ?? [fieldName];
     const predicate = rules.validateFieldPredicates?.[fieldName];
     const filled = candidates.some((name) => {
-      const value = values[name];
+      const value =
+        fieldName === I9_SSN_FIELD ? resolveSocialSecurityValue(values) : values[name];
       if (predicate) return predicate(value);
       return isFieldValueFilled(value);
     });

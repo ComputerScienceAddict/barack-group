@@ -16,6 +16,7 @@ import { getHighlightKeysForIssues, getMissingFieldIssues } from "@/lib/employee
 import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 import type { Locale } from "@/lib/employee-onboarding/i18n";
 import { pdfFieldValuesEqual, mergePdfFieldValues } from "@/lib/employee-onboarding/pdfFieldValues";
+import { normalizeI9FormValues } from "@/lib/employee-onboarding/requiredFields";
 import {
   DIRECT_DEPOSIT_STEP,
   FORM_START_STEP,
@@ -56,6 +57,15 @@ const PACKET_SUMMARY_KEYS: MessageKey[] = [
   "packetItemI9",
   "packetItemWh151",
   "packetItemDirectDeposit",
+];
+
+const TUTORIAL_STEP_KEYS: MessageKey[] = [
+  "tutorialStep1",
+  "tutorialStep2",
+  "tutorialStep3",
+  "tutorialStep4",
+  "tutorialStep5",
+  "tutorialStep6",
 ];
 
 const FORM_TITLE_KEYS: Record<OnboardingFormId, MessageKey> = {
@@ -205,7 +215,9 @@ function OnboardingAppContent() {
     if (!config) return {};
     const ref = getFormRef(config.id);
     const flushed = ref?.current?.flushValues() ?? formValues[config.id];
-    return mergePdfFieldValues(formValues[config.id], flushed);
+    const merged = mergePdfFieldValues(formValues[config.id], flushed);
+    if (config.id === "i9") return normalizeI9FormValues(merged);
+    return merged;
   }
 
   useEffect(() => {
@@ -601,15 +613,11 @@ function OnboardingAppContent() {
     <div className="siteLayout">
       <header className="siteHeader">
         <div className="siteBrand">
-          <div className="siteLogoStack">
-            <div className="siteLogoSlot">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/barak-group-logo.png" alt="Barak Group Inc." className="siteLogo" />
-            </div>
-            <div className="siteLogoSlot siteLogoSlotPartner">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/jani-king-logo.png" alt="Jani-King" className="sitePartnerLogo" />
-            </div>
+          <div className="siteLogos">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/barak-group-logo.png" alt="Barak Group Inc." className="siteLogo" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/jani-king-logo.png" alt="Jani-King" className="sitePartnerLogo" />
           </div>
           <div className="siteBrandText">
             <p className="siteEyebrow">{t("headerEyebrow")}</p>
@@ -686,19 +694,28 @@ function OnboardingAppContent() {
         )}
 
         <section
-          className="formSection"
+          className="formSection formSectionTutorial"
           style={{ display: step === TUTORIAL_STEP ? "block" : "none" }}
           aria-hidden={step !== TUTORIAL_STEP}
         >
-            <h2 className="formHeading">{t("tutorialTitle")}</h2>
+            <header className="tutorialHeader">
+              <h2 className="formHeading">{t("tutorialTitle")}</h2>
+              <p className="tutorialIntro">{t("tutorialIntro")}</p>
+            </header>
             <div className="tutorialCard">
-              <p className="tutorialLine">{t("tutorialStep1")}</p>
-              <p className="tutorialLine">{t("tutorialStep2")}</p>
-              <p className="tutorialLine">{t("tutorialStep3")}</p>
-              <p className="tutorialLine">{t("tutorialStep4")}</p>
-              <p className="tutorialLine">{t("tutorialStep5")}</p>
-              <p className="tutorialLine">{t("tutorialStep6")}</p>
-              <p className="tutorialTip">{t("tutorialTip")}</p>
+              <ol className="tutorialStepList">
+                {TUTORIAL_STEP_KEYS.map((key) => (
+                  <li key={key} className="tutorialStepItem">
+                    <span className="tutorialStepText">{t(key)}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="tutorialTip">
+                <span className="tutorialTipLabel" aria-hidden="true">
+                  Tip
+                </span>
+                {t("tutorialTip")}
+              </p>
             </div>
           </section>
 

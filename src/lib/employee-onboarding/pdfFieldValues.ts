@@ -1,7 +1,25 @@
 import type { PdfFieldValue } from "@/lib/employee-onboarding/fillPdf";
+import {
+  isSocialSecurityPdfFieldName,
+  sanitizeSocialSecurityDigits,
+} from "@/lib/employee-onboarding/requiredFields";
 
 function cssFieldSelector(fieldName: string) {
   return `.react-acroform-field[data-field-name="${CSS.escape(fieldName)}"]`;
+}
+
+function isPdfFieldValueEmpty(value: PdfFieldValue | undefined): boolean {
+  if (value === undefined || value === null) return true;
+  if (typeof value === "boolean") return false;
+  if (Array.isArray(value)) return value.length === 0;
+  return String(value).trim().length === 0;
+}
+
+function normalizeCollectedFieldValue(name: string, value: string): PdfFieldValue {
+  if (isSocialSecurityPdfFieldName(name)) {
+    return sanitizeSocialSecurityDigits(value);
+  }
+  return value;
 }
 
 /** Read live values from PDF overlay inputs (source of truth for what the user typed). */
@@ -22,7 +40,7 @@ export function collectDomFieldValues(root: ParentNode): Record<string, PdfField
       "textarea, input:not([type='checkbox']):not([type='radio']):not([type='hidden'])"
     );
     if (textInput) {
-      values[name] = textInput.value;
+      values[name] = normalizeCollectedFieldValue(name, textInput.value);
       return;
     }
 
@@ -63,11 +81,17 @@ export function valueFromFieldEvent(event: Event): { name: string; value: PdfFie
   if (target instanceof HTMLInputElement) {
     if (target.type === "checkbox") return { name, value: target.checked };
     if (target.type === "radio") return target.checked ? { name, value: target.value } : null;
-    return { name, value: target.value };
+    return {
+      name,
+      value: normalizeCollectedFieldValue(name, target.value),
+    };
   }
 
   if (target instanceof HTMLTextAreaElement) {
-    return { name, value: target.value };
+    return {
+      name,
+      value: normalizeCollectedFieldValue(name, target.value),
+    };
   }
 
   if (target instanceof HTMLSelectElement) {
@@ -81,7 +105,17 @@ export function mergePdfFieldValues(
   stateValues: Record<string, PdfFieldValue>,
   domValues: Record<string, PdfFieldValue>
 ): Record<string, PdfFieldValue> {
-  return { ...stateValues, ...domValues };
+  const merged: Record<string, PdfFieldValue> = { ...stateValues };
+
+  for (const [key, domValue] of Object.entries(domValues)) {
+    const stateValue = stateValues[key];
+    if (isPdfFieldValueEmpty(domValue) && !isPdfFieldValueEmpty(stateValue)) {
+      continue;
+    }
+    merged[key] = domValue;
+  }
+
+  return merged;
 }
 
 export function pdfFieldValuesEqual(

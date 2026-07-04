@@ -7,6 +7,10 @@ import {
   pdfRectToScreen,
   type FormField,
 } from "react-acroform";
+import {
+  isSocialSecurityPdfFieldName,
+  sanitizeSocialSecurityDigits,
+} from "@/lib/employee-onboarding/requiredFields";
 
 type AcroTextFieldProps = {
   field: FormField;
@@ -110,6 +114,8 @@ function buildTextInputStyle(
 export default function AcroTextField({ field, scale, pageHeight, className }: AcroTextFieldProps) {
   const [focused, setFocused] = useState(false);
   const formState = useFormStateContext();
+  const isSsnField = isSocialSecurityPdfFieldName(field.name);
+  const [localValue, setLocalValue] = useState(() => String(formState.getValue(field.name) ?? ""));
 
   const handleFocus = useCallback(() => setFocused(true), []);
   const handleBlur = useCallback(() => setFocused(false), []);
@@ -118,13 +124,15 @@ export default function AcroTextField({ field, scale, pageHeight, className }: A
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      formState.setValue(field.name, event.target.value);
+      const rawValue = event.target.value;
+      const nextValue = isSsnField ? sanitizeSocialSecurityDigits(rawValue) : rawValue;
+      setLocalValue(nextValue);
+      formState.setValue(field.name, nextValue);
     },
-    [formState, field.name]
+    [formState, field.name, isSsnField]
   );
 
   const inputStyle = buildTextInputStyle(field, fieldWidth, fieldHeight, scale, focused);
-  const value = String(formState.getValue(field.name) ?? "");
 
   const commonProps = {
     onFocus: handleFocus,
@@ -136,7 +144,14 @@ export default function AcroTextField({ field, scale, pageHeight, className }: A
     style: inputStyle,
     "aria-label": field.name,
     className: `react-acroform-input${field.comb ? " react-acroform-input--comb" : ""}`,
-    value,
+    value: localValue,
+    ...(isSsnField
+      ? {
+          inputMode: "numeric" as const,
+          autoComplete: "off",
+          pattern: "[0-9]*",
+        }
+      : {}),
   };
 
   return (

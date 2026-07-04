@@ -6,6 +6,27 @@ import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 /** I-9 nine-digit comb field (U.S. Social Security Number). */
 export const I9_SSN_FIELD = "US Social Security Number" as const;
 
+/** Keep digits only; I-9 SSN comb boxes store up to nine characters. */
+export function sanitizeSocialSecurityDigits(value: PdfFieldValue | undefined): string {
+  return String(value ?? "").replace(/\D/g, "").slice(0, 9);
+}
+
+export function resolveSocialSecurityValue(
+  values: Record<string, PdfFieldValue>
+): PdfFieldValue | undefined {
+  if (values[I9_SSN_FIELD] !== undefined) {
+    return sanitizeSocialSecurityDigits(values[I9_SSN_FIELD]);
+  }
+
+  for (const [name, value] of Object.entries(values)) {
+    if (isSocialSecurityPdfFieldName(name)) {
+      return sanitizeSocialSecurityDigits(value);
+    }
+  }
+
+  return undefined;
+}
+
 /** I-9 Section 1 — employee info & attestation (page 1 only). */
 export const I9_SECTION1_HIGHLIGHT_FIELDS = [
   "Last Name (Family Name)",
@@ -87,6 +108,14 @@ export function mirrorI9FieldValues(values: Record<string, PdfFieldValue>): Reco
   return mirrored;
 }
 
+/** Mirror aliases and normalize the nine-digit SSN comb value before validation/save. */
+export function normalizeI9FormValues(values: Record<string, PdfFieldValue>): Record<string, PdfFieldValue> {
+  const mirrored = mirrorI9FieldValues(values);
+  const ssn = sanitizeSocialSecurityDigits(resolveSocialSecurityValue(mirrored));
+  if (!ssn) return mirrored;
+  return { ...mirrored, [I9_SSN_FIELD]: ssn };
+}
+
 /** @deprecated Import from wh151Fields.ts */
 export {
   WH151_HIGHLIGHT_FIELDS,
@@ -139,8 +168,7 @@ export function isFieldValueFilled(value: PdfFieldValue | undefined): boolean {
 
 /** I-9 SSN comb field must contain nine digits. */
 export function isCompleteSocialSecurityValue(value: PdfFieldValue | undefined): boolean {
-  if (!isFieldValueFilled(value)) return false;
-  return String(value).replace(/\D/g, "").length === 9;
+  return sanitizeSocialSecurityDigits(value).length === 9;
 }
 
 export function getMissingRequiredFields(

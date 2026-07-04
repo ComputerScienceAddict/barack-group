@@ -30,7 +30,7 @@ export async function loadPdfBytes(templatePath: string): Promise<ArrayBuffer> {
   return response.arrayBuffer();
 }
 
-import { mirrorI9FieldValues } from "@/lib/employee-onboarding/requiredFields";
+import { normalizeI9FormValues } from "@/lib/employee-onboarding/requiredFields";
 
 function dataUrlToBytes(dataUrl: string): Uint8Array {
   const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
@@ -146,7 +146,7 @@ export async function fillPdfFromBytes(
   fieldValues: Record<string, PdfFieldValue>,
   fields?: PdfStampField[]
 ): Promise<FillPdfResult> {
-  const normalized = normalizeFieldValues(mirrorI9FieldValues(fieldValues));
+  const normalized = normalizeFieldValues(normalizeI9FormValues(fieldValues));
 
   if (Object.keys(normalized).length === 0) {
     return {

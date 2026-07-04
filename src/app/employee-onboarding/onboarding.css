@@ -96,47 +96,22 @@ button {
   flex: 1;
 }
 
-.siteLogoStack {
+.siteLogos {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   flex-shrink: 0;
-  padding: 10px 14px;
-  background: var(--brand-soft);
-  border: 1px solid #c7daf3;
-  border-radius: var(--radius-sm);
-}
-
-.siteLogoSlot,
-.siteLogoSlotPartner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(168px, 34vw);
-  height: 46px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.siteLogoSlotPartner {
-  background: var(--surface);
-  border-radius: 6px;
-  box-shadow: none;
-  padding: 0;
-  border: 1px solid var(--line);
-  box-sizing: border-box;
 }
 
 .siteLogo,
 .sitePartnerLogo {
   display: block;
+  height: 38px;
   width: auto;
-  height: auto;
-  max-width: min(140px, 100%);
-  max-height: 46px;
+  max-width: 120px;
   object-fit: contain;
-  object-position: center;
+  object-position: left center;
 }
 
 .siteBrandText {
@@ -614,26 +589,101 @@ button {
   max-width: 62ch;
 }
 
-.tutorialCard {
-  display: grid;
-  gap: 10px;
-  max-width: 720px;
-  padding: 18px 20px;
-  border: 1px solid #c7daf3;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, #f8fbff 0%, var(--brand-soft) 100%);
+.formSectionTutorial .formHeading {
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
-.tutorialLine {
+.tutorialHeader {
+  max-width: 720px;
+  margin-bottom: 20px;
+}
+
+.tutorialIntro {
+  margin: 8px 0 0;
+  max-width: 52ch;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.tutorialCard {
+  display: grid;
+  gap: 20px;
+  max-width: 720px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.tutorialStepList {
+  display: grid;
+  gap: 14px;
   margin: 0;
-  font-weight: 700;
-  color: #0f172a;
+  padding: 0;
+  list-style: none;
+  counter-reset: tutorial-step;
+}
+
+.tutorialStepItem {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 14px;
+  align-items: start;
+  counter-increment: tutorial-step;
+}
+
+.tutorialStepItem::before {
+  content: counter(tutorial-step);
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tutorialStepText {
+  margin: 0;
+  padding-top: 0.2rem;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
 .tutorialTip {
-  margin: 4px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: baseline;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: #1e3a8a;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #1e40af;
+  line-height: 1.5;
+}
+
+.tutorialTipLabel {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .nameEntryForm {
@@ -2261,10 +2311,10 @@ label {
     min-width: 0;
   }
 
-  .siteLogoSlot,
-  .siteLogoSlotPartner {
-    width: min(150px, 38vw);
-    height: 46px;
+  .siteLogo,
+  .sitePartnerLogo {
+    height: 34px;
+    max-width: 108px;
   }
 }
 
@@ -2291,15 +2341,6 @@ label {
     align-items: flex-start;
     text-align: left;
     gap: 12px;
-  }
-
-  .siteLogoStack {
-    width: auto;
-    align-items: flex-start;
-  }
-
-  .siteLogoSlotPartner {
-    padding: 0;
   }
 
   .siteBrandText {
@@ -2349,16 +2390,10 @@ label {
     display: none;
   }
 
-  .siteLogoSlot,
-  .siteLogoSlotPartner {
-    width: min(200px, 78vw);
-    height: 46px;
-  }
-
   .siteLogo,
   .sitePartnerLogo {
-    max-width: min(160px, 100%);
-    max-height: 46px;
+    height: 34px;
+    max-width: 100px;
   }
 
   .stepNav {
