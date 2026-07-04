@@ -514,9 +514,12 @@ function OnboardingAppContent() {
             lastName: normalizedName.lastName,
             packetId,
             locale,
-            formValues: flushedFormValues,
-            directDepositValues: flushedDirectDeposit,
-          }),
+          formValues: flushedFormValues,
+          directDepositValues: flushedDirectDeposit,
+          stampFields: Object.fromEntries(
+            formConfigs.map((config) => [config.id, getStampFieldsForForm(config.id)])
+          ),
+        }),
         });
         emailSent = emailResponse.ok;
         if (!emailResponse.ok) {

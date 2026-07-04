@@ -1,5 +1,4 @@
-import { configurePdfWorker, PDF_WORKER_SRC } from "@/lib/employee-onboarding/configurePdfWorker";
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import { PDFDocument } from "pdf-lib";
 
 /** Minimal field metadata needed to stamp a drawn signature onto a PDF page. */
 export type PdfStampField = {
@@ -9,29 +8,46 @@ export type PdfStampField = {
   rect: [number, number, number, number];
 };
 
-const WIDGET_SUBTYPE = "Widget";
+function findWidgetPageNumber(
+  doc: PDFDocument,
+  widget: { P: () => unknown; dict: unknown }
+): number {
+  const pages = doc.getPages();
+  const pageRef = widget.P();
 
+  let pageIndex = pages.findIndex((page) => page.ref === pageRef);
+  if (pageIndex === -1) {
+    const widgetRef = doc.context.getObjectRef(widget.dict as Parameters<typeof doc.context.getObjectRef>[0]);
+    if (widgetRef) {
+      const page = doc.findPageForAnnotationRef(widgetRef);
+      if (page) {
+        pageIndex = pages.findIndex((entry) => entry.ref === page.ref);
+      }
+    }
+  }
+
+  return pageIndex >= 0 ? pageIndex + 1 : 1;
+}
+
+/** Extract AcroForm widget metadata with pdf-lib (works on Vercel/serverless; no PDF.js worker). */
 export async function extractPdfStampFields(
   pdfBytes: ArrayBuffer | Uint8Array
 ): Promise<PdfStampField[]> {
-  configurePdfWorker(PDF_WORKER_SRC);
-
-  const data = pdfBytes instanceof ArrayBuffer ? new Uint8Array(pdfBytes) : pdfBytes;
-  const doc = await getDocument({ data, useSystemFonts: true }).promise;
+  const data = pdfBytes instanceof Uint8Array ? pdfBytes : new Uint8Array(pdfBytes);
+  const doc = await PDFDocument.load(data, { ignoreEncryption: true });
+  const form = doc.getForm();
   const fields: PdfStampField[] = [];
 
-  for (let pageNum = 1; pageNum <= doc.numPages; pageNum += 1) {
-    const page = await doc.getPage(pageNum);
-    const annotations = await page.getAnnotations();
+  for (const field of form.getFields()) {
+    const name = field.getName();
+    if (!name) continue;
 
-    for (const annotation of annotations) {
-      if (annotation.subtype !== WIDGET_SUBTYPE) continue;
-      if (!annotation.fieldName || !annotation.rect) continue;
-
+    for (const widget of field.acroField.getWidgets()) {
+      const { x, y, width, height } = widget.getRectangle();
       fields.push({
-        name: annotation.fieldName,
-        page: pageNum,
-        rect: annotation.rect as [number, number, number, number],
+        name,
+        page: findWidgetPageNumber(doc, widget),
+        rect: [x, y, x + width, y + height],
       });
     }
   }

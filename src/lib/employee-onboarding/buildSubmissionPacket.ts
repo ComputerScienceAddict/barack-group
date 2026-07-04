@@ -7,9 +7,10 @@ import {
   type DirectDepositValues,
 } from "@/lib/employee-onboarding/directDeposit";
 import { buildOnboardingPacket } from "@/lib/employee-onboarding/fillPdf";
+import type { PdfStampField } from "@/lib/employee-onboarding/extractPdfStampFields";
 import { EMPTY_FORM_VALUES, type FormValuesState } from "@/lib/employee-onboarding/loadDraft";
 import type { Locale } from "@/lib/employee-onboarding/i18n";
-import { getOnboardingFormConfigs } from "@/lib/employee-onboarding/pdfForms";
+import { getOnboardingFormConfigs, type OnboardingFormId } from "@/lib/employee-onboarding/pdfForms";
 
 async function loadPublicTemplate(templatePath: string): Promise<ArrayBuffer> {
   const filePath = path.join(process.cwd(), "public", templatePath.replace(/^\//, ""));
@@ -32,7 +33,8 @@ export function normalizeSubmissionFormValues(
 export async function buildSubmissionPacket(
   formValues: FormValuesState,
   directDepositValues: DirectDepositValues,
-  locale: Locale = "en"
+  locale: Locale = "en",
+  stampFieldsByForm?: Partial<Record<OnboardingFormId, PdfStampField[]>>
 ) {
   const normalizedDirectDeposit = normalizeDirectDepositValues(directDepositValues);
   const appendPdfBytes = usesDirectDeposit(normalizedDirectDeposit)
@@ -44,6 +46,7 @@ export async function buildSubmissionPacket(
       templatePath: config.templatePath,
       values: formValues[config.id] ?? {},
       pageCount: config.pageCount,
+      fields: stampFieldsByForm?.[config.id],
     })),
     { appendPdfBytes, loadTemplate: loadPublicTemplate }
   );

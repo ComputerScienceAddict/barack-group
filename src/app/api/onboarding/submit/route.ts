@@ -8,7 +8,9 @@ import { normalizeDirectDepositValues } from "@/lib/employee-onboarding/directDe
 import type { FormValuesState } from "@/lib/employee-onboarding/loadDraft";
 import type { DirectDepositValues } from "@/lib/employee-onboarding/directDeposit";
 import { sendSubmissionEmail } from "@/lib/employee-onboarding/sendSubmissionEmail";
+import type { PdfStampField } from "@/lib/employee-onboarding/extractPdfStampFields";
 import type { Locale } from "@/lib/employee-onboarding/i18n";
+import type { OnboardingFormId } from "@/lib/employee-onboarding/pdfForms";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -20,6 +22,7 @@ type SubmitBody = {
   locale?: Locale;
   formValues?: Partial<FormValuesState>;
   directDepositValues?: Partial<DirectDepositValues>;
+  stampFields?: Partial<Record<OnboardingFormId, PdfStampField[]>>;
   /** @deprecated Large base64 payloads are rejected by many hosts; send formValues instead. */
   pdfBase64?: string;
 };
@@ -46,7 +49,8 @@ export async function POST(request: Request) {
       const packetResult = await buildSubmissionPacket(
         normalizeSubmissionFormValues(body.formValues),
         normalizeDirectDepositValues(body.directDepositValues),
-        locale
+        locale,
+        body.stampFields
       );
       pdfBytes = Buffer.from(packetResult.pdfBytes);
     } else if (body.pdfBase64 && typeof body.pdfBase64 === "string") {
