@@ -1,4 +1,4 @@
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf.mjs";
 
 /** Minimal field metadata needed to stamp a drawn signature onto a PDF page. */
 export type PdfStampField = {
@@ -13,6 +13,10 @@ const WIDGET_SUBTYPE = "Widget";
 export async function extractPdfStampFields(
   pdfBytes: ArrayBuffer | Uint8Array
 ): Promise<PdfStampField[]> {
+  if (typeof window !== "undefined" && !GlobalWorkerOptions.workerSrc) {
+    GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+  }
+
   const data = pdfBytes instanceof ArrayBuffer ? new Uint8Array(pdfBytes) : pdfBytes;
   const doc = await getDocument({ data, useSystemFonts: true }).promise;
   const fields: PdfStampField[] = [];

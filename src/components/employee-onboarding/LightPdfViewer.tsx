@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePDFDocument } from "react-acroform";
-import type { PDFPageProxy } from "pdfjs-dist";
+import { GlobalWorkerOptions, type PDFPageProxy } from "pdfjs-dist";
 import LightPdfPage from "@/components/employee-onboarding/LightPdfPage";
 import { useLanguage } from "@/components/employee-onboarding/LanguageProvider";
 
@@ -25,6 +25,7 @@ export default function LightPdfViewer({
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [pages, setPages] = useState<PDFPageProxy[]>([]);
+  GlobalWorkerOptions.workerSrc = workerSrc;
   const { document, loading, error } = usePDFDocument({ src, workerSrc });
 
   useEffect(() => {

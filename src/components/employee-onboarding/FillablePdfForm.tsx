@@ -18,7 +18,7 @@ import {
   useFormStateContext,
   usePDFDocument
 } from "react-acroform";
-import type { PDFPageProxy } from "pdfjs-dist";
+import { GlobalWorkerOptions, type PDFPageProxy } from "pdfjs-dist";
 import "react-acroform/styles.css";
 import AcroPdfPage from "@/components/employee-onboarding/AcroPdfPage";
 import { downloadOnboardingPacket as downloadMergedPacket, downloadPdfBytes, fillPdf, type PdfFieldValue, type PdfStampField } from "@/lib/employee-onboarding/fillPdf";
@@ -173,6 +173,7 @@ function ScrollablePdfPages({
   const [scale, setScale] = useState(1);
   const [pages, setPages] = useState<PDFPageProxy[]>([]);
 
+  GlobalWorkerOptions.workerSrc = workerSrc;
   const { document, loading, error } = usePDFDocument({ src, workerSrc });
   const { fields, loading: fieldsLoading, error: fieldsError, radioGroups } = useFormFields({ document });
 
