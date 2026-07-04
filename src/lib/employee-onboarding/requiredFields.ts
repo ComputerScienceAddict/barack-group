@@ -3,6 +3,9 @@ import { getMissingFieldIssues } from "@/lib/employee-onboarding/fieldLabels";
 import { I9_CONTACT_HIGHLIGHT_FIELDS, mergeHighlightFields } from "@/lib/employee-onboarding/contactFields";
 import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 
+/** I-9 nine-digit comb field (U.S. Social Security Number). */
+export const I9_SSN_FIELD = "US Social Security Number" as const;
+
 /** I-9 Section 1 — employee info & attestation (page 1 only). */
 export const I9_SECTION1_HIGHLIGHT_FIELDS = [
   "Last Name (Family Name)",
@@ -15,7 +18,7 @@ export const I9_SECTION1_HIGHLIGHT_FIELDS = [
   "State",
   "ZIP Code",
   "Date of Birth mmddyyyy",
-  "US Social Security Number",
+  I9_SSN_FIELD,
   "Employees E-mail Address",
   "Telephone Number",
   "CB_1",
@@ -32,10 +35,7 @@ export const I9_SECTION1_HIGHLIGHT_FIELDS = [
 ] as const;
 
 /** I-9 SSN and phone — extra-visible yellow box. */
-export const I9_EMPHASIS_FIELDS = [
-  "US Social Security Number",
-  "Telephone Number",
-] as const;
+export const I9_EMPHASIS_FIELDS = [I9_SSN_FIELD, "Telephone Number"] as const;
 
 export function isSocialSecurityPdfFieldName(name: string): boolean {
   return /social security/i.test(name);
@@ -54,7 +54,7 @@ export const I9_SECTION1_VALIDATE_FIELDS = [
   "State",
   "ZIP Code",
   "Date of Birth mmddyyyy",
-  "US Social Security Number",
+  I9_SSN_FIELD,
   "Employees E-mail Address",
   "Telephone Number",
   "Signature of Employee",
@@ -112,6 +112,10 @@ export type RequiredFieldRules = {
     labelKey: MessageKey;
   }[];
   validateFieldAliases?: Readonly<Record<string, readonly string[]>>;
+  /** Per-field fill checks (e.g. nine-digit SSN comb boxes). */
+  validateFieldPredicates?: Readonly<
+    Record<string, (value: PdfFieldValue | undefined) => boolean>
+  >;
 };
 
 export const i9RequiredRules: RequiredFieldRules = {
@@ -120,7 +124,10 @@ export const i9RequiredRules: RequiredFieldRules = {
   highlightPages: [1],
   validateFields: I9_SECTION1_VALIDATE_FIELDS,
   checkboxGroups: [I9_CITIZENSHIP_CHECKBOXES],
-  validateFieldAliases: I9_VALIDATE_FIELD_ALIASES
+  validateFieldAliases: I9_VALIDATE_FIELD_ALIASES,
+  validateFieldPredicates: {
+    [I9_SSN_FIELD]: isCompleteSocialSecurityValue,
+  },
 };
 
 export function isFieldValueFilled(value: PdfFieldValue | undefined): boolean {
@@ -128,6 +135,12 @@ export function isFieldValueFilled(value: PdfFieldValue | undefined): boolean {
   if (typeof value === "boolean") return value;
   if (Array.isArray(value)) return value.length > 0;
   return String(value).trim().length > 0;
+}
+
+/** I-9 SSN comb field must contain nine digits. */
+export function isCompleteSocialSecurityValue(value: PdfFieldValue | undefined): boolean {
+  if (!isFieldValueFilled(value)) return false;
+  return String(value).replace(/\D/g, "").length === 9;
 }
 
 export function getMissingRequiredFields(

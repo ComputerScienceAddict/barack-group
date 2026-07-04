@@ -129,7 +129,12 @@ export function getMissingFieldIssues(
 
   for (const fieldName of rules.validateFields) {
     const candidates = rules.validateFieldAliases?.[fieldName] ?? [fieldName];
-    const filled = candidates.some((name) => isFieldValueFilled(values[name]));
+    const predicate = rules.validateFieldPredicates?.[fieldName];
+    const filled = candidates.some((name) => {
+      const value = values[name];
+      if (predicate) return predicate(value);
+      return isFieldValueFilled(value);
+    });
     if (!filled) {
       const labelKey = PDF_FIELD_LABEL_KEYS[fieldName];
       if (!labelKey) continue;

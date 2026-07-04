@@ -685,12 +685,11 @@ function OnboardingAppContent() {
           </div>
         )}
 
-        <div className="formPanel">
-          <section
-            className="formSection"
-            style={{ display: step === TUTORIAL_STEP ? "block" : "none" }}
-            aria-hidden={step !== TUTORIAL_STEP}
-          >
+        <section
+          className="formSection"
+          style={{ display: step === TUTORIAL_STEP ? "block" : "none" }}
+          aria-hidden={step !== TUTORIAL_STEP}
+        >
             <h2 className="formHeading">{t("tutorialTitle")}</h2>
             <div className="tutorialCard">
               <p className="tutorialLine">{t("tutorialStep1")}</p>
@@ -721,12 +720,13 @@ function OnboardingAppContent() {
           </section>
 
           <section
-            className="formSection"
+            className="formSection formSectionPdf"
             style={{ display: step === FORM_START_STEP ? "block" : "none" }}
             aria-hidden={step !== FORM_START_STEP}
           >
-            <h2 className="formHeading">{t("formEmployment")}</h2>
-            <p className="formSubheading">{t("employmentFormHint")}</p>
+            <div className="formStepHeader">
+              <h2 className="formHeading">{t("formEmployment")}</h2>
+            </div>
             <FillablePdfForm
               key={`employment-${locale}-${formSession}`}
               ref={employmentFormRef}
@@ -738,12 +738,13 @@ function OnboardingAppContent() {
           </section>
 
           <section
-            className="formSection"
+            className="formSection formSectionPdf"
             style={{ display: step === FORM_START_STEP + 1 ? "block" : "none" }}
             aria-hidden={step !== FORM_START_STEP + 1}
           >
-            <h2 className="formHeading">{t("formW4")}</h2>
-            <p className="formSubheading">{t("embeddedPdfHint")}</p>
+            <div className="formStepHeader">
+              <h2 className="formHeading">{t("formW4")}</h2>
+            </div>
             <FillablePdfForm
               key={`w4-${locale}-${formSession}`}
               ref={w4FormRef}
@@ -755,12 +756,13 @@ function OnboardingAppContent() {
           </section>
 
           <section
-            className="formSection"
+            className="formSection formSectionPdf"
             style={{ display: step === FORM_START_STEP + 2 ? "block" : "none" }}
             aria-hidden={step !== FORM_START_STEP + 2}
           >
-            <h2 className="formHeading">{t("formI9")}</h2>
-            <p className="formSubheading">{t("embeddedPdfHint")}</p>
+            <div className="formStepHeader">
+              <h2 className="formHeading">{t("formI9")}</h2>
+            </div>
             <FillablePdfForm
               key={`i9-${formSession}`}
               ref={i9FormRef}
@@ -772,12 +774,13 @@ function OnboardingAppContent() {
           </section>
 
           <section
-            className="formSection"
+            className="formSection formSectionPdf"
             style={{ display: step === FORM_START_STEP + 3 ? "block" : "none" }}
             aria-hidden={step !== FORM_START_STEP + 3}
           >
-            <h2 className="formHeading">{t("formWh151")}</h2>
-            <p className="formSubheading">{t("embeddedPdfHint")}</p>
+            <div className="formStepHeader">
+              <h2 className="formHeading">{t("formWh151")}</h2>
+            </div>
             <FillablePdfForm
               key={`wh151-${formSession}`}
               ref={wh151FormRef}
@@ -831,7 +834,6 @@ function OnboardingAppContent() {
               </div>
             </section>
           )}
-        </div>
 
         <div className="stickyActionBar">
           <div className="actionRow">

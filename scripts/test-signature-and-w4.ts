@@ -6,6 +6,7 @@ import { getMissingFieldIssues } from "../src/lib/employee-onboarding/fieldLabel
 import {
   decodeDrawnSignature,
   encodeDrawnSignature,
+  expandSignatureFieldRect,
   isPdfSignatureField,
   PDF_SIGNATURE_FIELD_NAMES,
 } from "../src/lib/employee-onboarding/signatureFields";
@@ -43,6 +44,15 @@ function testSignatureFieldRegistry() {
   }
   assert(!isPdfSignatureField("employee_date_step5"), "date field must not be treated as signature");
   console.log("✓ signature field registry");
+}
+
+function testEmploymentSignatureRectExpansion() {
+  const shortRect: [number, number, number, number] = [148, 215.4, 338, 226.2];
+  const expanded = expandSignatureFieldRect("applicant_signature", shortRect);
+  assert(expanded[3] - expanded[1] >= 41.9, "applicant signature rect should expand to at least 42pt");
+  const unchanged = expandSignatureFieldRect("employee_signature_step5", shortRect);
+  assert(unchanged[3] === shortRect[3], "non-employment signature rects should not expand");
+  console.log("✓ employment signature rect expansion");
 }
 
 function testW4MirrorClearBehavior() {
@@ -227,6 +237,7 @@ async function main() {
   console.log("=== Signature + W-4 Test Suite ===\n");
   testEncodeDecodeRoundTrip();
   testSignatureFieldRegistry();
+  testEmploymentSignatureRectExpansion();
   testW4MirrorClearBehavior();
   testDrawnSignatureValidation();
   await testDrawnSignaturePdfFill();

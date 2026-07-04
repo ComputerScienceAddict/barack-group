@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { BaseField, pdfRectToScreen, useFormStateContext, type FormField } from "react-acroform";
+import { useMemo, useState, type CSSProperties } from "react";
+import { pdfRectToScreen, useFormStateContext, type FormField } from "react-acroform";
 import SignaturePad from "@/components/employee-onboarding/SignaturePad";
 import {
   decodeDrawnSignature,
   encodeDrawnSignature,
+  expandSignatureFieldRect,
 } from "@/lib/employee-onboarding/signatureFields";
 
 type AcroSignatureFieldProps = {
@@ -51,12 +52,36 @@ export default function AcroSignatureField({
     setPadSession((value) => value + 1);
   }
 
-  const { height: fieldHeight } = pdfRectToScreen(field.rect, pageHeight, scale);
-  const buttonMinHeight = Math.max(32, fieldHeight);
+  const displayField = useMemo(
+    () => ({
+      ...field,
+      rect: expandSignatureFieldRect(field.name, field.rect),
+    }),
+    [field]
+  );
+
+  const { height: fieldHeight } = pdfRectToScreen(displayField.rect, pageHeight, scale);
+  const buttonMinHeight = Math.max(40, fieldHeight);
+
+  const positionStyle = useMemo((): CSSProperties => {
+    const { left, top, width, height } = pdfRectToScreen(displayField.rect, pageHeight, scale);
+    return {
+      position: "absolute",
+      left: `${left}px`,
+      top: `${top}px`,
+      width: `${width}px`,
+      height: `${Math.max(height, buttonMinHeight)}px`,
+    };
+  }, [buttonMinHeight, displayField.rect, pageHeight, scale]);
 
   return (
     <>
-      <BaseField field={field} scale={scale} pageHeight={pageHeight} className={className}>
+      <div
+        className={`react-acroform-field react-acroform-field--${field.type}${field.required ? " react-acroform-field--required" : ""}${field.readOnly ? " react-acroform-field--readonly" : ""}${className ? ` ${className}` : ""}`}
+        style={positionStyle}
+        data-field-name={field.name}
+        data-field-type={field.type}
+      >
         <div className="acroSignatureField" style={{ minHeight: buttonMinHeight }}>
           <button
             type="button"
@@ -83,7 +108,7 @@ export default function AcroSignatureField({
             </button>
           )}
         </div>
-      </BaseField>
+      </div>
 
       {open && (
         <div className="signatureModal" role="dialog" aria-modal="true" aria-label={`Sign ${field.name}`}>

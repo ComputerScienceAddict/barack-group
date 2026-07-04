@@ -9,6 +9,7 @@ import {
 import type { PdfStampField } from "@/lib/employee-onboarding/extractPdfStampFields";
 import {
   decodeDrawnSignature,
+  expandSignatureFieldRect,
   isPdfSignatureField,
 } from "@/lib/employee-onboarding/signatureFields";
 
@@ -57,7 +58,7 @@ function dataUrlToBytes(dataUrl: string): Uint8Array {
 }
 
 function getPdfRect(field: PdfStampField) {
-  const [x1, y1, x2, y2] = field.rect;
+  const [x1, y1, x2, y2] = expandSignatureFieldRect(field.name, field.rect);
 
   return {
     x: Math.min(x1, x2),
