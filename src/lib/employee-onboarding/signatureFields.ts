@@ -6,7 +6,7 @@ export const PDF_SIGNATURE_FIELD_NAMES = new Set<string>([
   "applicant_signature",
   "firma_solicitante",
   "Signature of Employee",
-  "Text440",
+  "WorkerSignature",
 ]);
 
 export function isPdfSignatureField(fieldName: string): boolean {

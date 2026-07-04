@@ -35,7 +35,7 @@ function testSignatureFieldRegistry() {
     "applicant_signature",
     "firma_solicitante",
     "Signature of Employee",
-    "Text440",
+    "WorkerSignature",
   ];
   for (const name of expected) {
     assert(PDF_SIGNATURE_FIELD_NAMES.has(name), `missing signature field registration: ${name}`);

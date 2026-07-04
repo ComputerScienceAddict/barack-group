@@ -98,7 +98,8 @@ const formValues: FormValuesState = {
     "Today's Date mmddyyy": TODAY,
   },
   wh151: {
-    Text440: DRAWN_SIGNATURE,
+    WorkerSignature: DRAWN_SIGNATURE,
+    Text440: "TEST TEST",
     Text441: TODAY,
   },
 };

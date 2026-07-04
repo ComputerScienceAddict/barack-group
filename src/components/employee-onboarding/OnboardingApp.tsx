@@ -102,6 +102,10 @@ function applyApplicantPrefill(
       ...current.w4,
       ...w4Prefill,
     },
+    wh151: {
+      ...current.wh151,
+      Text440: [name.firstName, name.lastName].filter(Boolean).join(" "),
+    },
     i9: {
       ...current.i9,
       "First Name Given Name from Section 1": name.firstName,

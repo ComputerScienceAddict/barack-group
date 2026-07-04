@@ -87,10 +87,12 @@ export function mirrorI9FieldValues(values: Record<string, PdfFieldValue>): Reco
   return mirrored;
 }
 
-/** WH-151PS employee signature block (page 2 only). */
-export const WH151_HIGHLIGHT_FIELDS = ["Text440", "Text441"] as const;
-
-export const WH151_VALIDATE_FIELDS = ["Text440", "Text441"] as const;
+/** @deprecated Import from wh151Fields.ts */
+export {
+  WH151_HIGHLIGHT_FIELDS,
+  WH151_VALIDATE_FIELDS,
+  wh151RequiredRules,
+} from "@/lib/employee-onboarding/wh151Fields";
 
 export type RequiredFieldRules = {
   highlightFields: readonly string[];
@@ -110,12 +112,6 @@ export type RequiredFieldRules = {
     labelKey: MessageKey;
   }[];
   validateFieldAliases?: Readonly<Record<string, readonly string[]>>;
-};
-
-export const wh151RequiredRules: RequiredFieldRules = {
-  highlightFields: WH151_HIGHLIGHT_FIELDS,
-  highlightPages: [2],
-  validateFields: WH151_VALIDATE_FIELDS
 };
 
 export const i9RequiredRules: RequiredFieldRules = {

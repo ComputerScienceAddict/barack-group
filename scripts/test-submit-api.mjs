@@ -97,6 +97,7 @@ const payload = {
       "Today's Date mmddyyy": TODAY,
     },
     wh151: {
+      WorkerSignature: "John Doe",
       Text440: "John Doe",
       Text441: TODAY,
     },

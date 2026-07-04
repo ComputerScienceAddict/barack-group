@@ -1816,8 +1816,10 @@ label {
 /* Signature button emphasis when field is required */
 .scrollablePdfViewer .react-acroform-field[data-field-name="employee_signature_step5"].pdf-field-required .acroSignatureButton,
 .scrollablePdfViewer .react-acroform-field[data-field-name="employee_signature_step5_sp"].pdf-field-required .acroSignatureButton,
+.scrollablePdfViewer .react-acroform-field[data-field-name="WorkerSignature"].pdf-field-required .acroSignatureButton,
 .react-acroform-viewer .react-acroform-field[data-field-name="employee_signature_step5"].pdf-field-required .acroSignatureButton,
-.react-acroform-viewer .react-acroform-field[data-field-name="employee_signature_step5_sp"].pdf-field-required .acroSignatureButton {
+.react-acroform-viewer .react-acroform-field[data-field-name="employee_signature_step5_sp"].pdf-field-required .acroSignatureButton,
+.react-acroform-viewer .react-acroform-field[data-field-name="WorkerSignature"].pdf-field-required .acroSignatureButton {
   border: 3px dashed #a16207 !important;
   background: rgba(254, 240, 138, 0.95) !important;
 }
@@ -1961,6 +1963,7 @@ label {
 .scrollablePdfViewer .react-acroform-field[data-field-name="fecha_firma"].pdf-field-required,
 .scrollablePdfViewer .react-acroform-field[data-field-name="Signature of Employee"].pdf-field-required,
 .scrollablePdfViewer .react-acroform-field[data-field-name="Today's Date mmddyyy"].pdf-field-required,
+.scrollablePdfViewer .react-acroform-field[data-field-name="WorkerSignature"].pdf-field-required,
 .scrollablePdfViewer .react-acroform-field[data-field-name="Text440"].pdf-field-required,
 .scrollablePdfViewer .react-acroform-field[data-field-name="Text441"].pdf-field-required,
 .react-acroform-viewer .react-acroform-field[data-field-name="applicant_signature"].pdf-field-required,
@@ -1969,6 +1972,7 @@ label {
 .react-acroform-viewer .react-acroform-field[data-field-name="fecha_firma"].pdf-field-required,
 .react-acroform-viewer .react-acroform-field[data-field-name="Signature of Employee"].pdf-field-required,
 .react-acroform-viewer .react-acroform-field[data-field-name="Today's Date mmddyyy"].pdf-field-required,
+.react-acroform-viewer .react-acroform-field[data-field-name="WorkerSignature"].pdf-field-required,
 .react-acroform-viewer .react-acroform-field[data-field-name="Text440"].pdf-field-required,
 .react-acroform-viewer .react-acroform-field[data-field-name="Text441"].pdf-field-required {
   box-shadow:

@@ -3,6 +3,25 @@ import type { Locale } from "@/lib/employee-onboarding/i18n";
 import type { RequiredFieldRules } from "@/lib/employee-onboarding/requiredFields";
 import { isFieldValueFilled } from "@/lib/employee-onboarding/requiredFields";
 
+/** Step 1 personal info + filing status (page 1). */
+export const W4_ENGLISH_STEP1_FIELDS = [
+  "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]",
+  "topmostSubform[0].Page1[0].Step1a[0].f1_02[0]",
+  "topmostSubform[0].Page1[0].Step1a[0].f1_03[0]",
+  "topmostSubform[0].Page1[0].Step1a[0].f1_04[0]",
+  "topmostSubform[0].Page1[0].f1_05[0]",
+] as const;
+
+export const W4_SPANISH_STEP1_FIELDS = [
+  "topmostSubform[0].Page1[0].Paso1a[0].f1_01[0]",
+  "topmostSubform[0].Page1[0].Paso1a[0].f1_02[0]",
+  "topmostSubform[0].Page1[0].Paso1a[0].f1_03[0]",
+  "topmostSubform[0].Page1[0].Paso1a[0].f1_04[0]",
+  "topmostSubform[0].Page1[0].f1_05[0]",
+] as const;
+
+export const W4_SSN_FIELD = "topmostSubform[0].Page1[0].f1_05[0]" as const;
+
 /** Step 3 dependents: (a), (b), and total (3). */
 export const W4_ENGLISH_STEP3_FIELDS = [
   "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]",
@@ -37,12 +56,22 @@ export const W4_SPANISH_SIGNATURE_DATE_FIELDS = [
   "employee_date_step5_sp",
 ] as const;
 
+export const W4_FILING_STATUS_CHECKBOXES = [
+  "topmostSubform[0].Page1[0].c1_1[0]",
+  "topmostSubform[0].Page1[0].c1_1[1]",
+  "topmostSubform[0].Page1[0].c1_1[2]",
+] as const;
+
 export const W4_ENGLISH_HIGHLIGHT_FIELDS = [
+  ...W4_ENGLISH_STEP1_FIELDS,
+  ...W4_FILING_STATUS_CHECKBOXES,
   ...W4_ENGLISH_STEP3_FIELDS,
   ...W4_ENGLISH_SIGNATURE_DATE_FIELDS,
 ] as const;
 
 export const W4_SPANISH_HIGHLIGHT_FIELDS = [
+  ...W4_SPANISH_STEP1_FIELDS,
+  ...W4_FILING_STATUS_CHECKBOXES,
   ...W4_SPANISH_STEP3_FIELDS,
   ...W4_SPANISH_SIGNATURE_DATE_FIELDS,
 ] as const;
@@ -63,12 +92,6 @@ export const W4_SPANISH_VALIDATE_FIELDS = [
   "topmostSubform[0].Page1[0].Paso1a[0].f1_04[0]",
   "topmostSubform[0].Page1[0].f1_05[0]",
   ...W4_SPANISH_SIGNATURE_DATE_FIELDS,
-] as const;
-
-export const W4_FILING_STATUS_CHECKBOXES = [
-  "topmostSubform[0].Page1[0].c1_1[0]",
-  "topmostSubform[0].Page1[0].c1_1[1]",
-  "topmostSubform[0].Page1[0].c1_1[2]",
 ] as const;
 
 /** Map English W-4 field keys to Spanish (and back) when switching locale. */
@@ -109,7 +132,7 @@ export function mirrorW4FieldValues(
 
 export const w4EnglishRequiredRules: RequiredFieldRules = {
   highlightFields: W4_ENGLISH_HIGHLIGHT_FIELDS,
-  emphasisFields: W4_ENGLISH_SIGNATURE_DATE_FIELDS,
+  emphasisFields: [...W4_ENGLISH_SIGNATURE_DATE_FIELDS, W4_SSN_FIELD],
   highlightPages: [1],
   validateFields: W4_ENGLISH_VALIDATE_FIELDS,
   checkboxGroups: [W4_FILING_STATUS_CHECKBOXES],
@@ -117,7 +140,7 @@ export const w4EnglishRequiredRules: RequiredFieldRules = {
 
 export const w4SpanishRequiredRules: RequiredFieldRules = {
   highlightFields: W4_SPANISH_HIGHLIGHT_FIELDS,
-  emphasisFields: W4_SPANISH_SIGNATURE_DATE_FIELDS,
+  emphasisFields: [...W4_SPANISH_SIGNATURE_DATE_FIELDS, W4_SSN_FIELD],
   highlightPages: [1],
   validateFields: W4_SPANISH_VALIDATE_FIELDS,
   checkboxGroups: [W4_FILING_STATUS_CHECKBOXES],
