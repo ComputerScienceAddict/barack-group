@@ -1,8 +1,10 @@
 "use client";
 
+import "@/lib/employee-onboarding/configurePdfWorker";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePDFDocument } from "react-acroform";
-import { GlobalWorkerOptions, type PDFPageProxy } from "pdfjs-dist";
+import type { PDFPageProxy } from "pdfjs-dist";
+import { PDF_WORKER_SRC } from "@/lib/employee-onboarding/configurePdfWorker";
 import LightPdfPage from "@/components/employee-onboarding/LightPdfPage";
 import { useLanguage } from "@/components/employee-onboarding/LanguageProvider";
 
@@ -18,14 +20,13 @@ type LightPdfViewerProps = {
 
 export default function LightPdfViewer({
   src,
-  workerSrc = "/pdf.worker.min.mjs",
+  workerSrc = PDF_WORKER_SRC,
   active = true
 }: LightPdfViewerProps) {
   const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [pages, setPages] = useState<PDFPageProxy[]>([]);
-  GlobalWorkerOptions.workerSrc = workerSrc;
   const { document, loading, error } = usePDFDocument({ src, workerSrc });
 
   useEffect(() => {

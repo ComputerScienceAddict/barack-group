@@ -1,5 +1,6 @@
 "use client";
 
+import "@/lib/employee-onboarding/configurePdfWorker";
 import {
   forwardRef,
   useCallback,
@@ -18,7 +19,8 @@ import {
   useFormStateContext,
   usePDFDocument
 } from "react-acroform";
-import { GlobalWorkerOptions, type PDFPageProxy } from "pdfjs-dist";
+import { PDF_WORKER_SRC } from "@/lib/employee-onboarding/configurePdfWorker";
+import type { PDFPageProxy } from "pdfjs-dist";
 import "react-acroform/styles.css";
 import AcroPdfPage from "@/components/employee-onboarding/AcroPdfPage";
 import { downloadOnboardingPacket as downloadMergedPacket, downloadPdfBytes, fillPdf, type PdfFieldValue, type PdfStampField } from "@/lib/employee-onboarding/fillPdf";
@@ -64,6 +66,7 @@ type FillablePdfFormProps = {
 
 export type FillablePdfFormHandle = {
   flushValues: () => Record<string, PdfFieldValue>;
+  getStampFields: () => PdfStampField[];
   focusMissingFields: (fieldKeys: string[]) => boolean;
   clearMissingMarks: () => void;
 };
@@ -173,7 +176,6 @@ function ScrollablePdfPages({
   const [scale, setScale] = useState(1);
   const [pages, setPages] = useState<PDFPageProxy[]>([]);
 
-  GlobalWorkerOptions.workerSrc = workerSrc;
   const { document, loading, error } = usePDFDocument({ src, workerSrc });
   const { fields, loading: fieldsLoading, error: fieldsError, radioGroups } = useFormFields({ document });
 
@@ -414,6 +416,7 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
         onChangeRef.current(merged);
         return merged;
       },
+      getStampFields: () => stampFieldsRef.current,
       focusMissingFields: (fieldKeys: string[]) => {
         const root = fieldsRootRef.current;
         if (!root || fieldKeys.length === 0) return false;
@@ -484,7 +487,7 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
           />
           <ScrollablePdfPages
             src={config.templatePath}
-            workerSrc="/pdf.worker.min.mjs"
+            workerSrc={PDF_WORKER_SRC}
             pageCount={config.pageCount}
             fieldsRootRef={fieldsRootRef}
             highlightFields={config.requiredRules.highlightFields}

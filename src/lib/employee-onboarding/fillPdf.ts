@@ -1,3 +1,4 @@
+import "@/lib/employee-onboarding/configurePdfWorker";
 import {
   PDFCheckBox,
   PDFDocument,

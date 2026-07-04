@@ -1,5 +1,6 @@
 "use client";
 
+import "@/lib/employee-onboarding/configurePdfWorker";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import FillablePdfForm, { type FillablePdfFormHandle } from "@/components/employee-onboarding/FillablePdfForm";
 import NameEntryStep from "@/components/employee-onboarding/NameEntryStep";
@@ -189,6 +190,10 @@ function OnboardingAppContent() {
     if (formId === "i9") return i9FormRef;
     if (formId === "wh151") return wh151FormRef;
     return null;
+  }
+
+  function getStampFieldsForForm(formId: OnboardingFormId) {
+    return getFormRef(formId)?.current?.getStampFields() ?? [];
   }
 
   function flushStepValues(formStep: number): Record<string, PdfFieldValue> {
@@ -487,6 +492,7 @@ function OnboardingAppContent() {
           templatePath: config.templatePath,
           values: flushedFormValues[config.id],
           pageCount: config.pageCount,
+          fields: getStampFieldsForForm(config.id),
         })),
         { appendPdfBytes }
       );
