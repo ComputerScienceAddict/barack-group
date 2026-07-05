@@ -16,9 +16,9 @@ export function ServicesPageContent() {
         />
       </AnimatedContent>
 
-      <div className="mt-12 grid gap-10 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12">
+      <div className="mt-12 grid items-stretch gap-10 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12">
         {serviceHighlights.map((service, index) => (
-          <AnimatedContent key={service.title} delay={index * 60}>
+          <AnimatedContent key={service.title} delay={index * 60} className="h-full">
             <ServiceCard {...service} />
           </AnimatedContent>
         ))}

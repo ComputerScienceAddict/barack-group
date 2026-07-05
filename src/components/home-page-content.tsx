@@ -61,7 +61,7 @@ export function HomePageContent() {
       <HomeHero />
 
       {/* SERVICES */}
-      <section className="relative bg-[#06080f] px-4 py-24 sm:px-6">
+      <section className="relative bg-[#06080f] px-4 py-16 sm:px-6 sm:py-24">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
         <div className="mx-auto w-full max-w-6xl">
           <AnimatedContent>
@@ -74,9 +74,9 @@ export function HomePageContent() {
             />
           </AnimatedContent>
 
-          <div className="mt-12 grid gap-10 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12">
+          <div className="mt-12 grid items-stretch gap-10 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12">
             {serviceHighlights.map((service, index) => (
-              <AnimatedContent key={service.title} delay={index * 60}>
+              <AnimatedContent key={service.title} delay={index * 60} className="h-full">
                 <ServiceCard {...service} />
               </AnimatedContent>
             ))}
@@ -85,7 +85,7 @@ export function HomePageContent() {
       </section>
 
       {/* GALLERY */}
-      <section className="relative bg-[#06080f] px-4 py-20 sm:px-6">
+      <section className="relative bg-[#06080f] px-4 py-16 sm:px-6 sm:py-20">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
         <div className="mx-auto w-full max-w-6xl">
           <AnimatedContent>
@@ -107,7 +107,7 @@ export function HomePageContent() {
       </section>
 
       {/* INDUSTRIES */}
-      <section className="relative bg-[#06080f] px-4 py-20 sm:px-6">
+      <section className="relative bg-[#06080f] px-4 py-16 sm:px-6 sm:py-20">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
         <div className="mx-auto w-full max-w-6xl">
           <AnimatedContent>
@@ -136,7 +136,7 @@ export function HomePageContent() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="relative bg-[#080c14] px-4 py-24 sm:px-6">
+      <section className="relative bg-[#080c14] px-4 py-16 sm:px-6 sm:py-24">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
         <div className="mx-auto w-full max-w-6xl">
           <AnimatedContent>
