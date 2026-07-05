@@ -196,26 +196,6 @@ function ScrollablePdfPages({
     [hiddenOverlayFields]
   );
 
-  const highlightConfigKey = useMemo(
-    () =>
-      [
-        resolvedHighlightFields.join("\u0001"),
-        excludeHighlightFields?.join("\u0001") ?? "",
-        hiddenOverlayFields?.join("\u0001") ?? "",
-        highlightPages?.join(",") ?? "",
-        emphasisFields?.join("\u0001") ?? "",
-        displayFields.length,
-      ].join("|"),
-    [
-      displayFields.length,
-      emphasisFields,
-      excludeHighlightFields,
-      hiddenOverlayFields,
-      highlightPages,
-      resolvedHighlightFields,
-    ]
-  );
-
   useEffect(() => {
     if (wh153Overlay) {
       onWh153Mapping?.(wh153Overlay.mapping);
@@ -281,7 +261,14 @@ function ScrollablePdfPages({
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [fieldsRootRef, highlightConfigKey, visiblePages.length]);
+  }, [
+    emphasisFields,
+    excludeHighlightFields,
+    fieldsRootRef,
+    highlightPages,
+    resolvedHighlightFields,
+    visiblePages.length,
+  ]);
 
   useEffect(() => {
     const container = fieldsRootRef.current;
