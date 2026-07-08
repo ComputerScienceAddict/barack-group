@@ -73,11 +73,6 @@ const johnDoeFormValues: FormValuesState = {
     emergency_2_alt_phone: "555-555-6666",
     applicant_signature: DRAWN_SIGNATURE,
     applicant_signature_date: TODAY,
-    interviewed_by: "HR Rep",
-    company_date: TODAY,
-    position_offered: "Cleaner",
-    start_date: TODAY,
-    company_notes: "John Doe onboarding test",
   },
   w4: {
     "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]": "John",
@@ -157,26 +152,6 @@ for (const [name, rules, values] of rulesByForm) {
   assert(missing.length === 0, `${name} has ${missing.length} missing required field(s)`);
   console.log(`✓ ${name}: all required fields present`);
 }
-
-const employmentWithoutCompany = { ...johnDoeFormValues.employment };
-for (const key of [
-  "interviewed_by",
-  "company_date",
-  "position_offered",
-  "start_date",
-  "company_notes",
-] as const) {
-  delete employmentWithoutCompany[key];
-}
-const employmentCompanyMissing = getMissingFieldIssues(
-  employmentEnglishRequiredRules,
-  employmentWithoutCompany
-);
-assert(
-  employmentCompanyMissing.length === 0,
-  `employment should not require company-only fields (${employmentCompanyMissing.map((issue) => issue.fieldKey).join(", ")})`
-);
-console.log("✓ employment: company-only fields are optional");
 
 // 3. Build combined packet and verify fills saved
 const packetResult = await buildSubmissionPacket(johnDoeFormValues, directDeposit, "en");

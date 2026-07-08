@@ -50,11 +50,6 @@ export const EMPLOYMENT_SPANISH_FIELD_KEYS = [
   "emergencia_telefono_alterno_2",
   "firma_solicitante",
   "fecha_firma",
-  "entrevistado_por",
-  "fecha_entrevista",
-  "puesto_ofrecido",
-  "fecha_inicio",
-  "notas",
 ] as const;
 
 /** AcroForm field names in janiking-employment-application-english.pdf */
@@ -97,11 +92,6 @@ export const EMPLOYMENT_ENGLISH_FIELD_KEYS = [
   "emergency_2_alt_phone",
   "applicant_signature",
   "applicant_signature_date",
-  "interviewed_by",
-  "company_date",
-  "position_offered",
-  "start_date",
-  "company_notes",
 ] as const;
 
 const EMPLOYMENT_ENGLISH_CHECKBOX_FIELDS = new Set([
@@ -223,73 +213,39 @@ const EMPLOYMENT_SPANISH_CHECKBOX_GROUPS: LabeledCheckboxGroup[] = [
 
 function employmentTextValidateFields(
   allKeys: readonly string[],
-  checkboxFields: Set<string>
+  checkboxFields: Set<string>,
+  optionalFields: ReadonlySet<string>
 ): string[] {
-  return allKeys.filter((key) => !checkboxFields.has(key));
+  return allKeys.filter((key) => !checkboxFields.has(key) && !optionalFields.has(key));
 }
 
-/** "For Company Use Only" — employer fills these; applicants must not see or complete them. */
-export const EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS = [
-  "interviewed_by",
-  "company_date",
-  "position_offered",
-  "start_date",
-  "company_notes",
-] as const;
-
-export const EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS = [
-  "entrevistado_por",
-  "fecha_entrevista",
-  "puesto_ofrecido",
-  "fecha_inicio",
-  "notas",
-] as const;
-
-const EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELD_SET = new Set<string>(
-  EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS
-);
-
-const EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELD_SET = new Set<string>(
-  EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS
-);
-
-export const EMPLOYMENT_COMPANY_ONLY_FIELD_NAMES = new Set<string>([
-  ...EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS,
-  ...EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS,
+const EMPLOYMENT_OPTIONAL_NAME_FIELDS = new Set<string>([
+  "middle_initial",
+  "inicial_segundo_nombre",
 ]);
-
-const EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS = EMPLOYMENT_ENGLISH_FIELD_KEYS.filter(
-  (k) => !EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELD_SET.has(k)
-);
-
-const EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS = EMPLOYMENT_SPANISH_FIELD_KEYS.filter(
-  (k) => !EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELD_SET.has(k)
-);
 
 export const employmentSpanishRequiredRules: RequiredFieldRules = {
   highlightFields: mergeHighlightFields(
-    EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS,
+    EMPLOYMENT_SPANISH_FIELD_KEYS.filter((key) => !EMPLOYMENT_OPTIONAL_NAME_FIELDS.has(key)),
     EMPLOYMENT_SPANISH_CONTACT_HIGHLIGHT_FIELDS
   ),
-  excludeHighlightFields: EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS,
-  hiddenOverlayFields: EMPLOYMENT_SPANISH_COMPANY_ONLY_FIELDS,
   validateFields: employmentTextValidateFields(
-    EMPLOYMENT_SPANISH_HIGHLIGHT_FIELDS,
-    EMPLOYMENT_SPANISH_CHECKBOX_FIELDS
+    EMPLOYMENT_SPANISH_FIELD_KEYS,
+    EMPLOYMENT_SPANISH_CHECKBOX_FIELDS,
+    EMPLOYMENT_OPTIONAL_NAME_FIELDS
   ),
   labeledCheckboxGroups: EMPLOYMENT_SPANISH_CHECKBOX_GROUPS,
 };
 
 export const employmentEnglishRequiredRules: RequiredFieldRules = {
   highlightFields: mergeHighlightFields(
-    EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS,
+    EMPLOYMENT_ENGLISH_FIELD_KEYS.filter((key) => !EMPLOYMENT_OPTIONAL_NAME_FIELDS.has(key)),
     EMPLOYMENT_ENGLISH_CONTACT_HIGHLIGHT_FIELDS
   ),
-  excludeHighlightFields: EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS,
-  hiddenOverlayFields: EMPLOYMENT_ENGLISH_COMPANY_ONLY_FIELDS,
   validateFields: employmentTextValidateFields(
-    EMPLOYMENT_ENGLISH_HIGHLIGHT_FIELDS,
-    EMPLOYMENT_ENGLISH_CHECKBOX_FIELDS
+    EMPLOYMENT_ENGLISH_FIELD_KEYS,
+    EMPLOYMENT_ENGLISH_CHECKBOX_FIELDS,
+    EMPLOYMENT_OPTIONAL_NAME_FIELDS
   ),
   labeledCheckboxGroups: EMPLOYMENT_ENGLISH_CHECKBOX_GROUPS,
 };
@@ -339,11 +295,6 @@ const EMPLOYMENT_LOCALE_MIRROR_PAIRS: ReadonlyArray<readonly [string, string]> =
   ["emergency_2_alt_phone", "emergencia_telefono_alterno_2"],
   ["applicant_signature", "firma_solicitante"],
   ["applicant_signature_date", "fecha_firma"],
-  ["interviewed_by", "entrevistado_por"],
-  ["company_date", "fecha_entrevista"],
-  ["position_offered", "puesto_ofrecido"],
-  ["start_date", "fecha_inicio"],
-  ["company_notes", "notas"],
 ];
 
 function hasValue(value: unknown): boolean {

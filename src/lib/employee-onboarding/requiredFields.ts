@@ -31,7 +31,6 @@ export function resolveSocialSecurityValue(
 export const I9_SECTION1_HIGHLIGHT_FIELDS = [
   "Last Name (Family Name)",
   "First Name Given Name",
-  "Employee Middle Initial (if any)",
   "Employee Other Last Names Used (if any)",
   "Address Street Number and Name",
   "Apt Number (if any)",

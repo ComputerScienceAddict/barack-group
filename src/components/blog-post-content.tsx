@@ -1,11 +1,7 @@
 import Link from "next/link";
-import { posts } from "@/lib/site-data";
-import { notFound } from "next/navigation";
+import type { Post } from "@/lib/site-data";
 
-export function BlogPostContent({ slug }: { slug: string }) {
-  const post = posts.find((p) => p.slug === slug);
-  if (!post) notFound();
-
+export function BlogPostContent({ post }: { post: Post }) {
   return (
     <div className="container">
       <div style={{ paddingTop: "3rem", paddingBottom: "1.5rem" }}>

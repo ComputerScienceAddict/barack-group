@@ -50,6 +50,7 @@ import {
 } from "@/lib/employee-onboarding/loadDraft";
 import { mirrorW4FieldValues } from "@/lib/employee-onboarding/w4Fields";
 import { mirrorEmploymentFieldValues } from "@/lib/employee-onboarding/employmentFields";
+import { decodeDrawnSignature } from "@/lib/employee-onboarding/signatureFields";
 
 const PACKET_SUMMARY_KEYS: MessageKey[] = [
   "packetItemEmployment",
@@ -75,10 +76,52 @@ const FORM_TITLE_KEYS: Record<OnboardingFormId, MessageKey> = {
   wh151: "formWh151",
 };
 
+const SIGNATURE_FIELD_KEYS_BY_FORM: Record<OnboardingFormId, readonly string[]> = {
+  employment: ["applicant_signature", "firma_solicitante"],
+  w4: ["employee_signature_step5", "employee_signature_step5_sp"],
+  i9: ["Signature of Employee"],
+  wh151: ["WorkerSignature"],
+};
+
+function findFirstCapturedSignature(values: FormValuesState): string | null {
+  for (const formId of Object.keys(SIGNATURE_FIELD_KEYS_BY_FORM) as OnboardingFormId[]) {
+    for (const key of SIGNATURE_FIELD_KEYS_BY_FORM[formId]) {
+      const encoded = String(values[formId][key] ?? "");
+      if (decodeDrawnSignature(encoded)) return encoded;
+    }
+  }
+  return null;
+}
+
+function applyCapturedSignatureToAllForms(
+  current: FormValuesState,
+  encodedSignature: string
+): FormValuesState {
+  let changed = false;
+  const next: FormValuesState = {
+    employment: { ...current.employment },
+    w4: { ...current.w4 },
+    i9: { ...current.i9 },
+    wh151: { ...current.wh151 },
+  };
+
+  for (const formId of Object.keys(SIGNATURE_FIELD_KEYS_BY_FORM) as OnboardingFormId[]) {
+    for (const key of SIGNATURE_FIELD_KEYS_BY_FORM[formId]) {
+      const existingValue = String(next[formId][key] ?? "");
+      if (decodeDrawnSignature(existingValue)) continue;
+      next[formId][key] = encodedSignature;
+      changed = true;
+    }
+  }
+
+  return changed ? next : current;
+}
+
 function applyApplicantPrefill(
   current: FormValuesState,
   name: ApplicantName
 ): FormValuesState {
+  const fullName = [name.firstName, name.lastName].filter(Boolean).join(" ");
   const employmentPrefill: Record<string, PdfFieldValue> = {
     first_name: name.firstName,
     last_name: name.lastName,
@@ -114,13 +157,17 @@ function applyApplicantPrefill(
     },
     wh151: {
       ...current.wh151,
-      Text440: [name.firstName, name.lastName].filter(Boolean).join(" "),
+      Text440: fullName,
+      "nombre del empleado": fullName,
     },
     i9: {
       ...current.i9,
       "First Name Given Name from Section 1": name.firstName,
       "First Name Given Name": name.firstName,
       "Last Name Family Name from Section 1": name.lastName,
+      "Last Name (Family Name)": name.lastName,
+      "Employee Middle Initial (if any)": "",
+      "Middle initial if any from Section 1": "",
     },
   };
 }
@@ -135,18 +182,18 @@ export default function OnboardingApp() {
 
 function OnboardingAppContent() {
   const { locale, setLocale, t } = useLanguage();
-  const [initialDraft] = useState(readDraftSnapshot);
   const formConfigs = useMemo(() => getOnboardingFormConfigs(locale), [locale]);
-  const [step, setStep] = useState(initialDraft.step);
-  const [formValues, setFormValues] = useState<FormValuesState>(initialDraft.formValues);
+  const [step, setStep] = useState(TUTORIAL_STEP);
+  const [formValues, setFormValues] = useState<FormValuesState>(EMPTY_FORM_VALUES);
   const [directDepositValues, setDirectDepositValues] = useState<DirectDepositValues>(
-    initialDraft.directDepositValues
+    EMPTY_DIRECT_DEPOSIT_VALUES
   );
-  const [applicantName, setApplicantName] = useState<ApplicantName>(initialDraft.applicantName);
+  const [applicantName, setApplicantName] = useState<ApplicantName>(EMPTY_APPLICANT_NAME);
   const [nameMissingKeys, setNameMissingKeys] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [messageIsError, setMessageIsError] = useState(false);
-  const [showDraftRestoredNotice, setShowDraftRestoredNotice] = useState(initialDraft.draftRestored);
+  const [showDraftRestoredNotice, setShowDraftRestoredNotice] = useState(false);
+  const [draftHydrated, setDraftHydrated] = useState(false);
   const [missingIssues, setMissingIssues] = useState<MissingFieldIssue[]>([]);
   const [missingFormStep, setMissingFormStep] = useState<number | null>(null);
   const pendingFocusRef = useRef<{ step: number; highlightKeys: string[]; scrollTarget: string } | null>(
@@ -172,7 +219,10 @@ function OnboardingAppContent() {
   const updateFormValues = useCallback((formId: OnboardingFormId, values: Record<string, PdfFieldValue>) => {
     setFormValues((prev) => {
       if (pdfFieldValuesEqual(prev[formId], values)) return prev;
-      return { ...prev, [formId]: values };
+      const merged = { ...prev, [formId]: values };
+      const firstSignature = findFirstCapturedSignature(merged);
+      if (!firstSignature) return merged;
+      return applyCapturedSignatureToAllForms(merged, firstSignature);
     });
   }, []);
 
@@ -250,6 +300,17 @@ function OnboardingAppContent() {
   }, [step]);
 
   useEffect(() => {
+    const draft = readDraftSnapshot();
+    setFormValues(draft.formValues);
+    setDirectDepositValues(draft.directDepositValues);
+    setApplicantName(draft.applicantName);
+    setStep(draft.step);
+    setShowDraftRestoredNotice(draft.draftRestored);
+    setDraftHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!draftHydrated) return;
     window.localStorage.setItem(
       DRAFT_KEY,
       JSON.stringify({
@@ -260,7 +321,7 @@ function OnboardingAppContent() {
         savedAt: new Date().toISOString(),
       })
     );
-  }, [applicantName, directDepositValues, formValues, step]);
+  }, [applicantName, directDepositValues, draftHydrated, formValues, step]);
 
   function handleLocaleChange(next: Locale) {
     if (next === locale) return;
@@ -360,6 +421,12 @@ function OnboardingAppContent() {
       }
       setNameMissingKeys([]);
       setFormValues((prev) => applyApplicantPrefill(prev, normalized));
+      setDirectDepositValues((prev) => ({
+        ...prev,
+        employeeName: prev.employeeName.trim().length > 0
+          ? prev.employeeName
+          : [normalized.firstName, normalized.lastName].filter(Boolean).join(" "),
+      }));
       return true;
     }
 
@@ -598,6 +665,14 @@ function OnboardingAppContent() {
   const packetSummaryKeys = usesDirectDeposit(directDepositValues)
     ? PACKET_SUMMARY_KEYS
     : PACKET_SUMMARY_KEYS.filter((key) => key !== "packetItemDirectDeposit");
+  const capturedSignature = useMemo(() => findFirstCapturedSignature(formValues), [formValues]);
+
+  const fillAllSignatureFields = useCallback(() => {
+    if (!capturedSignature) return;
+    setFormValues((prev) => applyCapturedSignatureToAllForms(prev, capturedSignature));
+    setMessage("Signature copied to all documents.");
+    setMessageIsError(false);
+  }, [capturedSignature]);
 
   const missingConfig = missingFormStep !== null ? getConfigForStep(missingFormStep) : null;
   const missingFormTitle =
@@ -860,6 +935,11 @@ function OnboardingAppContent() {
               </button>
             ) : (
               <span aria-hidden="true" />
+            )}
+            {capturedSignature && isFormStep(step) && (
+              <button type="button" className="secondaryButton" onClick={fillAllSignatureFields}>
+                Use first signature everywhere
+              </button>
             )}
             {showDirectDepositSubmit ? (
               <button type="button" className="primaryButton" onClick={submitAndDownload} disabled={submitting}>

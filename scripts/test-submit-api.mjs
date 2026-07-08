@@ -62,11 +62,6 @@ const payload = {
       emergency_2_alt_phone: "555-555-6666",
       applicant_signature: "John Doe",
       applicant_signature_date: TODAY,
-      interviewed_by: "HR Rep",
-      company_date: TODAY,
-      position_offered: "Cleaner",
-      start_date: TODAY,
-      company_notes: "John Doe onboarding test",
     },
     w4: {
       "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]": "John",

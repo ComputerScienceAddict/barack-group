@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { pdfRectToScreen, useFormStateContext, type FormField } from "react-acroform";
 import SignaturePad from "@/components/employee-onboarding/SignaturePad";
 import {
@@ -8,6 +8,8 @@ import {
   encodeDrawnSignature,
   expandSignatureFieldRect,
 } from "@/lib/employee-onboarding/signatureFields";
+
+const PRIMARY_SIGNATURE_STORAGE_KEY = "onboardingPrimaryDrawnSignature";
 
 type AcroSignatureFieldProps = {
   field: FormField;
@@ -26,9 +28,27 @@ export default function AcroSignatureField({
   const [open, setOpen] = useState(false);
   const [draftValue, setDraftValue] = useState("");
   const [padSession, setPadSession] = useState(0);
+  const [savedSignature, setSavedSignature] = useState<string | null>(null);
 
   const currentValue = String(formState.getValue(field.name) ?? "");
   const signatureImage = useMemo(() => decodeDrawnSignature(currentValue), [currentValue]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(PRIMARY_SIGNATURE_STORAGE_KEY) ?? "";
+    const decoded = decodeDrawnSignature(stored);
+    if (decoded) setSavedSignature(stored);
+  }, []);
+
+  useEffect(() => {
+    if (!signatureImage) return;
+    const encoded = String(formState.getValue(field.name) ?? "");
+    if (!decodeDrawnSignature(encoded)) return;
+    setSavedSignature(encoded);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(PRIMARY_SIGNATURE_STORAGE_KEY, encoded);
+    }
+  }, [field.name, formState, signatureImage]);
 
   function openSigner() {
     setOpen(true);
@@ -42,8 +62,18 @@ export default function AcroSignatureField({
 
   function saveSignature() {
     if (!draftValue) return;
-    formState.setValue(field.name, encodeDrawnSignature(draftValue));
+    const encoded = encodeDrawnSignature(draftValue);
+    formState.setValue(field.name, encoded);
+    setSavedSignature(encoded);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(PRIMARY_SIGNATURE_STORAGE_KEY, encoded);
+    }
     setOpen(false);
+  }
+
+  function useSavedSignature() {
+    if (!savedSignature) return;
+    formState.setValue(field.name, savedSignature);
   }
 
   function clearSignature() {
@@ -89,14 +119,26 @@ export default function AcroSignatureField({
             style={{ minHeight: buttonMinHeight }}
             onClick={openSigner}
             aria-label={`Sign ${field.name}`}
+            title={signatureImage ? "Update signature" : "Tap to sign"}
           >
             {signatureImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={signatureImage} alt="Signature preview" className="acroSignaturePreview" />
             ) : (
-              <span className="acroSignaturePrompt">Click to sign</span>
+              <span className="acroSignaturePrompt">Tap to sign</span>
             )}
           </button>
+          {!signatureImage && savedSignature && (
+            <button
+              type="button"
+              className="acroSignatureReuse"
+              onClick={useSavedSignature}
+              aria-label={`Use saved signature for ${field.name}`}
+              title="Use your saved signature"
+            >
+              Use saved signature
+            </button>
+          )}
           {signatureImage && (
             <button
               type="button"

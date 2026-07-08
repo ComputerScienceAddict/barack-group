@@ -70,11 +70,6 @@ const formValues: FormValuesState = {
     emergencia_telefono_alterno_2: "555-000-0105",
     firma_solicitante: DRAWN_SIGNATURE,
     fecha_firma: TODAY,
-    entrevistado_por: "HR Rep",
-    fecha_entrevista: TODAY,
-    puesto_ofrecido: "Cleaner",
-    fecha_inicio: TODAY,
-    notas: "Spanish W-4 block signature test",
   },
   w4: {
     "topmostSubform[0].Page1[0].Paso1a[0].f1_01[0]": "BLOCK",
