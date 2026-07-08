@@ -148,6 +148,7 @@ export type RequiredFieldRules = {
 
 export const i9RequiredRules: RequiredFieldRules = {
   highlightFields: mergeHighlightFields(I9_SECTION1_HIGHLIGHT_FIELDS, I9_CONTACT_HIGHLIGHT_FIELDS),
+  hiddenOverlayFields: ["State", "Telephone Number"],
   emphasisFields: I9_EMPHASIS_FIELDS,
   highlightPages: [1],
   validateFields: I9_SECTION1_VALIDATE_FIELDS,
