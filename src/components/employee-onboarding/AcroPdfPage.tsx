@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckboxField,
-  DropdownField,
   RadioField,
   SignatureField,
   type FormField
 } from "react-acroform";
 import AcroTextField from "@/components/employee-onboarding/AcroTextField";
+import AcroDropdownField from "@/components/employee-onboarding/AcroDropdownField";
 import AcroSignatureField from "@/components/employee-onboarding/AcroSignatureField";
 import { isPdfSignatureField } from "@/lib/employee-onboarding/signatureFields";
 import { W4_LEGACY_STEP5_FIELDS } from "@/lib/employee-onboarding/w4Fields";
@@ -192,7 +192,7 @@ export default function AcroPdfPage({
                     />
                   );
                 case "dropdown":
-                  return <DropdownField key={key} {...commonProps} />;
+                  return <AcroDropdownField key={key} {...commonProps} />;
                 case "signature":
                   return (
                     <SignatureField key={key} {...commonProps} onSignatureClick={onSignatureClick} />

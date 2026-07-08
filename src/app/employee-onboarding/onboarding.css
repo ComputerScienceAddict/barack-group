@@ -1564,6 +1564,10 @@ label {
   border-left: 3px solid var(--success);
 }
 
+.i9MobileQuickFields {
+  display: none;
+}
+
 .pdfViewerShell {
   overflow: visible;
   max-height: none;
@@ -2478,6 +2482,61 @@ label {
 
   .scrollablePdfViewer {
     gap: 16px;
+  }
+
+  .i9MobileQuickFields {
+    display: grid;
+    gap: 12px;
+    margin: 0 0 14px;
+    padding: 14px;
+    border: 2px solid #f59e0b;
+    border-radius: var(--radius-sm);
+    background: #fffbeb;
+  }
+
+  .i9MobileQuickTitle {
+    margin: 0;
+    color: #92400e;
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  .i9MobileQuickHint {
+    margin: -6px 0 0;
+    color: #78350f;
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .i9MobileQuickGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .i9MobileQuickGrid label {
+    color: #334155;
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  .i9MobileQuickGrid input,
+  .i9MobileQuickGrid select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 12px;
+    border: 1px solid #b45309;
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+    color: var(--ink);
+    font-size: 1rem;
+  }
+
+  .i9MobileQuickGrid input:focus,
+  .i9MobileQuickGrid select:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.16);
   }
 
   .pdfPageWrap {

@@ -48,6 +48,59 @@ const FORM_TITLE_KEYS: Record<string, MessageKey> = {
   wh153: "formWh153",
 };
 
+const US_STATE_OPTIONS = [
+  "AL",
+  "AK",
+  "AZ",
+  "AR",
+  "CA",
+  "CO",
+  "CT",
+  "DE",
+  "FL",
+  "GA",
+  "HI",
+  "ID",
+  "IL",
+  "IN",
+  "IA",
+  "KS",
+  "KY",
+  "LA",
+  "ME",
+  "MD",
+  "MA",
+  "MI",
+  "MN",
+  "MS",
+  "MO",
+  "MT",
+  "NE",
+  "NV",
+  "NH",
+  "NJ",
+  "NM",
+  "NY",
+  "NC",
+  "ND",
+  "OH",
+  "OK",
+  "OR",
+  "PA",
+  "RI",
+  "SC",
+  "SD",
+  "TN",
+  "TX",
+  "UT",
+  "VT",
+  "VA",
+  "WA",
+  "WV",
+  "WI",
+  "WY",
+] as const;
+
 function delay(ms: number) {
   return new Promise<void>((resolve) => {
     window.setTimeout(resolve, ms);
@@ -141,6 +194,58 @@ function DomSyncBridge({
   }, [fieldsRootRef, normalizeValues, valuesStoreRef]);
 
   return null;
+}
+
+function I9MobileQuickFields({
+  values,
+  onFieldChange,
+}: {
+  values: Record<string, PdfFieldValue>;
+  onFieldChange: (fieldName: string, value: PdfFieldValue) => void;
+}) {
+  const { t } = useLanguage();
+  const state = String(values.State ?? "");
+  const phone = String(values["Telephone Number"] ?? "");
+
+  return (
+    <div className="i9MobileQuickFields" aria-label="I-9 quick fields">
+      <p className="i9MobileQuickTitle">I-9 quick fields</p>
+      <p className="i9MobileQuickHint">
+        Use these larger mobile fields if the PDF boxes are hard to tap. They save into the same I-9 PDF.
+      </p>
+      <div className="i9MobileQuickGrid">
+        <label>
+          {t("fieldState")}
+          <select
+            value={state}
+            onChange={(event) => onFieldChange("State", event.target.value)}
+            onInput={(event) => onFieldChange("State", event.currentTarget.value)}
+            onBlur={(event) => onFieldChange("State", event.currentTarget.value)}
+          >
+            <option value="">Select state</option>
+            {US_STATE_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          {t("fieldPhone")}
+          <input
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            value={phone}
+            onChange={(event) => onFieldChange("Telephone Number", event.target.value)}
+            onInput={(event) => onFieldChange("Telephone Number", event.currentTarget.value)}
+            onBlur={(event) => onFieldChange("Telephone Number", event.currentTarget.value)}
+            placeholder="555-123-4567"
+          />
+        </label>
+      </div>
+    </div>
+  );
 }
 
 function ScrollablePdfPages({
@@ -382,6 +487,18 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
     return normalized;
   }, [collapseOverlayValues, isWh153, values, wh153Mapping]);
 
+  const handleQuickFieldChange = useCallback(
+    (fieldName: string, value: PdfFieldValue) => {
+      const merged = collapseOverlayValues({
+        ...readMergedValues(),
+        [fieldName]: value,
+      });
+      valuesStoreRef.current = merged;
+      onChangeRef.current(merged);
+    },
+    [collapseOverlayValues, readMergedValues]
+  );
+
   const handleChange = useCallback(
     (_fieldName: string, _value: FormFieldValue, allValues: Record<string, FormFieldValue>) => {
       const root = fieldsRootRef.current;
@@ -459,6 +576,9 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
       </div>
       {downloadError && <p className="pdfFormError">{downloadError}</p>}
       {downloadNote && <p className="pdfFormSuccess">{downloadNote}</p>}
+      {config.id === "i9" && (
+        <I9MobileQuickFields values={valuesStoreRef.current} onFieldChange={handleQuickFieldChange} />
+      )}
       <div className="pdfViewerShell">
         <FormStateProvider values={mergedDefaults} onChange={handleChange}>
           <FormValuesBridge
