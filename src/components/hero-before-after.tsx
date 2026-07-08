@@ -3,13 +3,13 @@ import { heroBeforeAfter } from "@/lib/site-data";
 
 export function HeroBeforeAfter() {
   return (
-    <figure className="overflow-hidden rounded-[1.85rem] border border-white/10 bg-[#050814]">
-      <div className="relative min-h-[240px] sm:min-h-[360px] lg:min-h-[390px]">
+    <figure className="vintage-photo-frame overflow-hidden rounded-[1.35rem] p-2 sm:rounded-[1.65rem] sm:p-2.5">
+      <div className="relative min-h-[265px] overflow-hidden rounded-[1rem] bg-[#090d14] sm:min-h-[360px] sm:rounded-[1.2rem] lg:min-h-[410px]">
         <Image
           src={heroBeforeAfter.before.src}
           alt={heroBeforeAfter.before.alt}
           fill
-          className="object-cover object-center"
+          className="object-cover object-center vintage-photo-base"
           sizes="(max-width: 768px) 100vw, 50vw"
           priority
         />
@@ -18,33 +18,45 @@ export function HeroBeforeAfter() {
           src={heroBeforeAfter.after.src}
           alt={heroBeforeAfter.after.alt}
           fill
-          className="animate-hero-crossfade object-cover object-center"
+          className="object-cover object-center vintage-after-wipe"
           sizes="(max-width: 768px) 100vw, 50vw"
           priority
         />
 
-        <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/45 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-white backdrop-blur-xl">
-          Live project result
+        <div className="vintage-wipe-line" />
+
+        <div className="pointer-events-none absolute inset-0 vintage-photo-grade" />
+        <div className="pointer-events-none absolute inset-0 hero-vintage-grain" />
+
+        <div className="pointer-events-none absolute left-4 top-4 sm:left-5 sm:top-5">
+          <div className="vintage-ticket">
+            Field Log 014
+          </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#03050b] via-[#03050b]/15 to-transparent" />
+        <div className="pointer-events-none absolute right-4 top-4 sm:right-5 sm:top-5">
+          <div className="vintage-tag">
+            6 Day Turnover
+          </div>
+        </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-4 pb-4 pt-16 sm:px-5 sm:pb-5 sm:pt-20">
-          <div className="flex items-end justify-between gap-4 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-xl">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-4 pb-4 pt-20 sm:px-5 sm:pb-5">
+          <div className="vintage-photo-caption">
             <div>
-              <p className="font-display text-xl font-black uppercase tracking-[-0.02em] text-white">
-                Strip & refinish
+              <div className="mb-2 h-px w-12 bg-[#d6bd86]" />
+              <p className="font-display text-xl font-black uppercase leading-none tracking-[-0.02em] text-[#fff7e8] sm:text-2xl">
+                Concrete Floor Reset
               </p>
-              <p className="mt-0.5 text-xs text-slate-400">
-                Concrete floor restoration
+              <p className="mt-2 text-[12px] font-medium uppercase tracking-[0.14em] text-[#c9bda5]">
+                Strip · Scrub · Seal · Polish
               </p>
             </div>
 
-            <p className="shrink-0 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-              <span className="animate-hero-label-before text-white">Before</span>
-              <span className="mx-1.5 text-blue-400">/</span>
-              <span className="animate-hero-label-after text-white">After</span>
-            </p>
+            <div className="vintage-before-after-badge">
+              <span className="animate-hero-label-before">Before</span>
+              <span className="text-[#d6bd86]">/</span>
+              <span className="animate-hero-label-after">After</span>
+            </div>
           </div>
         </div>
       </div>

@@ -1,37 +1,65 @@
-"use client";
-
-import Image from "next/image";
 import Link from "next/link";
-import { AnimatedContent } from "@/components/reactbits";
-import type { Post } from "@/lib/site-data";
+import { posts } from "@/lib/site-data";
+import { notFound } from "next/navigation";
 
-export function BlogPostContent({ post }: { post: Post }) {
+export function BlogPostContent({ slug }: { slug: string }) {
+  const post = posts.find((p) => p.slug === slug);
+  if (!post) notFound();
+
   return (
-    <article className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 lg:py-20">
-      <AnimatedContent>
-        <Link href="/blog" className="text-sm text-slate-500 transition hover:text-blue-300">
-          ← Back to updates
+    <div className="container">
+      <div style={{ paddingTop: "3rem", paddingBottom: "1.5rem" }}>
+        <Link
+          href="/blog"
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--color-ink-3)",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.4rem",
+          }}
+        >
+          ← All updates
         </Link>
+      </div>
 
-        <time className="mt-8 block text-xs text-slate-500">{post.date}</time>
-        <h1 className="mt-2 font-display text-4xl font-bold leading-tight text-white sm:text-5xl">{post.title}</h1>
-      </AnimatedContent>
+      <article style={{ paddingBottom: "4rem" }}>
+        <header style={{ borderBottom: "1px solid var(--color-border)", paddingBottom: "2rem", marginBottom: "2rem" }}>
+          <p style={{ fontSize: "0.8125rem", color: "var(--color-ink-3)", marginBottom: "0.75rem" }}>
+            {post.date}
+          </p>
+          <h1
+            style={{
+              fontFamily: "var(--font-dm-serif, Georgia, serif)",
+              fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
+              fontWeight: 700,
+              color: "var(--color-ink)",
+              lineHeight: 1.2,
+              marginBottom: "0.75rem",
+            }}
+          >
+            {post.title}
+          </h1>
+          <p style={{ fontSize: "1rem", color: "var(--color-ink-2)" }}>{post.excerpt}</p>
+        </header>
 
-      <AnimatedContent delay={80}>
-        <div className="relative mt-8 aspect-[16/10] overflow-hidden rounded-xl">
-          <Image src={post.image} alt={post.imageAlt} fill className="object-cover" priority />
-        </div>
-      </AnimatedContent>
-
-      <AnimatedContent delay={120}>
-        <div className="mt-8 space-y-5">
-          {post.content.map((paragraph) => (
-            <p key={paragraph} className="text-base leading-7 text-slate-300">
-              {paragraph}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          {post.content.map((para, i) => (
+            <p
+              key={i}
+              style={{
+                fontSize: "1.0625rem",
+                color: "var(--color-ink-2)",
+                lineHeight: 1.8,
+                maxWidth: "42rem",
+              }}
+            >
+              {para}
             </p>
           ))}
         </div>
-      </AnimatedContent>
-    </article>
+      </article>
+    </div>
   );
 }

@@ -1,33 +1,37 @@
-"use client";
-
-import { AnimatedContent } from "@/components/reactbits";
-import { MediaGridCard } from "@/components/media-grid-card";
-import { SectionHeading } from "@/components/section-heading";
+import Link from "next/link";
 import { industries } from "@/lib/site-data";
 
 export function IndustriesPageContent() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-      <AnimatedContent>
-        <SectionHeading
-          eyebrow="Industries"
-          title="Where we work"
-          description="Apartments, offices, stadiums, kitchens, and vacation rentals."
-        />
-      </AnimatedContent>
+    <div className="container">
+      <section className="hero" style={{ paddingBottom: "2.5rem" }}>
+        <span className="hero-eyebrow">Who we serve</span>
+        <h1 className="hero-title">Industries</h1>
+        <p className="hero-subtitle">
+          We work across environments where consistency, timing, and quality
+          are non-negotiable. If it needs to be clean, we can help.
+        </p>
+      </section>
 
-      <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {industries.map((industry, index) => (
-          <AnimatedContent key={industry.name} delay={index * 60} className="h-full">
-            <MediaGridCard
-              image={industry.image}
-              alt={industry.name}
-              title={industry.name}
-              subtitle={industry.summary}
-            />
-          </AnimatedContent>
-        ))}
-      </div>
+      <section className="section" style={{ borderBottom: "none" }}>
+        <div className="industry-grid" style={{ marginTop: 0 }}>
+          {industries.map((ind) => (
+            <div key={ind.name} className="industry-item">
+              <p className="industry-name">{ind.name}</p>
+              <p className="industry-summary">{ind.summary}</p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: "3rem", paddingTop: "2rem", borderTop: "1px solid var(--color-border)" }}>
+          <p style={{ fontSize: "1rem", color: "var(--color-ink-2)", marginBottom: "1rem" }}>
+            Don&apos;t see your industry? We likely serve it — reach out and let&apos;s talk.
+          </p>
+          <Link href="/contact" className="btn-primary">
+            Get in touch
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

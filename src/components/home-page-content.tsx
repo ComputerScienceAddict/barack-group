@@ -1,161 +1,137 @@
-"use client";
-
-import { HomeHero } from "@/components/home-hero";
-import { MediaGridCard } from "@/components/media-grid-card";
-import { ServiceCard } from "@/components/service-card";
-import { AnimatedContent } from "@/components/reactbits";
-import { SectionHeading } from "@/components/section-heading";
-import { galleryImages, industries, serviceHighlights, testimonials, type Testimonial } from "@/lib/site-data";
-
-const avatarColors = ["bg-orange-500", "bg-emerald-600", "bg-violet-600"];
-
-function YelpStars() {
-  return (
-    <div className="flex gap-0.5 text-[#d32323]" aria-label="5 out of 5 stars">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden>
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  );
-}
-
-function YelpReview({ review, index }: { review: Testimonial; index: number }) {
-  const initials = review.author
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-  const subtitle = review.company ?? review.role;
-
-  return (
-    <article className="h-full rounded-lg border border-neutral-200 bg-white p-5 text-left shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
-      <div className="flex items-start gap-3">
-        <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${avatarColors[index % avatarColors.length]}`}
-        >
-          {initials}
-        </div>
-        <div className="min-w-0">
-          <p className="truncate font-semibold text-neutral-900">{review.author}</p>
-          <p className="truncate text-xs text-neutral-500">{subtitle}</p>
-        </div>
-      </div>
-
-      <div className="mt-3 flex items-center gap-2">
-        <YelpStars />
-        <span className="text-xs text-neutral-400">·</span>
-        <span className="text-xs text-neutral-500">5 stars</span>
-      </div>
-
-      <p className="mt-3 text-[15px] leading-relaxed text-neutral-800">{review.quote}</p>
-    </article>
-  );
-}
+import Link from "next/link";
+import { HeroImageCarousel } from "@/components/hero-image-carousel";
+import { HeroLightningBackdrop } from "@/components/hero-lightning-backdrop";
+import { ServiceShowcaseSection } from "@/components/service-showcase-section";
+import {
+  phoneNumbers,
+  serviceHighlights,
+  industries,
+  posts,
+} from "@/lib/site-data";
 
 export function HomePageContent() {
   return (
-    <>
-      <HomeHero />
+    <div className="w-full">
+      <section className="relative w-full overflow-hidden border-b-2 barak-border">
+        <HeroLightningBackdrop />
+        <div className="relative z-[1] max-w-6xl mx-auto flex flex-wrap lg:border-r-2 lg:border-l-2 barak-border">
+          <div className="barak-panel relative z-[1] w-full bg-[color-mix(in_srgb,var(--color-panel)_90%,transparent)] md:w-1/2 px-4 sm:px-6 md:px-8 lg:px-12 py-8 lg:py-16">
+            <h1 className="text-2xl font-bold leading-tight text-[var(--color-ink)]">
+              Barak Group delivers dependable commercial cleaning across Oregon, Utah, and Idaho.
+            </h1>
 
-      {/* SERVICES */}
-      <section className="relative bg-[#06080f] px-4 py-16 sm:px-6 sm:py-24">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
-        <div className="mx-auto w-full max-w-6xl">
-          <AnimatedContent>
-            <SectionHeading
-              index="01"
-              eyebrow="Services"
-              title="What we do"
-              description="Offices, apartments, job sites, and event venues."
-              action={{ label: "All services", href: "/services" }}
-            />
-          </AnimatedContent>
+            <ul className="mt-6 space-y-3">
+              {serviceHighlights.slice(0, 4).map((service) => (
+                <li key={service.title} className="flex items-start text-[var(--color-ink-2)]">
+                  <span className="mr-2 mt-0.5 text-[var(--color-accent)]">•</span>
+                  <span>
+                    <strong className="text-[var(--color-ink)]">{service.title}.</strong>{" "}
+                    {service.description}
+                  </span>
+                </li>
+              ))}
+            </ul>
 
-          <div className="mt-12 grid items-stretch gap-10 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12">
-            {serviceHighlights.map((service, index) => (
-              <AnimatedContent key={service.title} delay={index * 60} className="h-full">
-                <ServiceCard {...service} />
-              </AnimatedContent>
-            ))}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/contact" className="barak-btn-primary px-4 py-2 text-sm font-semibold">
+                Get a Quote
+              </Link>
+              <Link href="/services" className="barak-btn-secondary px-4 py-2 text-sm font-semibold">
+                View Services
+              </Link>
+            </div>
+          </div>
+
+          <div className="relative z-[1] flex w-full flex-col border-t-2 barak-border bg-[var(--color-panel)] md:w-1/2 md:border-l-2 md:border-t-0">
+            <HeroImageCarousel />
+            <div className="barak-hero-caption">
+              <p className="barak-hero-caption-label">On-site crews</p>
+              <p className="barak-hero-caption-text">
+                Offices, stadiums, construction sites, and specialty jobs across the Pacific Northwest and Mountain West.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* GALLERY */}
-      <section className="relative bg-[#06080f] px-4 py-16 sm:px-6 sm:py-20">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
-        <div className="mx-auto w-full max-w-6xl">
-          <AnimatedContent>
-            <SectionHeading
-              index="02"
-              eyebrow="Gallery"
-              title="On the job"
-              description="Photos from sites across Oregon, Utah, and Idaho."
-            />
-          </AnimatedContent>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {galleryImages.map((src, index) => (
-              <AnimatedContent key={src} delay={index * 40} className="h-full">
-                <MediaGridCard image={src} alt={`Barak Group project photo ${index + 1}`} />
-              </AnimatedContent>
-            ))}
+      <ServiceShowcaseSection />
+
+      <section className="w-full border-b-2 barak-border">
+        <div className="barak-band max-w-6xl mx-auto flex flex-wrap lg:border-r-2 lg:border-l-2 barak-border">
+          <div className="px-4 sm:px-6 md:px-8 lg:px-12 pt-8 w-full relative">
+            <div className="absolute right-4 top-4 hidden md:block border barak-border bg-[var(--color-paper)]/90 px-3 py-1.5 text-xs font-medium text-[var(--color-ink-2)]">
+              Built for high-traffic facilities
+            </div>
+            <div className="flex justify-center flex-wrap w-full relative pb-8">
+              <h2 className="text-3xl font-bold leading-tight text-center w-full text-[var(--color-ink)]">
+                Need a crew that shows up and does it right?
+              </h2>
+              <p className="mt-3 text-center max-w-2xl text-[var(--color-ink-2)]">
+                We support offices, campuses, events, construction, and specialty jobs with flexible staffing and clear communication.
+              </p>
+              <div className="mt-6 w-full flex justify-center">
+                <Link href="/contact" className="barak-btn-secondary px-5 py-2.5 text-sm font-semibold">
+                  YES, LET&apos;S TALK
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* INDUSTRIES */}
-      <section className="relative bg-[#06080f] px-4 py-16 sm:px-6 sm:py-20">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
-        <div className="mx-auto w-full max-w-6xl">
-          <AnimatedContent>
-            <SectionHeading
-              index="03"
-              eyebrow="Industries"
-              title="Where we work"
-              description="Apartments, offices, stadiums, kitchens, and vacation rentals."
-              action={{ label: "View all", href: "/industries" }}
-            />
-          </AnimatedContent>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {industries.map((industry, index) => (
-              <AnimatedContent key={industry.name} delay={index * 50} className="h-full">
-                <MediaGridCard
-                  image={industry.image}
-                  alt={industry.name}
-                  title={industry.name}
-                  subtitle={industry.summary}
-                  href="/industries"
-                />
-              </AnimatedContent>
-            ))}
+      <section className="w-full border-b-2 barak-border">
+        <div className="w-full max-w-6xl mx-auto flex flex-wrap lg:border-l-2 lg:border-r-2 barak-border">
+          <div className="w-full lg:w-2/3 border-b-2 lg:border-b-0 barak-border bg-[var(--color-paper)]">
+            <div className="relative px-4 sm:px-6 md:px-8 lg:px-12 py-4 sm:py-6 md:py-8 lg:py-10">
+              <h2 className="text-2xl font-bold leading-tight text-[var(--color-ink)]">Recent Updates</h2>
+              <ul className="mt-4">
+                {posts.map((post) => (
+                  <li key={post.slug} className="py-4 border-b border-stone-300/80 last:border-b-0">
+                    <p className="text-xs font-semibold text-[var(--color-ink-3)]">{post.date}</p>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="text-lg font-semibold text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors"
+                    >
+                      {post.title}
+                    </Link>
+                    <p className="text-sm text-[var(--color-ink-2)]">{post.excerpt}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* TESTIMONIALS */}
-      <section className="relative bg-[#080c14] px-4 py-16 sm:px-6 sm:py-24">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-600/30 to-transparent" />
-        <div className="mx-auto w-full max-w-6xl">
-          <AnimatedContent>
-            <SectionHeading
-              index="04"
-              eyebrow="Reviews"
-              title="What clients say"
-              description="Recent feedback from facilities teams we work with."
-            />
-          </AnimatedContent>
-          <div className="mt-14 grid gap-4 md:grid-cols-3">
-            {testimonials.map((item, index) => (
-              <AnimatedContent key={item.author} delay={index * 80}>
-                <YelpReview review={item} index={index} />
-              </AnimatedContent>
-            ))}
+          <div className="w-full lg:w-1/3 lg:border-l-2 barak-border bg-[var(--color-paper-2)]">
+            <div className="px-4 sm:px-6 md:px-8 lg:px-12 py-8 border-b-2 barak-border">
+              <h2 className="text-2xl font-bold leading-tight text-[var(--color-ink)]">Service Areas</h2>
+            </div>
+            <ul className="px-4 sm:px-6 md:px-8 lg:px-12 py-8">
+              {phoneNumbers.map((office) => (
+                <li key={office.state} className="mb-3">
+                  <p className="font-semibold text-[var(--color-ink)]">{office.state}</p>
+                  <a
+                    href={office.href}
+                    className="text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] underline underline-offset-2"
+                  >
+                    {office.phone}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <div className="px-4 sm:px-6 md:px-8 lg:px-12 py-8 border-t-2 barak-border">
+              <h2 className="text-2xl font-bold leading-tight text-[var(--color-ink)]">Industries</h2>
+            </div>
+            <ul className="px-4 sm:px-6 md:px-8 lg:px-12 py-8">
+              {industries.slice(0, 8).map((industry) => (
+                <li key={industry.name} className="mb-2 text-[var(--color-ink-2)]">
+                  {industry.name}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

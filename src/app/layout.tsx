@@ -1,23 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, Libre_Baskerville, Oswald } from "next/font/google";
+import { Lora, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteShell } from "@/components/site-shell";
 
-const display = Oswald({
-  variable: "--font-oswald",
+const display = Lora({
+  variable: "--font-dm-serif",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const accent = Libre_Baskerville({
-  variable: "--font-baskerville",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  style: ["normal", "italic"],
+  weight: ["500", "600", "700"],
+  style: ["normal"],
 });
 
 const body = Inter({
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -30,12 +24,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${accent.variable} ${body.variable} h-full antialiased`}>
-      <body className="min-h-full bg-[#06080f] text-white">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${display.variable} ${body.variable} h-full`}
+    >
+      <body suppressHydrationWarning className="min-h-full bg-[var(--color-paper)] text-[var(--color-ink)] antialiased">
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

@@ -29,13 +29,34 @@ export type Post = {
   imageAlt: string;
 };
 
+const siteAsset = (path: string) => `https://www.barakservices.com${path}`;
+
 export const heroImage = {
-  src: "https://barakservices.com/wp-content/uploads/2023/10/cheerful-cleaner-moving-cart-with-cleaning-supplie.jpg",
+  src: siteAsset("/event-venue.png"),
   alt: "Barak Group cleaning professional with equipment",
 };
 
+export const heroCarouselSlides = [
+  {
+    src: siteAsset("/event-venue.png"),
+    alt: "Barak Group crew supporting a large event venue",
+  },
+  {
+    src: siteAsset("/office-building.png"),
+    alt: "Office building janitorial service by Barak Group",
+  },
+  {
+    src: siteAsset("/hero-after.png"),
+    alt: "Floor refinishing results after Barak Group service",
+  },
+  {
+    src: siteAsset("/hero-before.png"),
+    alt: "Specialty cleaning and surface prep by Barak Group",
+  },
+];
+
 export const heroPanelImage = {
-  src: "https://barakservices.com/wp-content/uploads/2023/12/80d07e6c-a735-47e3-9fae-c3f2298a8245.jpeg",
+  src: "/event-venue.png",
   alt: "Barak Group crew at Timbers Stadium",
 };
 
@@ -51,12 +72,12 @@ export const heroBeforeAfter = {
 };
 
 export const galleryImages = [
-  "https://barakservices.com/wp-content/uploads/2023/12/97bf00b2-1ed0-4f1d-a283-7d2c28811d29.jpeg",
-  "https://barakservices.com/wp-content/uploads/2023/12/67c4776c-40bf-4fbe-81da-02d5f116b5c7.jpeg",
-  "https://barakservices.com/wp-content/uploads/2023/12/52593a0b-2517-415a-9cd0-93bbe678ce60-2.jpg",
-  "https://barakservices.com/wp-content/uploads/2023/12/80d07e6c-a735-47e3-9fae-c3f2298a8245.jpeg",
-  "https://barakservices.com/wp-content/uploads/2023/12/IMG_5682-scaled.jpeg",
-  "https://barakservices.com/wp-content/uploads/2023/12/FullSizeRender-scaled.jpeg",
+  "/event-venue.png",
+  "/office-building.png",
+  "/hero-after.png",
+  "/hero-before.png",
+  "/event-venue.png",
+  "/office-building.png",
 ];
 
 export const phoneNumbers = [
@@ -89,48 +110,47 @@ export const locations = [
 export const serviceHighlights: Service[] = [
   {
     title: "Office cleaning",
-    description: "Nightly or weekly janitorial while your team is off the clock.",
+    description: "Daily, nightly, or weekly janitorial service based on your building schedule.",
     bullets: [
-      "Kitchens and restrooms",
-      "Floors and carpet",
-      "Trash and windows",
+      "Restrooms and breakrooms",
+      "Floors, carpet, and touchpoints",
+      "Trash, liners, and interior glass",
     ],
-    image:
-      "https://barakservices.com/wp-content/uploads/2023/10/cheerful-cleaner-moving-cart-with-cleaning-supplie.jpg",
+    image: "https://www.barakservices.com/office-building.png",
     imageAlt: "Cleaner pushing supply cart in a hallway",
   },
   {
     title: "Construction & turnover",
-    description: "Final cleans for new builds and tenant move-ins.",
+    description: "Move-in ready cleaning for new construction, remodels, and turnovers.",
     bullets: [
-      "Post-construction top-down cleans",
-      "Move-in / move-out work",
-      "Photo documentation",
+      "Post-construction detail cleaning",
+      "Turnover and move-out resets",
+      "Photo verification on request",
     ],
-    image: "https://barakservices.com/wp-content/uploads/2023/12/3d09cb4d-5f17-49fe-90e7-14588ef86253.jpeg",
+    image: "https://www.barakservices.com/hero-after.png",
     imageAlt: "Crew preparing a property for turnover",
   },
   {
     title: "Events & large venues",
-    description: "Stadiums, fairs, and race weekends — restrooms, trash, and resets.",
+    description: "Cleaning support for game days, festivals, and high-traffic event windows.",
     bullets: [
-      "Restroom and waste runs",
-      "Grounds and common areas",
-      "Extra staff when you need it",
+      "Restroom and waste routes",
+      "Concourse and common-area resets",
+      "Flexible staffing by attendance",
     ],
-    image: "/event-venue.png",
+    image: "https://www.barakservices.com/event-venue.png",
     imageAlt: "Event venue with active cleaning support",
   },
   {
     title: "Exterior & specialty",
-    description: "Pressure washing, windows, floors, and winter ice melt.",
+    description: "Exterior maintenance and specialty cleaning for difficult surfaces.",
     bullets: [
       "Pressure washing",
-      "Exterior windows",
-      "Carpet and water extraction",
+      "Exterior window cleaning",
+      "Carpet spotting and extraction",
     ],
-    image: "https://barakservices.com/wp-content/uploads/2023/12/6e92e5b4-b82c-46a0-8426-50b49ba178d1.jpg",
-    imageAlt: "Exterior cleaning and maintenance crew",
+    image: "https://www.barakservices.com/hero-before.png",
+    imageAlt: "Professional cleaner performing specialty cleaning work",
   },
 ];
 
@@ -148,12 +168,12 @@ export const industries: Industry[] = [
   {
     name: "Construction",
     summary: "Post-build cleaning and quality walkthrough prep.",
-    image: "https://barakservices.com/wp-content/uploads/2023/12/3d09cb4d-5f17-49fe-90e7-14588ef86253.jpeg",
+    image: "/hero-after.png",
   },
   {
     name: "Stadiums & Universities",
     summary: "High-traffic venue maintenance at scale.",
-    image: "https://barakservices.com/wp-content/uploads/2023/12/80d07e6c-a735-47e3-9fae-c3f2298a8245.jpeg",
+    image: "/event-venue.png",
   },
   {
     name: "Restaurant Kitchens",
@@ -201,7 +221,7 @@ export const posts: Post[] = [
       "Lots of restrooms, lots of foot traffic, tight turnaround before gates open.",
       "Same crew, same checklist every match — in and out before kickoff.",
     ],
-    image: "https://barakservices.com/wp-content/uploads/2023/12/80d07e6c-a735-47e3-9fae-c3f2298a8245.jpeg",
+    image: "/event-venue.png",
     imageAlt: "Team member at Timbers Stadium",
   },
   {
@@ -214,7 +234,7 @@ export const posts: Post[] = [
       "Restrooms, concourses, and trash pick-up on a loop until the last car leaves.",
       "Event work is mostly timing — hit your zones, reset, move on.",
     ],
-    image: "https://barakservices.com/wp-content/uploads/2023/12/67c4776c-40bf-4fbe-81da-02d5f116b5c7.jpeg",
+    image: "/office-building.png",
     imageAlt: "Barak team member at a race event",
   },
   {
@@ -227,7 +247,7 @@ export const posts: Post[] = [
       "When something goes wrong mid-event, it helps to have people who can actually fix it.",
       "Back on the floor before the next session — that was the whole weekend.",
     ],
-    image: "https://barakservices.com/wp-content/uploads/2023/12/52593a0b-2517-415a-9cd0-93bbe678ce60-2.jpg",
+    image: "/hero-before.png",
     imageAlt: "Crew member supporting Indy race operations",
   },
 ];

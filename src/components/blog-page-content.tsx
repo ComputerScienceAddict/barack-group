@@ -1,48 +1,30 @@
-"use client";
-
-import Image from "next/image";
 import Link from "next/link";
-import { AnimatedContent } from "@/components/reactbits";
-import { SectionHeading } from "@/components/section-heading";
 import { posts } from "@/lib/site-data";
 
 export function BlogPageContent() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-      <AnimatedContent>
-        <SectionHeading
-          eyebrow="Updates"
-          title="From the field"
-          description="Photos and short notes from recent jobs."
-        />
-      </AnimatedContent>
+    <div className="container">
+      <section className="hero" style={{ paddingBottom: "2.5rem" }}>
+        <span className="hero-eyebrow">From the field</span>
+        <h1 className="hero-title">Updates</h1>
+        <p className="hero-subtitle">
+          Snapshots from job sites, crew milestones, and company news.
+        </p>
+      </section>
 
-      <div className="mt-12 divide-y divide-white/10 border-y border-white/10">
-        {posts.map((post, index) => (
-          <AnimatedContent key={post.slug} delay={index * 60}>
-            <Link
-              href={`/blog/${post.slug}`}
-              className="group grid gap-5 py-7 sm:grid-cols-[160px_1fr] sm:items-start sm:gap-6"
-            >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-xl sm:aspect-square">
-                <Image
-                  src={post.image}
-                  alt={post.imageAlt}
-                  fill
-                  className="object-cover transition duration-300 group-hover:opacity-90"
-                />
-              </div>
-              <div className="min-w-0">
-                <time className="text-xs text-slate-500">{post.date}</time>
-                <h2 className="mt-1 font-display text-xl font-bold leading-snug text-white transition group-hover:text-blue-300 sm:text-2xl">
-                  {post.title}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-slate-400">{post.excerpt}</p>
-              </div>
+      <section className="section" style={{ borderBottom: "none" }}>
+        <div className="post-list">
+          {posts.map((post) => (
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="post-row" style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ display: "flex", gap: "1.5rem", alignItems: "baseline" }}>
+                <span className="post-date">{post.date}</span>
+                <span className="post-title">{post.title}</span>
+              </span>
+              <span className="post-excerpt" style={{ paddingLeft: "8.5rem" }}>{post.excerpt}</span>
             </Link>
-          </AnimatedContent>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

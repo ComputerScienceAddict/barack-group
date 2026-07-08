@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SiteImage } from "@/components/site-image";
 
 type ServiceCardProps = {
   title: string;
@@ -12,7 +12,7 @@ export function ServiceCard({ title, description, bullets, image, imageAlt }: Se
   return (
     <article className="service-card-modern group flex h-full flex-col">
       <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-[#050814]">
-        <Image
+        <SiteImage
           src={image}
           alt={imageAlt}
           fill
@@ -24,17 +24,22 @@ export function ServiceCard({ title, description, bullets, image, imageAlt }: Se
       </div>
 
       <div className="flex flex-1 flex-col p-6">
-        <h3 className="font-display text-xl font-bold leading-tight tracking-tight text-white sm:min-h-[2.75rem] sm:text-[1.65rem]">
+        <h3 className="text-[1.15rem] font-semibold leading-tight text-white sm:text-[1.3rem]">
           {title}
         </h3>
 
-        <p className="mt-3 flex-1 text-sm leading-6 text-slate-400 sm:min-h-[4.5rem]">
+        <p className="mt-3 flex-1 text-sm leading-6 text-slate-300">
           {description}
         </p>
 
-        <p className="mt-4 border-t border-white/8 pt-4 text-sm leading-relaxed text-slate-500 sm:min-h-[3.25rem]">
-          {bullets.join(" · ")}
-        </p>
+        <div className="mt-4 border-t border-white/10 pt-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Includes</p>
+          <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-300 marker:text-slate-500">
+            {bullets.map((bullet) => (
+              <li key={bullet}>{bullet}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </article>
   );

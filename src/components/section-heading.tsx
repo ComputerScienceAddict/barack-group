@@ -15,11 +15,11 @@ export function SectionHeading({ index, eyebrow, title, description, action, chi
     <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
       <div className="flex gap-4 sm:gap-5">
         {index ? (
-          <span className="font-display text-5xl font-bold leading-none text-blue-600/20 sm:text-7xl lg:text-8xl">{index}</span>
+          <span className="font-display text-5xl font-bold leading-none text-white/10 sm:text-7xl lg:text-8xl">{index}</span>
         ) : null}
         <div className="space-y-2">
           {eyebrow ? (
-            <p className="font-display text-xs font-bold uppercase tracking-[0.2em] text-blue-400">{eyebrow}</p>
+            <p className="font-display text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{eyebrow}</p>
           ) : null}
           <h2 className="font-display text-3xl font-bold leading-[0.95] tracking-tight text-white sm:text-4xl lg:text-5xl">
             {title}
@@ -31,7 +31,7 @@ export function SectionHeading({ index, eyebrow, title, description, action, chi
       {action ? (
         <Link
           href={action.href}
-          className="shrink-0 text-sm font-semibold text-blue-400 transition hover:text-blue-300"
+          className="shrink-0 text-sm font-semibold text-slate-300 transition hover:text-white"
         >
           {action.label} →
         </Link>
