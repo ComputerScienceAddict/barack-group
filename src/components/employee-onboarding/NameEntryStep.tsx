@@ -21,6 +21,10 @@ export default function NameEntryStep({
   if (!active) return null;
 
   const missingClass = (key: string) => (missingKeys.includes(key) ? " nameEntryFieldMissing" : "");
+  const updateField = (key: "firstName" | "lastName", value: string) => {
+    if (values[key] === value) return;
+    onChange({ ...values, [key]: value });
+  };
 
   return (
     <div className="nameEntryForm">
@@ -35,7 +39,9 @@ export default function NameEntryStep({
             name="firstName"
             autoComplete="given-name"
             value={values.firstName}
-            onChange={(event) => onChange({ ...values, firstName: event.target.value })}
+            onChange={(event) => updateField("firstName", event.target.value)}
+            onInput={(event) => updateField("firstName", event.currentTarget.value)}
+            onBlur={(event) => updateField("firstName", event.currentTarget.value)}
             placeholder={t("nameEntryFirstNamePlaceholder")}
           />
         </label>
@@ -46,7 +52,9 @@ export default function NameEntryStep({
             name="lastName"
             autoComplete="family-name"
             value={values.lastName}
-            onChange={(event) => onChange({ ...values, lastName: event.target.value })}
+            onChange={(event) => updateField("lastName", event.target.value)}
+            onInput={(event) => updateField("lastName", event.currentTarget.value)}
+            onBlur={(event) => updateField("lastName", event.currentTarget.value)}
             placeholder={t("nameEntryLastNamePlaceholder")}
           />
         </label>

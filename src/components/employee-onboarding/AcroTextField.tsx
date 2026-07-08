@@ -118,18 +118,36 @@ export default function AcroTextField({ field, scale, pageHeight, className }: A
   const [localValue, setLocalValue] = useState(() => String(formState.getValue(field.name) ?? ""));
 
   const handleFocus = useCallback(() => setFocused(true), []);
-  const handleBlur = useCallback(() => setFocused(false), []);
+  const commitValue = useCallback(
+    (rawValue: string) => {
+      const nextValue = isSsnField ? sanitizeSocialSecurityDigits(rawValue) : rawValue;
+      setLocalValue((prevValue) => (prevValue === nextValue ? prevValue : nextValue));
+      formState.setValue(field.name, nextValue);
+    },
+    [field.name, formState, isSsnField]
+  );
+  const handleBlur = useCallback(
+    (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setFocused(false);
+      // iOS/Android keyboards may finalize text on blur; commit that value explicitly.
+      commitValue(event.currentTarget.value);
+    },
+    [commitValue]
+  );
 
   const { width: fieldWidth, height: fieldHeight } = pdfRectToScreen(field.rect, pageHeight, scale);
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const rawValue = event.target.value;
-      const nextValue = isSsnField ? sanitizeSocialSecurityDigits(rawValue) : rawValue;
-      setLocalValue(nextValue);
-      formState.setValue(field.name, nextValue);
+      commitValue(event.target.value);
     },
-    [formState, field.name, isSsnField]
+    [commitValue]
+  );
+  const handleInput = useCallback(
+    (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      commitValue(event.currentTarget.value);
+    },
+    [commitValue]
   );
 
   const inputStyle = buildTextInputStyle(field, fieldWidth, fieldHeight, scale, focused);
@@ -138,6 +156,7 @@ export default function AcroTextField({ field, scale, pageHeight, className }: A
     onFocus: handleFocus,
     onBlur: handleBlur,
     onChange: handleChange,
+    onInput: handleInput,
     readOnly: field.readOnly,
     required: field.required,
     maxLength: field.maxLength && field.maxLength > 0 ? field.maxLength : undefined,

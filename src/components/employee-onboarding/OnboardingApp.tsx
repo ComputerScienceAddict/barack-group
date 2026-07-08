@@ -83,6 +83,15 @@ const SIGNATURE_FIELD_KEYS_BY_FORM: Record<OnboardingFormId, readonly string[]> 
   wh151: ["WorkerSignature"],
 };
 
+function safeSetLocalStorageItem(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage write failures to keep onboarding usable on restricted mobile browsers.
+  }
+}
+
 function findFirstCapturedSignature(values: FormValuesState): string | null {
   for (const formId of Object.keys(SIGNATURE_FIELD_KEYS_BY_FORM) as OnboardingFormId[]) {
     for (const key of SIGNATURE_FIELD_KEYS_BY_FORM[formId]) {
@@ -311,7 +320,7 @@ function OnboardingAppContent() {
 
   useEffect(() => {
     if (!draftHydrated) return;
-    window.localStorage.setItem(
+    safeSetLocalStorageItem(
       DRAFT_KEY,
       JSON.stringify({
         formValues,
@@ -613,7 +622,7 @@ function OnboardingAppContent() {
         console.error("Email delivery failed:", emailError);
       }
 
-      window.localStorage.setItem(
+      safeSetLocalStorageItem(
         PACKET_KEY,
         JSON.stringify(
           {

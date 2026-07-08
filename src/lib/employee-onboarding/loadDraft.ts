@@ -37,11 +37,37 @@ export type DraftSnapshot = {
   draftRestored: boolean;
 };
 
-export function clearStoredOnboardingData() {
+function getStoredItem(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function setStoredItem(key: string, value: string) {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(DRAFT_KEY);
-  window.localStorage.removeItem(PACKET_KEY);
-  window.localStorage.setItem(VERSION_KEY, STORAGE_VERSION);
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage failures (private mode / blocked storage).
+  }
+}
+
+function removeStoredItem(key: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Ignore storage failures (private mode / blocked storage).
+  }
+}
+
+export function clearStoredOnboardingData() {
+  removeStoredItem(DRAFT_KEY);
+  removeStoredItem(PACKET_KEY);
+  setStoredItem(VERSION_KEY, STORAGE_VERSION);
 }
 
 export function readDraftSnapshot(): DraftSnapshot {
@@ -55,14 +81,14 @@ export function readDraftSnapshot(): DraftSnapshot {
 
   if (typeof window === "undefined") return defaults;
 
-  const savedVersion = window.localStorage.getItem(VERSION_KEY);
+  const savedVersion = getStoredItem(VERSION_KEY);
   if (savedVersion !== STORAGE_VERSION) {
     clearStoredOnboardingData();
     return defaults;
   }
 
   try {
-    const raw = window.localStorage.getItem(DRAFT_KEY);
+    const raw = getStoredItem(DRAFT_KEY);
     if (!raw) return defaults;
 
     const draft = JSON.parse(raw) as {
