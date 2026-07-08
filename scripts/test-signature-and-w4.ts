@@ -229,7 +229,7 @@ function testUiWiring() {
   assert(acroPdfPage.includes("AcroSignatureField"), "AcroPdfPage must render AcroSignatureField");
   assert(acroPdfPage.includes("isPdfSignatureField"), "AcroPdfPage must gate signature fields");
   assert(acroSignature.includes("SignaturePad"), "AcroSignatureField must use SignaturePad");
-  assert(acroSignature.includes("Click to sign"), "AcroSignatureField must show click-to-sign prompt");
+  assert(acroSignature.includes("Tap to sign"), "AcroSignatureField must show tap-to-sign prompt");
   console.log("✓ signature UI wiring");
 }
 
