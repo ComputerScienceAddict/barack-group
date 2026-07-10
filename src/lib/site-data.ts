@@ -29,29 +29,19 @@ export type Post = {
   imageAlt: string;
 };
 
-const siteAsset = (path: string) => `https://www.barakservices.com${path}`;
-
 export const heroImage = {
-  src: siteAsset("/event-venue.png"),
-  alt: "Barak Group cleaning professional with equipment",
+  src: "/hero-on-site-supplies.png",
+  alt: "Barak Group on-site supply and equipment staging area",
 };
 
 export const heroCarouselSlides = [
   {
-    src: siteAsset("/event-venue.png"),
-    alt: "Barak Group crew supporting a large event venue",
+    src: "/hero-on-site-supplies.png",
+    alt: "Barak Group crew supply room with cleaning equipment and PPE",
   },
   {
-    src: siteAsset("/office-building.png"),
-    alt: "Office building janitorial service by Barak Group",
-  },
-  {
-    src: siteAsset("/hero-after.png"),
-    alt: "Floor refinishing results after Barak Group service",
-  },
-  {
-    src: siteAsset("/hero-before.png"),
-    alt: "Specialty cleaning and surface prep by Barak Group",
+    src: "/hero-on-site-mopping.png",
+    alt: "Barak Group crew member mopping a facility floor on site",
   },
 ];
 

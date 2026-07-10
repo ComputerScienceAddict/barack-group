@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Barak Group">
+  <rect width="180" height="180" rx="40" fill="#1c1917"/>
+  <path
+    fill="#facc15"
+    d="M102.5 18 52 96.5h28.5L72 162l52.5-81H96z"
+  />
+  <path
+    fill="#fde68a"
+    opacity="0.85"
+    d="M96.5 34 64.5 86.5h19L78 148l38.5-59H89.5z"
+  />
+</svg>
