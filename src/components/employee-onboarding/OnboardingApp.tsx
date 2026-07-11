@@ -83,6 +83,27 @@ const SIGNATURE_FIELD_KEYS_BY_FORM: Record<OnboardingFormId, readonly string[]> 
   wh151: ["WorkerSignature"],
 };
 
+function getInitialOnboardingState() {
+  if (typeof window === "undefined") {
+    return {
+      formValues: EMPTY_FORM_VALUES,
+      directDepositValues: EMPTY_DIRECT_DEPOSIT_VALUES,
+      applicantName: EMPTY_APPLICANT_NAME,
+      step: TUTORIAL_STEP,
+      showDraftRestoredNotice: false,
+    };
+  }
+
+  const draft = readDraftSnapshot();
+  return {
+    formValues: draft.formValues,
+    directDepositValues: draft.directDepositValues,
+    applicantName: draft.applicantName,
+    step: draft.step,
+    showDraftRestoredNotice: draft.draftRestored,
+  };
+}
+
 function safeSetLocalStorageItem(key: string, value: string) {
   if (typeof window === "undefined") return;
   try {
@@ -192,17 +213,20 @@ export default function OnboardingApp() {
 function OnboardingAppContent() {
   const { locale, setLocale, t } = useLanguage();
   const formConfigs = useMemo(() => getOnboardingFormConfigs(locale), [locale]);
-  const [step, setStep] = useState(TUTORIAL_STEP);
-  const [formValues, setFormValues] = useState<FormValuesState>(EMPTY_FORM_VALUES);
+  const initialOnboardingState = useMemo(() => getInitialOnboardingState(), []);
+  const [step, setStep] = useState(initialOnboardingState.step);
+  const [formValues, setFormValues] = useState<FormValuesState>(initialOnboardingState.formValues);
   const [directDepositValues, setDirectDepositValues] = useState<DirectDepositValues>(
-    EMPTY_DIRECT_DEPOSIT_VALUES
+    initialOnboardingState.directDepositValues
   );
-  const [applicantName, setApplicantName] = useState<ApplicantName>(EMPTY_APPLICANT_NAME);
+  const [applicantName, setApplicantName] = useState<ApplicantName>(initialOnboardingState.applicantName);
   const [nameMissingKeys, setNameMissingKeys] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [messageIsError, setMessageIsError] = useState(false);
-  const [showDraftRestoredNotice, setShowDraftRestoredNotice] = useState(false);
-  const [draftHydrated, setDraftHydrated] = useState(false);
+  const [showDraftRestoredNotice, setShowDraftRestoredNotice] = useState(
+    initialOnboardingState.showDraftRestoredNotice
+  );
+  const [draftHydrated] = useState(() => typeof window !== "undefined");
   const [missingIssues, setMissingIssues] = useState<MissingFieldIssue[]>([]);
   const [missingFormStep, setMissingFormStep] = useState<number | null>(null);
   const pendingFocusRef = useRef<{ step: number; highlightKeys: string[]; scrollTarget: string } | null>(
@@ -307,16 +331,6 @@ function OnboardingAppContent() {
     // focusStepMissing uses refs; only re-run when navigation step changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
-
-  useEffect(() => {
-    const draft = readDraftSnapshot();
-    setFormValues(draft.formValues);
-    setDirectDepositValues(draft.directDepositValues);
-    setApplicantName(draft.applicantName);
-    setStep(draft.step);
-    setShowDraftRestoredNotice(draft.draftRestored);
-    setDraftHydrated(true);
-  }, []);
 
   useEffect(() => {
     if (!draftHydrated) return;

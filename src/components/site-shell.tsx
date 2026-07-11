@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";import { usePathname } from "next/navigation";
-import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { phoneNumbers } from "@/lib/site-data";
 
 const navLinks = [
@@ -45,8 +46,19 @@ function Header() {
   const pathname = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth >= 768) {
+        setOpen(false);
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <header className="barak-header print:hidden">
+    <header key={pathname} className="barak-header print:hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="barak-header-inner">
           <Link href="/" className="barak-header-logo-image" onClick={() => setOpen(false)}>
@@ -73,11 +85,11 @@ function Header() {
 
           <button
             type="button"
-            className={`barak-header-menu-btn md:hidden ${open ? "barak-header-menu-btn-open" : ""}`}
+            className={`barak-header-menu-btn ${open ? "barak-header-menu-btn-open" : ""}`}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-nav"
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpen((current) => !current)}
           >
             <span className="barak-header-menu-icon" aria-hidden="true">
               <span />
@@ -88,37 +100,43 @@ function Header() {
           </button>
         </div>
 
-        {open && (
-          <nav id="mobile-nav" className="barak-header-mobile-nav md:hidden">
-            {navLinks.map((link) => {
-              const isActive = pathname.startsWith(link.href);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className={`barak-header-mobile-link ${isActive ? "barak-header-mobile-link-active" : ""}`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-            <Link
-              href="/contact"
-              onClick={() => setOpen(false)}
-              className={`barak-header-mobile-link ${pathname.startsWith("/contact") ? "barak-header-mobile-link-active" : ""}`}
-            >
-              Contact
-            </Link>
-            <Link
-              href="/contact"
-              className="barak-header-cta barak-header-cta-mobile"
-              onClick={() => setOpen(false)}
-            >
-              Get a quote
-            </Link>
-          </nav>
-        )}
+        <nav
+          id="mobile-nav"
+          className={`barak-header-mobile-nav ${open ? "is-open" : ""}`}
+          aria-hidden={!open}
+          aria-label="Mobile"
+        >
+          {navLinks.map((link) => {
+            const isActive = pathname.startsWith(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                tabIndex={open ? 0 : -1}
+                className={`barak-header-mobile-link ${isActive ? "barak-header-mobile-link-active" : ""}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/contact"
+            onClick={() => setOpen(false)}
+            tabIndex={open ? 0 : -1}
+            className={`barak-header-mobile-link ${pathname.startsWith("/contact") ? "barak-header-mobile-link-active" : ""}`}
+          >
+            Contact
+          </Link>
+          <Link
+            href="/contact"
+            className="barak-header-cta barak-header-cta-mobile"
+            onClick={() => setOpen(false)}
+            tabIndex={open ? 0 : -1}
+          >
+            Get a quote
+          </Link>
+        </nav>
       </div>
     </header>
   );

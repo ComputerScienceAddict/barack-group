@@ -449,6 +449,7 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
   const isWh153 = config.id === "wh153";
   const wh153MappingRef = useRef<Wh153OverlayMapping | null>(null);
   const [wh153Mapping, setWh153Mapping] = useState<Wh153OverlayMapping | null>(null);
+  const [i9QuickValues, setI9QuickValues] = useState<Record<string, PdfFieldValue>>({});
   const mergedDefaults = useMemo(() => {
     const base = { ...defaultValues, ...values };
     if (!isWh153 || !wh153Mapping) return base;
@@ -473,7 +474,10 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
 
   useEffect(() => {
     valuesStoreRef.current = isWh153 ? values : mergePdfFieldValues(valuesStoreRef.current, values);
-  }, [isWh153, values]);
+    if (config.id === "i9") {
+      setI9QuickValues(valuesStoreRef.current);
+    }
+  }, [config.id, isWh153, values]);
 
   const readMergedValues = useCallback((): Record<string, PdfFieldValue> => {
     const root = fieldsRootRef.current;
@@ -494,9 +498,12 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
         [fieldName]: value,
       });
       valuesStoreRef.current = merged;
+      if (config.id === "i9") {
+        setI9QuickValues(merged);
+      }
       onChangeRef.current(merged);
     },
-    [collapseOverlayValues, readMergedValues]
+    [collapseOverlayValues, config.id, readMergedValues]
   );
 
   const handleChange = useCallback(
@@ -507,9 +514,12 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
         mergePdfFieldValues(allValues as Record<string, PdfFieldValue>, domValues)
       );
       valuesStoreRef.current = merged;
+      if (config.id === "i9") {
+        setI9QuickValues(merged);
+      }
       onChangeRef.current(merged);
     },
-    [collapseOverlayValues]
+    [collapseOverlayValues, config.id]
   );
 
   useImperativeHandle(
@@ -577,7 +587,7 @@ const FillablePdfForm = forwardRef<FillablePdfFormHandle, FillablePdfFormProps>(
       {downloadError && <p className="pdfFormError">{downloadError}</p>}
       {downloadNote && <p className="pdfFormSuccess">{downloadNote}</p>}
       {config.id === "i9" && (
-        <I9MobileQuickFields values={valuesStoreRef.current} onFieldChange={handleQuickFieldChange} />
+        <I9MobileQuickFields values={i9QuickValues} onFieldChange={handleQuickFieldChange} />
       )}
       <div className="pdfViewerShell">
         <FormStateProvider values={mergedDefaults} onChange={handleChange}>

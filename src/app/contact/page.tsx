@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { locations, phoneNumbers } from "@/lib/site-data";
 
 export const metadata = {

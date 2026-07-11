@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { pdfRectToScreen, useFormStateContext, type FormField } from "react-acroform";
 import SignaturePad from "@/components/employee-onboarding/SignaturePad";
 import {
@@ -28,27 +28,16 @@ export default function AcroSignatureField({
   const [open, setOpen] = useState(false);
   const [draftValue, setDraftValue] = useState("");
   const [padSession, setPadSession] = useState(0);
-  const [savedSignature, setSavedSignature] = useState<string | null>(null);
+  const [savedSignature, setSavedSignature] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    const stored = window.localStorage.getItem(PRIMARY_SIGNATURE_STORAGE_KEY) ?? "";
+    return decodeDrawnSignature(stored) ? stored : null;
+  });
 
   const currentValue = String(formState.getValue(field.name) ?? "");
   const signatureImage = useMemo(() => decodeDrawnSignature(currentValue), [currentValue]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(PRIMARY_SIGNATURE_STORAGE_KEY) ?? "";
-    const decoded = decodeDrawnSignature(stored);
-    if (decoded) setSavedSignature(stored);
-  }, []);
-
-  useEffect(() => {
-    if (!signatureImage) return;
-    const encoded = String(formState.getValue(field.name) ?? "");
-    if (!decodeDrawnSignature(encoded)) return;
-    setSavedSignature(encoded);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(PRIMARY_SIGNATURE_STORAGE_KEY, encoded);
-    }
-  }, [field.name, formState, signatureImage]);
+  const reusableSignature =
+    savedSignature ?? (decodeDrawnSignature(currentValue) ? currentValue : null);
 
   function openSigner() {
     setOpen(true);
@@ -72,8 +61,8 @@ export default function AcroSignatureField({
   }
 
   function useSavedSignature() {
-    if (!savedSignature) return;
-    formState.setValue(field.name, savedSignature);
+    if (!reusableSignature) return;
+    formState.setValue(field.name, reusableSignature);
   }
 
   function clearSignature() {
@@ -128,7 +117,7 @@ export default function AcroSignatureField({
               <span className="acroSignaturePrompt">Tap to sign</span>
             )}
           </button>
-          {!signatureImage && savedSignature && (
+            {!signatureImage && reusableSignature && (
             <button
               type="button"
               className="acroSignatureReuse"
