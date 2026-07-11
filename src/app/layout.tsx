@@ -20,6 +20,14 @@ export const metadata: Metadata = {
   title: "Barak Group Inc. — Commercial & Residential Cleaning",
   description:
     "Barak Group Inc. provides commercial and residential cleaning, maintenance, and specialty facility services across Oregon, Utah, and Idaho.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: [{ url: "/favicon.ico" }],
+    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
