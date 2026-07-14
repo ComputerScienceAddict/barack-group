@@ -260,6 +260,12 @@ button {
   box-shadow: var(--shadow-md);
 }
 
+.siteMain > .notice {
+  width: min(760px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .stepNav {
   margin-bottom: 24px;
   padding: 18px 20px;
@@ -569,6 +575,14 @@ button {
   border-radius: 0 0 var(--radius-md) var(--radius-md);
   backdrop-filter: blur(8px);
   box-shadow: 0 -4px 20px rgba(12, 35, 64, 0.06);
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.stickyActionBar .primaryButton,
+.stickyActionBar .ghostButton {
+  min-width: min(320px, 100%);
 }
 
 .formSection:not(.formSectionPdf) .formHeading {
@@ -1311,10 +1325,10 @@ label {
 .signatureCanvas {
   display: block;
   width: 100%;
-  height: 175px;
+  height: 240px;
   background: #ffffff;
   border: 1px solid #cbd5e1;
-  border-radius: 18px;
+  border-radius: 12px;
   touch-action: none;
 }
 
@@ -1358,7 +1372,7 @@ label {
 .acroSignatureButton:focus-visible,
 .acroSignatureReuse:focus-visible,
 .acroSignatureClear:focus-visible {
-  outline: 3px solid #1d4ed8;
+  outline: 2px solid #94a3b8;
   outline-offset: 2px;
 }
 
@@ -1619,8 +1633,8 @@ label {
 .i9MobileQuickGrid input:focus,
 .i9MobileQuickGrid select:focus {
   outline: none;
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.16);
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.2);
 }
 
 .pdfViewerShell {
@@ -1724,8 +1738,8 @@ label {
 }
 
 .employmentOverlayInput:focus {
-  outline: 2px solid #1d4ed8;
-  border-color: #1d4ed8;
+  outline: 2px solid #94a3b8;
+  border-color: #64748b;
   z-index: 2;
 }
 
@@ -1818,8 +1832,8 @@ label {
 }
 
 .employmentInput:focus {
-  outline: 2px solid #1d4ed8;
-  border-color: #1d4ed8;
+  outline: 2px solid #94a3b8;
+  border-color: #64748b;
 }
 
 .employmentChoiceGroup {
@@ -1971,8 +1985,8 @@ label {
 
 .scrollablePdfViewer .react-acroform-field:focus-within,
 .react-acroform-viewer .react-acroform-field:focus-within {
-  box-shadow: inset 0 0 0 2px #1d4ed8;
-  background-color: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 0 0 1px #94a3b8;
+  background-color: transparent;
 }
 
 .scrollablePdfViewer .react-acroform-field--text > div,
@@ -2175,23 +2189,31 @@ label {
 
 .react-acroform-viewer .react-acroform-field input:focus,
 .react-acroform-viewer .react-acroform-field textarea:focus,
-.react-acroform-viewer .react-acroform-field select:focus {
-  border-color: #1d4ed8 !important;
+.react-acroform-viewer .react-acroform-field select:focus,
+.scrollablePdfViewer .react-acroform-field input:focus,
+.scrollablePdfViewer .react-acroform-field textarea:focus,
+.scrollablePdfViewer .react-acroform-field select:focus {
+  border-color: #64748b !important;
   background-color: rgba(255, 255, 255, 0.98) !important;
   box-shadow: none !important;
+  outline: none !important;
 }
 
 .react-acroform-viewer .react-acroform-field--checkbox,
-.react-acroform-viewer .react-acroform-field--radio {
-  box-shadow: inset 0 0 0 1px #2563eb;
-  background-color: rgba(255, 255, 255, 0.15);
+.react-acroform-viewer .react-acroform-field--radio,
+.scrollablePdfViewer .react-acroform-field--checkbox,
+.scrollablePdfViewer .react-acroform-field--radio {
+  box-shadow: inset 0 0 0 1px #94a3b8;
+  background-color: transparent;
   cursor: pointer;
 }
 
 .react-acroform-viewer .react-acroform-field--checkbox:focus-within,
-.react-acroform-viewer .react-acroform-field--radio:focus-within {
-  box-shadow: inset 0 0 0 2px #1d4ed8;
-  background-color: rgba(255, 255, 255, 0.3);
+.react-acroform-viewer .react-acroform-field--radio:focus-within,
+.scrollablePdfViewer .react-acroform-field--checkbox:focus-within,
+.scrollablePdfViewer .react-acroform-field--radio:focus-within {
+  box-shadow: inset 0 0 0 1px #94a3b8;
+  background-color: transparent;
 }
 
 .react-acroform-viewer .react-acroform-field--checkbox label,
@@ -2607,4 +2629,258 @@ label {
     width: 100%;
     min-height: 48px;
   }
+
+  .infoCityRow,
+  .yesNoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .radioRow {
+    flex-direction: column;
+  }
+}
+
+/* ── Quiet single-page onboarding form ──────────────────────────── */
+
+.quietForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.quietIntro {
+  margin: 0 auto 28px;
+  padding: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 56ch;
+  text-align: center;
+}
+
+.quietBlock {
+  padding: 0 0 28px;
+  margin: 0 0 28px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: transparent;
+}
+
+.quietBlock:last-of-type {
+  border-bottom: none;
+  margin-bottom: 8px;
+}
+
+.quietBlockWarn .quietHeading {
+  color: var(--danger);
+}
+
+.quietHeading {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.quietSubheading {
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.quietHint {
+  margin: -6px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.infoCityRow {
+  grid-template-columns: minmax(0, 1.4fr) 96px 110px;
+}
+
+.quietForm .fieldBlock {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.quietForm .fieldLabel {
+  color: #64748b;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.quietForm .fieldBlock input,
+.quietForm .fieldGrid input,
+.quietForm .fieldBlock select,
+.quietForm .fieldGrid select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: #fbfdff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.quietForm .fieldBlock select,
+.quietForm .fieldGrid select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.quietForm .fieldBlock input:focus,
+.quietForm .fieldGrid input:focus,
+.quietForm .fieldBlock select:focus,
+.quietForm .fieldGrid select:focus {
+  background: #ffffff;
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18);
+}
+
+.yesNoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quietChoice {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quietChoiceLabel {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.quietChoiceRow {
+  display: flex;
+  gap: 8px;
+}
+
+.quietChoiceRow label,
+.quietChipRow label,
+.quietList label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.quietChoiceRow label {
+  flex: 1;
+  justify-content: center;
+}
+
+.quietChoiceRow label.isOn,
+.quietChipRow label.isOn,
+.quietList label.isOn {
+  background: #eef2f7;
+  color: var(--brand);
+}
+
+.quietChoiceRow input,
+.quietChipRow input,
+.quietList input {
+  width: 15px;
+  min-height: 15px;
+  accent-color: var(--brand-mid);
+}
+
+.quietChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quietList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quietList label {
+  justify-content: flex-start;
+}
+
+.fieldMissing input,
+.fieldMissing select {
+  border-color: #f1a8a8 !important;
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08) !important;
+}
+
+.quietChoice.fieldMissing .quietChoiceLabel {
+  color: var(--danger);
+}
+
+.infoFieldError {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.quietForm .directDepositQuestionCard {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  box-shadow: none;
+}
+
+.quietForm .signaturePad {
+  margin-top: 4px;
+}
+
+.devAutofillToolbar {
+  display: inline-flex;
+}
+
+.devAutofillButton {
+  padding: 8px 12px;
+  border: 1px solid #c7daf3;
+  border-radius: var(--radius-sm);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.devAutofillButton:hover {
+  background: #dce8f8;
+  border-color: #9bb6da;
 }

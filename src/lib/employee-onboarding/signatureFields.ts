@@ -17,19 +17,29 @@ export const EMPLOYMENT_APPLICANT_SIGNATURE_FIELDS = new Set<string>([
 
 export const EMPLOYMENT_APPLICANT_SIGNATURE_MIN_HEIGHT_PT = 42;
 
+/** I-9 employee signature — expand to fill the visible row (widget rect is just the line). */
+export const I9_EMPLOYEE_SIGNATURE_FIELD = "Signature of Employee";
+export const I9_SIGNATURE_MIN_HEIGHT_PT = 22;
+
 export function expandSignatureFieldRect(
   fieldName: string,
   rect: readonly [number, number, number, number]
 ): [number, number, number, number] {
-  if (!EMPLOYMENT_APPLICANT_SIGNATURE_FIELDS.has(fieldName)) {
-    return [rect[0], rect[1], rect[2], rect[3]];
-  }
-
   const left = Math.min(rect[0], rect[2]);
   const right = Math.max(rect[0], rect[2]);
   const bottom = Math.min(rect[1], rect[3]);
   const top = Math.max(rect[1], rect[3]);
   const height = top - bottom;
+
+  // I-9: expand upward so the stamp fills the visible "Signature of Employee" row.
+  if (fieldName === I9_EMPLOYEE_SIGNATURE_FIELD) {
+    if (height >= I9_SIGNATURE_MIN_HEIGHT_PT) return [left, bottom, right, top];
+    return [left, bottom, right, bottom + I9_SIGNATURE_MIN_HEIGHT_PT];
+  }
+
+  if (!EMPLOYMENT_APPLICANT_SIGNATURE_FIELDS.has(fieldName)) {
+    return [left, bottom, right, top];
+  }
 
   if (height >= EMPLOYMENT_APPLICANT_SIGNATURE_MIN_HEIGHT_PT) {
     return [left, bottom, right, top];

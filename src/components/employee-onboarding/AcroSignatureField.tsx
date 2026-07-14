@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { pdfRectToScreen, useFormStateContext, type FormField } from "react-acroform";
 import SignaturePad from "@/components/employee-onboarding/SignaturePad";
 import {
@@ -28,11 +28,14 @@ export default function AcroSignatureField({
   const [open, setOpen] = useState(false);
   const [draftValue, setDraftValue] = useState("");
   const [padSession, setPadSession] = useState(0);
-  const [savedSignature, setSavedSignature] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
+  const [savedSignature, setSavedSignature] = useState<string | null>(null);
+
+  useEffect(() => {
     const stored = window.localStorage.getItem(PRIMARY_SIGNATURE_STORAGE_KEY) ?? "";
-    return decodeDrawnSignature(stored) ? stored : null;
-  });
+    if (decodeDrawnSignature(stored)) {
+      setSavedSignature(stored);
+    }
+  }, []);
 
   const currentValue = String(formState.getValue(field.name) ?? "");
   const signatureImage = useMemo(() => decodeDrawnSignature(currentValue), [currentValue]);

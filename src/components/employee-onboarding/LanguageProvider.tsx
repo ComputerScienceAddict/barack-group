@@ -16,7 +16,15 @@ type LanguageContextValue = {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(readInitialLocale);
+  // Default must match SSR; restore saved locale after mount to avoid hydration mismatch.
+  const [locale, setLocaleState] = useState<Locale>("en");
+
+  useEffect(() => {
+    const stored = readInitialLocale();
+    if (stored !== "en") {
+      setLocaleState(stored);
+    }
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = locale;

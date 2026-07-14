@@ -3,15 +3,42 @@ import {
   PDFDocument,
   PDFDropdown,
   PDFForm,
+  PDFName,
   PDFRadioGroup,
   PDFTextField,
 } from "pdf-lib";
 import type { PdfStampField } from "@/lib/employee-onboarding/extractPdfStampFields";
 import {
   decodeDrawnSignature,
+  EMPLOYMENT_APPLICANT_SIGNATURE_FIELDS,
   expandSignatureFieldRect,
+  I9_EMPLOYEE_SIGNATURE_FIELD,
   isPdfSignatureField,
+  PDF_SIGNATURE_FIELD_NAMES,
 } from "@/lib/employee-onboarding/signatureFields";
+
+/**
+ * Employment (and other) templates store a light-blue /MK /BG on widgets.
+ * Flatten burns that tint into the page unless we strip it and regenerate
+ * appearances first. PDFTextField has no setBackgroundColor — clear the
+ * widget dict directly and mark every field dirty so updateFieldAppearances
+ * rebuilds streams for filled and unfilled widgets alike.
+ */
+function stripAcroFormFieldHighlights(form: PDFForm) {
+  for (const field of form.getFields()) {
+    try {
+      for (const widget of field.acroField.getWidgets()) {
+        const ac = widget.getAppearanceCharacteristics();
+        if (!ac) continue;
+        ac.dict.delete(PDFName.of("BG"));
+        ac.dict.delete(PDFName.of("BC"));
+      }
+      form.markFieldAsDirty(field.ref);
+    } catch {
+      // Unusual widgets — keep going.
+    }
+  }
+}
 
 export type PdfFieldValue = string | boolean | string[];
 
@@ -57,6 +84,84 @@ function dataUrlToBytes(dataUrl: string): Uint8Array {
   return bytes;
 }
 
+/**
+ * Crop near-white canvas margins so the drawn ink fills the PDF field
+ * instead of sitting as a tiny scribble inside a huge white PNG.
+ */
+async function trimSignatureDataUrl(dataUrl: string): Promise<string> {
+  if (typeof document === "undefined") return dataUrl;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(dataUrl);
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        let minX = width;
+        let minY = height;
+        let maxX = -1;
+        let maxY = -1;
+        const threshold = 245;
+
+        for (let y = 0; y < height; y += 1) {
+          for (let x = 0; x < width; x += 1) {
+            const i = (y * width + x) * 4;
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3];
+            const isInk = a > 20 && (r < threshold || g < threshold || b < threshold);
+            if (!isInk) continue;
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+          }
+        }
+
+        if (maxX < minX || maxY < minY) {
+          resolve(dataUrl);
+          return;
+        }
+
+        const pad = 8;
+        const left = Math.max(0, minX - pad);
+        const top = Math.max(0, minY - pad);
+        const right = Math.min(width, maxX + pad + 1);
+        const bottom = Math.min(height, maxY + pad + 1);
+        const cropW = Math.max(1, right - left);
+        const cropH = Math.max(1, bottom - top);
+
+        const cropped = document.createElement("canvas");
+        cropped.width = cropW;
+        cropped.height = cropH;
+        const cropCtx = cropped.getContext("2d");
+        if (!cropCtx) {
+          resolve(dataUrl);
+          return;
+        }
+        cropCtx.fillStyle = "#ffffff";
+        cropCtx.fillRect(0, 0, cropW, cropH);
+        cropCtx.drawImage(canvas, left, top, cropW, cropH, 0, 0, cropW, cropH);
+        resolve(cropped.toDataURL("image/png"));
+      } catch {
+        resolve(dataUrl);
+      }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 function getPdfRect(field: PdfStampField) {
   const [x1, y1, x2, y2] = expandSignatureFieldRect(field.name, field.rect);
 
@@ -84,30 +189,61 @@ async function stampSignatureField({
   const pageIndex = Math.max(0, field.page - 1);
   const page = pdfDoc.getPage(pageIndex);
 
-  const signatureBytes = dataUrlToBytes(signatureDataUrl);
+  const trimmedDataUrl = await trimSignatureDataUrl(signatureDataUrl);
+  const signatureBytes = dataUrlToBytes(trimmedDataUrl);
 
   const signatureImage =
-    signatureDataUrl.startsWith("data:image/jpeg") ||
-    signatureDataUrl.startsWith("data:image/jpg")
+    trimmedDataUrl.startsWith("data:image/jpeg") ||
+    trimmedDataUrl.startsWith("data:image/jpg")
       ? await pdfDoc.embedJpg(signatureBytes)
       : await pdfDoc.embedPng(signatureBytes);
 
+  const isEmploymentSignature = EMPLOYMENT_APPLICANT_SIGNATURE_FIELDS.has(field.name);
+  const isI9Signature = field.name === I9_EMPLOYEE_SIGNATURE_FIELD;
+
+  // All signature types use the expanded rect (I-9 and employment expand upward to fill the row).
   const { x, y, width, height } = getPdfRect(field);
 
   const paddingX = 4;
   const paddingY = 2;
-
   const maxWidth = Math.max(1, width - paddingX * 2);
   const maxHeight = Math.max(1, height - paddingY * 2);
 
-  const scale = Math.min(maxWidth / signatureImage.width, maxHeight / signatureImage.height);
+  const imgW = Math.max(1, signatureImage.width);
+  const imgH = Math.max(1, signatureImage.height);
 
-  const drawWidth = signatureImage.width * scale;
-  const drawHeight = signatureImage.height * scale;
+  let drawWidth: number;
+  let drawHeight: number;
+
+  if (isI9Signature) {
+    // Fill the full I-9 cell — scale to contain (largest that fits), then center.
+    const scale = Math.min(maxWidth / imgW, maxHeight / imgH);
+    drawWidth = imgW * scale;
+    drawHeight = imgH * scale;
+  } else {
+    // Employment / other: keep stamps short so they read as handwriting on the line.
+    const heightCap = isEmploymentSignature
+      ? Math.min(Math.max(maxHeight, 20), 28)
+      : Math.min(maxHeight, 32);
+    const scale = Math.min(maxWidth / imgW, heightCap / imgH);
+    drawWidth = imgW * scale;
+    drawHeight = imgH * scale;
+
+    // Employment line is long — widen a bit so the signature isn't a tall skinny blip.
+    if (isEmploymentSignature) {
+      drawWidth = Math.min(maxWidth, drawWidth * 1.55);
+    }
+  }
+
+  // Center in box for I-9; sit on signature line for others.
+  const drawX = x + paddingX + Math.max(0, (maxWidth - drawWidth) / 2);
+  const drawY = isI9Signature
+    ? y + paddingY + Math.max(0, (maxHeight - drawHeight) / 2)
+    : y + paddingY;
 
   page.drawImage(signatureImage, {
-    x: x + (width - drawWidth) / 2,
-    y: y + (height - drawHeight) / 2,
+    x: drawX,
+    y: drawY,
     width: drawWidth,
     height: drawHeight,
   });
@@ -200,9 +336,21 @@ export async function fillPdfFromBytes(
   }
 
   try {
+    stripAcroFormFieldHighlights(form);
     form.updateFieldAppearances();
   } catch {
     // Some government PDFs still save /V values without custom appearances.
+  }
+
+  // Signature widgets are stamped as images after flatten — remove them first so they
+  // don't bake in as empty blue highlight boxes on the employment / I-9 / W-4 forms.
+  for (const name of PDF_SIGNATURE_FIELD_NAMES) {
+    try {
+      const field = form.getFieldMaybe(name);
+      if (field) form.removeField(field);
+    } catch {
+      // Field may not exist on this template.
+    }
   }
 
   if (form.getFields().length > 0) {

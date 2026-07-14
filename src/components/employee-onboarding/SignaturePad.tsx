@@ -1,12 +1,14 @@
 "use client";
 
 import { PointerEvent, useEffect, useRef, useState } from "react";
+import { useLanguage } from "@/components/employee-onboarding/LanguageProvider";
 
 type SignaturePadProps = {
   onChange: (signatureDataUrl: string) => void;
 };
 
 export default function SignaturePad({ onChange }: SignaturePadProps) {
+  const { t } = useLanguage();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasInk, setHasInk] = useState(false);
@@ -25,7 +27,7 @@ export default function SignaturePad({ onChange }: SignaturePadProps) {
     ctx.scale(scale, scale);
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3.25;
     ctx.strokeStyle = "#111827";
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, rect.width, rect.height);
@@ -37,7 +39,7 @@ export default function SignaturePad({ onChange }: SignaturePadProps) {
     const rect = canvas.getBoundingClientRect();
     return {
       x: event.clientX - rect.left,
-      y: event.clientY - rect.top
+      y: event.clientY - rect.top,
     };
   }
 
@@ -91,7 +93,7 @@ export default function SignaturePad({ onChange }: SignaturePadProps) {
     <div className="signaturePad">
       <canvas
         ref={canvasRef}
-        aria-label="Draw electronic signature"
+        aria-label={t("fieldEmployeeSignature")}
         className="signatureCanvas"
         onPointerDown={startDrawing}
         onPointerMove={draw}
@@ -99,9 +101,9 @@ export default function SignaturePad({ onChange }: SignaturePadProps) {
         onPointerLeave={stopDrawing}
       />
       <div className="signatureTools">
-        <span>{hasInk ? "Signature captured" : "Draw your signature above"}</span>
+        <span>{hasInk ? t("signaturePadHintDone") : t("signaturePadHintEmpty")}</span>
         <button type="button" className="ghostButton smallButton" onClick={clearSignature}>
-          Clear
+          {t("signaturePadClear")}
         </button>
       </div>
     </div>

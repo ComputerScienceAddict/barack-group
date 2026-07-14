@@ -9,8 +9,7 @@ export function ServiceShowcaseSection() {
           <p className="barak-services-eyebrow">What we do</p>
           <h2 className="barak-services-title">Services we provide</h2>
           <p className="barak-services-desc">
-            From daily office janitorial to stadium events and post-construction cleanup — crews
-            staffed and managed by Barak Group.
+            Daily office cleaning, stadium events, post-construction — our crews, our supervision.
           </p>
         </div>
 

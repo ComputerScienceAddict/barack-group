@@ -7,10 +7,10 @@ type DevAutofillButtonProps = {
   label?: string;
 };
 
-/** Local dev only — stripped from production builds. */
+/** Shown in development to quickly fill the onboarding form with sample data. */
 export default function DevAutofillButton({
   onAutofill,
-  label = "Dev: Autofill this form",
+  label = "Autofill",
 }: DevAutofillButtonProps) {
   if (!isDevAutofillEnabled()) return null;
 

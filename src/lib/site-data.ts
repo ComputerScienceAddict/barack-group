@@ -1,5 +1,6 @@
 export type Service = {
   title: string;
+  heroLine: string;
   description: string;
   bullets: string[];
   image: string;
@@ -100,44 +101,48 @@ export const locations = [
 export const serviceHighlights: Service[] = [
   {
     title: "Office cleaning",
-    description: "Daily, nightly, or weekly janitorial service based on your building schedule.",
+    heroLine: "Office janitorial on nights, weekends, or a daily schedule.",
+    description: "Janitorial for offices on a schedule that fits the building.",
     bullets: [
-      "Restrooms and breakrooms",
-      "Floors, carpet, and touchpoints",
-      "Trash, liners, and interior glass",
+      "Restrooms and break rooms",
+      "Vacuum, mop, and carpet",
+      "Trash out, liners replaced, interior windows",
     ],
     image: "https://www.barakservices.com/office-building.png",
     imageAlt: "Cleaner pushing supply cart in a hallway",
   },
   {
     title: "Construction & turnover",
-    description: "Move-in ready cleaning for new construction, remodels, and turnovers.",
+    heroLine: "Construction cleanup and apartment turnovers.",
+    description: "Clean up after the job or get a unit ready for move-in.",
     bullets: [
-      "Post-construction detail cleaning",
-      "Turnover and move-out resets",
-      "Photo verification on request",
+      "Dust, debris, and construction mess cleared",
+      "Units ready before move-in",
+      "Walkthrough photos if you need them",
     ],
     image: "https://www.barakservices.com/hero-after.png",
     imageAlt: "Crew preparing a property for turnover",
   },
   {
     title: "Events & large venues",
-    description: "Cleaning support for game days, festivals, and high-traffic event windows.",
+    heroLine: "Stadium and event work. Timbers, NASCAR, Indy, and similar.",
+    description: "Restrooms, trash, and resets when thousands of people show up.",
     bullets: [
-      "Restroom and waste routes",
-      "Concourse and common-area resets",
-      "Flexible staffing by attendance",
+      "Restrooms and trash on a loop",
+      "Concourses and seating areas reset",
+      "Extra crew when the crowd shows up",
     ],
     image: "https://www.barakservices.com/event-venue.png",
     imageAlt: "Event venue with active cleaning support",
   },
   {
     title: "Exterior & specialty",
-    description: "Exterior maintenance and specialty cleaning for difficult surfaces.",
+    heroLine: "Power washing, outside windows, and carpet extraction.",
+    description: "Outside work and deep carpet when standard cleaning is not enough.",
     bullets: [
-      "Pressure washing",
-      "Exterior window cleaning",
-      "Carpet spotting and extraction",
+      "Sidewalks, parking lots, and building exteriors",
+      "Outside windows",
+      "Carpet stains and extraction",
     ],
     image: "https://www.barakservices.com/hero-before.png",
     imageAlt: "Professional cleaner performing specialty cleaning work",
@@ -147,32 +152,32 @@ export const serviceHighlights: Service[] = [
 export const industries: Industry[] = [
   {
     name: "Apartment Communities",
-    summary: "Shared spaces and turnover support.",
+    summary: "Clubhouses, halls, and unit turnovers.",
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
   },
   {
     name: "Office Buildings",
-    summary: "Consistent cleaning that protects productivity.",
+    summary: "Nights and weekends, around your schedule.",
     image: "/office-building.png",
   },
   {
     name: "Construction",
-    summary: "Post-build cleaning and quality walkthrough prep.",
+    summary: "Final cleans before the walkthrough.",
     image: "/hero-after.png",
   },
   {
     name: "Stadiums & Universities",
-    summary: "High-traffic venue maintenance at scale.",
+    summary: "Match days and busy campus events.",
     image: "/event-venue.png",
   },
   {
     name: "Restaurant Kitchens",
-    summary: "Detailed cleaning and sanitation support.",
+    summary: "Deep cleans and hood work with partner crews.",
     image: "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1200&q=80",
   },
   {
     name: "Airbnb & Vacation Rentals",
-    summary: "Fast turnarounds and reliable quality.",
+    summary: "Quick turnarounds between guests.",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
   },
 ];
@@ -205,7 +210,7 @@ export const posts: Post[] = [
     slug: "2023-dahli-at-timbers-stadium",
     title: "Dahli at Timbers Stadium",
     date: "January 19, 2024",
-    excerpt: "Pre-match cleanup at Providence Park with Dahli on the crew.",
+    excerpt: "Dahli at Providence Park before a Timbers match.",
     content: [
       "Dahli posted up while the rest of the team ran the pre-match plan at Providence Park.",
       "Lots of restrooms, lots of foot traffic, tight turnaround before gates open.",
@@ -218,7 +223,7 @@ export const posts: Post[] = [
     slug: "2023-chucho-at-nascar",
     title: "Chucho at NASCAR",
     date: "January 19, 2024",
-    excerpt: "Race weekend in Utah — long shifts, quick resets between events.",
+    excerpt: "Chucho at the NASCAR track in Utah.",
     content: [
       "Chucho between shifts at the track after another full race day.",
       "Restrooms, concourses, and trash pick-up on a loop until the last car leaves.",
@@ -231,7 +236,7 @@ export const posts: Post[] = [
     slug: "2023-indy-car-races",
     title: "Indy car weekend",
     date: "January 19, 2024",
-    excerpt: "Hector's crew on cleaning and small fixes during Indy weekend.",
+    excerpt: "Hector's crew at Indy — cleaning and fixing what broke.",
     content: [
       "Hector and the crew split time between cleaning runs and whatever broke on site.",
       "When something goes wrong mid-event, it helps to have people who can actually fix it.",
