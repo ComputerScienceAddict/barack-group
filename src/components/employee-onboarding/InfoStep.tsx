@@ -14,7 +14,7 @@ import type {
   FilingStatus,
   CitizenshipStatus,
 } from "@/lib/employee-onboarding/onboardingAnswers";
-import { formatSsnInput } from "@/lib/employee-onboarding/onboardingAnswers";
+import { formatSsnInput, formatDependentCountInput, computeW4Step3Amounts } from "@/lib/employee-onboarding/onboardingAnswers";
 import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 
 const US_STATES: ReadonlyArray<{ code: string; name: string }> = [
@@ -177,6 +177,8 @@ export default function InfoStep({
     [3, "citizenshipPermanentResident"],
     [4, "citizenshipAlienAuthorized"],
   ];
+
+  const step3Amounts = computeW4Step3Amounts(answers);
 
   return (
     <div className="quietForm">
@@ -482,6 +484,48 @@ export default function InfoStep({
             ))}
           </div>
         </fieldset>
+
+        <div className="quietDependents">
+          <p className="quietSubheading">{t("quietW4Dependents")}</p>
+          <p className="quietHint">{t("quietW4DependentsHint")}</p>
+          <div className="fieldGrid twoColumns">
+            <label
+              className={`fieldBlock${miss("w4QualifyingChildren", missingFields)}`}
+              data-field="w4QualifyingChildren"
+            >
+              <span className="fieldLabel">{t("quietW4QualifyingChildren")}</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                value={answers.w4QualifyingChildren}
+                onChange={(e) => set("w4QualifyingChildren", formatDependentCountInput(e.target.value))}
+                placeholder="0"
+                aria-invalid={missingFields.includes("w4QualifyingChildren")}
+              />
+            </label>
+            <label
+              className={`fieldBlock${miss("w4OtherDependents", missingFields)}`}
+              data-field="w4OtherDependents"
+            >
+              <span className="fieldLabel">{t("quietW4OtherDependents")}</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                value={answers.w4OtherDependents}
+                onChange={(e) => set("w4OtherDependents", formatDependentCountInput(e.target.value))}
+                placeholder="0"
+                aria-invalid={missingFields.includes("w4OtherDependents")}
+              />
+            </label>
+          </div>
+          <p className="quietDependentsTotal">
+            {t("quietW4DependentsTotal", {
+              amount: step3Amounts.step3Total.toLocaleString(),
+            })}
+          </p>
+        </div>
 
         <fieldset className={`quietChoice${missingFields.includes("citizenshipStatus") ? " fieldMissing" : ""}`}>
           <legend className="quietChoiceLabel">{t("quietI9Citizenship")}</legend>

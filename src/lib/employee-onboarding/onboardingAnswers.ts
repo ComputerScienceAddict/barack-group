@@ -33,6 +33,10 @@ export type OnboardingAnswers = {
   emergency2Phone: string;
   emergency2AltPhone: string;
   w4FilingStatus: FilingStatus | null;
+  /** Qualifying children under age 17 (W-4 Step 3a). Count only — we multiply by $2,000. */
+  w4QualifyingChildren: string;
+  /** Other dependents (W-4 Step 3b). Count only — we multiply by $500. */
+  w4OtherDependents: string;
   citizenshipStatus: CitizenshipStatus | null;
 };
 
@@ -63,8 +67,41 @@ export const EMPTY_ANSWERS: OnboardingAnswers = {
   emergency2Phone: "",
   emergency2AltPhone: "",
   w4FilingStatus: null,
+  w4QualifyingChildren: "",
+  w4OtherDependents: "",
   citizenshipStatus: null,
 };
+
+const W4_CHILD_CREDIT = 2000;
+const W4_OTHER_DEPENDENT_CREDIT = 500;
+
+function parseDependentCount(value: string): number {
+  const digits = String(value ?? "").replace(/\D/g, "");
+  if (!digits) return 0;
+  return Math.min(99, Number.parseInt(digits, 10) || 0);
+}
+
+/** Keep only digits while typing a dependent count (max 2 digits). */
+export function formatDependentCountInput(value: string): string {
+  return String(value ?? "").replace(/\D/g, "").slice(0, 2);
+}
+
+/** Turn dependent counts into W-4 Step 3 dollar amounts. */
+export function computeW4Step3Amounts(
+  answers: Pick<OnboardingAnswers, "w4QualifyingChildren" | "w4OtherDependents">
+) {
+  const children = parseDependentCount(answers.w4QualifyingChildren);
+  const other = parseDependentCount(answers.w4OtherDependents);
+  const step3a = children * W4_CHILD_CREDIT;
+  const step3b = other * W4_OTHER_DEPENDENT_CREDIT;
+  return {
+    children,
+    other,
+    step3a,
+    step3b,
+    step3Total: step3a + step3b,
+  };
+}
 
 function getTodayMDY(): string {
   const d = new Date();
@@ -207,6 +244,11 @@ export function mapAnswersToPdfValues(
     fecha_firma: today,
   };
 
+  const { step3a, step3b, step3Total } = computeW4Step3Amounts(answers);
+  const step3aStr = String(step3a);
+  const step3bStr = String(step3b);
+  const step3TotalStr = String(step3Total);
+
   const w4: Record<string, PdfFieldValue> = {
     // ── English Step 1 ──────────────────────────────────────────────
     "topmostSubform[0].Page1[0].Step1a[0].f1_01[0]": answers.firstName,
@@ -214,6 +256,10 @@ export function mapAnswersToPdfValues(
     "topmostSubform[0].Page1[0].Step1a[0].f1_03[0]": answers.address,
     "topmostSubform[0].Page1[0].Step1a[0].f1_04[0]": w4CityStateZip,
     "topmostSubform[0].Page1[0].f1_05[0]": ssnRaw,
+    // ── English Step 3 (counts → dollar credits) ────────────────────
+    "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_06[0]": step3aStr,
+    "topmostSubform[0].Page1[0].Step3_ReadOrder[0].f1_07[0]": step3bStr,
+    "topmostSubform[0].Page1[0].f1_08[0]": step3TotalStr,
     // ── English Step 5 (signature / date) ───────────────────────────
     employee_signature_step5: signature,
     employee_date_step5: today,
@@ -222,6 +268,9 @@ export function mapAnswersToPdfValues(
     "topmostSubform[0].Page1[0].Paso1a[0].f1_02[0]": answers.lastName,
     "topmostSubform[0].Page1[0].Paso1a[0].f1_03[0]": answers.address,
     "topmostSubform[0].Page1[0].Paso1a[0].f1_04[0]": w4CityStateZip,
+    // ── Spanish Step 3 ──────────────────────────────────────────────
+    "topmostSubform[0].Page1[0].Paso3_ReadOrder[0].f1_06[0]": step3aStr,
+    "topmostSubform[0].Page1[0].f1_07[0]": step3bStr,
     // ── Spanish Step 5 ──────────────────────────────────────────────
     employee_signature_step5_sp: signature,
     employee_date_step5_sp: today,
@@ -304,6 +353,8 @@ export function validateAnswers(answers: OnboardingAnswers): AnswersValidation {
   req("emergency2AltPhone", answers.emergency2AltPhone);
 
   if (answers.w4FilingStatus === null) missing.push("w4FilingStatus");
+  if (answers.w4QualifyingChildren.trim() === "") missing.push("w4QualifyingChildren");
+  if (answers.w4OtherDependents.trim() === "") missing.push("w4OtherDependents");
   if (answers.citizenshipStatus === null) missing.push("citizenshipStatus");
 
   return { isValid: missing.length === 0, missingFields: missing };

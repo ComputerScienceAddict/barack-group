@@ -91,7 +91,7 @@ function OnboardingAppContent() {
           answers?: OnboardingAnswers;
           directDepositValues?: DirectDepositValues;
         };
-        if (draft.answers) setAnswers(draft.answers);
+        if (draft.answers) setAnswers({ ...EMPTY_ANSWERS, ...draft.answers });
         if (draft.directDepositValues) {
           setDirectDepositValues(normalizeDirectDepositValues(draft.directDepositValues));
         }

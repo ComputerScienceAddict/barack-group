@@ -2707,6 +2707,23 @@ label {
   color: var(--muted);
 }
 
+.quietDependents {
+  display: grid;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.quietDependents .quietHint {
+  margin: -4px 0 0;
+}
+
+.quietDependentsTotal {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
 .infoCityRow {
   grid-template-columns: minmax(0, 1.4fr) 96px 110px;
 }
