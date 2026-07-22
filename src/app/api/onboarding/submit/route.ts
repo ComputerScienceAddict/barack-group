@@ -18,6 +18,8 @@ export const maxDuration = 60;
 type SubmitBody = {
   firstName?: string;
   lastName?: string;
+  /** USPS state code from the application address (e.g. TX, OR). */
+  state?: string;
   packetId?: string;
   locale?: Locale;
   formValues?: Partial<FormValuesState>;
@@ -68,6 +70,7 @@ export async function POST(request: Request) {
 
     await sendSubmissionEmail({
       applicantName,
+      state: typeof body.state === "string" ? body.state : undefined,
       pdfBytes,
       packetId: typeof body.packetId === "string" ? body.packetId : undefined,
     });

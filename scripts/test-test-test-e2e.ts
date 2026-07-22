@@ -117,8 +117,8 @@ const directDeposit: DirectDepositValues = {
 };
 
 async function main() {
-  const subject = buildWorkDocumentsSubject(APPLICANT);
-  const filename = buildWorkDocumentsFilename(APPLICANT);
+  const subject = buildWorkDocumentsSubject({ applicantName: APPLICANT, state: "MI" });
+  const filename = buildWorkDocumentsFilename({ applicantName: APPLICANT, state: "MI" });
   console.log(`Subject: ${subject}`);
   console.log(`Attachment: ${filename}`);
 
@@ -131,6 +131,7 @@ async function main() {
 
   await sendSubmissionEmail({
     applicantName: APPLICANT,
+    state: "MI",
     pdfBytes: Buffer.from(packetResult.pdfBytes),
     packetId: "NH-TESTTEST",
   });

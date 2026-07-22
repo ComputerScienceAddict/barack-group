@@ -8,6 +8,8 @@ import {
 
 export type SendSubmissionEmailInput = {
   applicantName: ApplicantName;
+  /** Applicant address state (USPS code or full name) — used in the email subject. */
+  state?: string | null;
   pdfBytes: Buffer;
   packetId?: string;
 };
@@ -40,9 +42,10 @@ function getSmtpConfig() {
 
 export async function sendSubmissionEmail(input: SendSubmissionEmailInput) {
   const applicantName = normalizeApplicantName(input.applicantName);
+  const label = { applicantName, state: input.state };
   const { host, port, user, pass, to } = getSmtpConfig();
-  const subject = buildWorkDocumentsSubject(applicantName);
-  const filename = buildWorkDocumentsFilename(applicantName);
+  const subject = buildWorkDocumentsSubject(label);
+  const filename = buildWorkDocumentsFilename(label);
 
   const transporter = nodemailer.createTransport({
     host,

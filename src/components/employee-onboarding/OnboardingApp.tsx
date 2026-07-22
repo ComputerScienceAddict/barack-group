@@ -196,6 +196,7 @@ function OnboardingAppContent() {
           body: JSON.stringify({
             firstName: answers.firstName.trim(),
             lastName: answers.lastName.trim(),
+            state: answers.state.trim(),
             packetId,
             locale,
             formValues,

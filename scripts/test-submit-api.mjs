@@ -31,6 +31,7 @@ const TODAY = "06/01/2026";
 const payload = {
   firstName: "John",
   lastName: "Doe",
+  state: "MI",
   packetId: "NH-JOHNDOE",
   locale: "en",
   formValues: {
@@ -113,6 +114,6 @@ if (!response.ok) {
 }
 
 console.log("Submit API test passed for John Doe.");
-console.log("Expected email subject: john-doe-workdocs");
-console.log("Expected attachment: john-doe-workdocs.pdf");
+console.log("Expected email subject: 𝐌𝐢𝐜𝐡𝐢𝐠𝐚𝐧 — john-doe-workdocs");
+console.log("Expected attachment: michigan-john-doe-workdocs.pdf");
 console.log("Email should be delivered to SMTP_TO recipients.");

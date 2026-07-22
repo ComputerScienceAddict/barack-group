@@ -132,12 +132,15 @@ async function main() {
 console.log("=== John Doe E2E Test ===\n");
 
 // 1. Email subject / filename
-const subject = buildWorkDocumentsSubject(JOHN_DOE);
-const filename = buildWorkDocumentsFilename(JOHN_DOE);
+const subject = buildWorkDocumentsSubject({ applicantName: JOHN_DOE, state: "MI" });
+const filename = buildWorkDocumentsFilename({ applicantName: JOHN_DOE, state: "MI" });
 console.log(`Subject: ${subject}`);
 console.log(`Attachment: ${filename}`);
-assert(subject === "john-doe-workdocs", `Expected subject john-doe-workdocs, got ${subject}`);
-assert(filename === "john-doe-workdocs.pdf", `Expected filename john-doe-workdocs.pdf, got ${filename}`);
+assert(
+  subject === "𝐌𝐢𝐜𝐡𝐢𝐠𝐚𝐧 — john-doe-workdocs",
+  `Expected subject with bold Michigan first, got ${subject}`
+);
+assert(filename === "michigan-john-doe-workdocs.pdf", `Expected filename michigan-john-doe-workdocs.pdf, got ${filename}`);
 
 // 2. Validation — all forms complete
 const rulesByForm = [
@@ -186,6 +189,7 @@ console.log(`\n✓ Wrote test packet: ${outPath}`);
 console.log("\nSending email to SMTP_TO recipients...");
 await sendSubmissionEmail({
   applicantName: JOHN_DOE,
+  state: "MI",
   pdfBytes: Buffer.from(packetResult.pdfBytes),
   packetId: "NH-JOHNDOE",
 });
