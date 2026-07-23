@@ -13,8 +13,14 @@ import type {
   ShiftType,
   FilingStatus,
   CitizenshipStatus,
+  ApplyingFromState,
 } from "@/lib/employee-onboarding/onboardingAnswers";
-import { formatSsnInput, formatDependentCountInput, computeW4Step3Amounts } from "@/lib/employee-onboarding/onboardingAnswers";
+import {
+  formatSsnInput,
+  formatDependentCountInput,
+  computeW4Step3Amounts,
+  APPLYING_FROM_STATES,
+} from "@/lib/employee-onboarding/onboardingAnswers";
 import type { MessageKey } from "@/lib/employee-onboarding/i18n";
 
 const US_STATES: ReadonlyArray<{ code: string; name: string }> = [
@@ -183,6 +189,33 @@ export default function InfoStep({
   return (
     <div className="quietForm">
       <p className="quietIntro">{t("quietIntro")}</p>
+
+      <section className="quietBlock">
+        <h2 className="quietHeading">{t("sectionApplyingFrom")}</h2>
+        <p className="quietHint">{t("quietApplyingFromHint")}</p>
+        <fieldset
+          className={`quietChoice${missingFields.includes("applyingFromState") ? " fieldMissing" : ""}`}
+          data-field="applyingFromState"
+        >
+          <legend className="quietChoiceLabel">{t("quietApplyingFrom")}</legend>
+          <div className="quietApplyFromGrid">
+            {APPLYING_FROM_STATES.map((entry) => (
+              <label
+                key={entry.code}
+                className={answers.applyingFromState === entry.code ? "isOn" : ""}
+              >
+                <input
+                  type="radio"
+                  name="applyingFromState"
+                  checked={answers.applyingFromState === entry.code}
+                  onChange={() => set("applyingFromState", entry.code as ApplyingFromState)}
+                />
+                {entry.name}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      </section>
 
       <section className="quietBlock">
         <h2 className="quietHeading">{t("sectionAboutYou")}</h2>

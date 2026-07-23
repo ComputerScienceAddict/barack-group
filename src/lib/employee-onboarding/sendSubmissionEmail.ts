@@ -8,7 +8,7 @@ import {
 
 export type SendSubmissionEmailInput = {
   applicantName: ApplicantName;
-  /** Applicant address state (USPS code or full name) — used in the email subject. */
+  /** Applying-from office state (OR / UT / ID / TX) — used in the email subject. */
   state?: string | null;
   pdfBytes: Buffer;
   packetId?: string;

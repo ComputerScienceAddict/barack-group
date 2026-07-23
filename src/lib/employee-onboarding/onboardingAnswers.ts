@@ -5,6 +5,22 @@ export type PositionType = "full_time" | "part_time" | "temporary" | "on_call";
 export type ShiftType = "day" | "afternoon" | "night" | "weekends" | "any";
 export type CitizenshipStatus = 1 | 2 | 3 | 4;
 export type FilingStatus = 0 | 1 | 2;
+/** Office / hiring state the applicant is applying from (email subject). */
+export type ApplyingFromState = "OR" | "UT" | "ID" | "TX";
+
+export const APPLYING_FROM_STATES: ReadonlyArray<{
+  code: ApplyingFromState;
+  name: string;
+}> = [
+  { code: "OR", name: "Oregon" },
+  { code: "UT", name: "Utah" },
+  { code: "ID", name: "Idaho" },
+  { code: "TX", name: "Texas" },
+];
+
+export function isApplyingFromState(value: string | null | undefined): value is ApplyingFromState {
+  return APPLYING_FROM_STATES.some((entry) => entry.code === value);
+}
 
 export type OnboardingAnswers = {
   firstName: string;
@@ -18,6 +34,8 @@ export type OnboardingAnswers = {
   city: string;
   state: string;
   zip: string;
+  /** Which Barak office state they are applying from (OR / UT / ID / TX). */
+  applyingFromState: ApplyingFromState | "";
   age18: boolean | null;
   positions: PositionType[];
   shifts: ShiftType[];
@@ -52,6 +70,7 @@ export const EMPTY_ANSWERS: OnboardingAnswers = {
   city: "",
   state: "",
   zip: "",
+  applyingFromState: "",
   age18: null,
   positions: [],
   shifts: [],
@@ -335,6 +354,7 @@ export function validateAnswers(answers: OnboardingAnswers): AnswersValidation {
   req("state", answers.state);
   req("zip", answers.zip);
 
+  if (!isApplyingFromState(answers.applyingFromState)) missing.push("applyingFromState");
   if (!isCompleteSsn(answers.ssn)) missing.push("ssn");
   if (answers.age18 === null) missing.push("age18");
   if (answers.positions.length === 0) missing.push("positions");

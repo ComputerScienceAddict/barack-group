@@ -18,7 +18,7 @@ export const maxDuration = 60;
 type SubmitBody = {
   firstName?: string;
   lastName?: string;
-  /** USPS state code from the application address (e.g. TX, OR). */
+  /** Applying-from office state (OR / UT / ID / TX) — used in the email subject. */
   state?: string;
   packetId?: string;
   locale?: Locale;

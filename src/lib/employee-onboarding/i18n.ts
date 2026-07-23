@@ -193,6 +193,9 @@ const en = {
   quietIntro:
     "Fill this out once. Your answers and signature will autofill the Employment Application, W-4, I-9, and WH-151. Every required box across those forms.",
   quietTagline: "One short form. We autofill the rest.",
+  sectionApplyingFrom: "Where are you applying?",
+  quietApplyingFrom: "Which state are you applying from?",
+  quietApplyingFromHint: "Choose the Barak Group location you are applying to. This appears first on your submission email.",
   sectionAboutYou: "About you",
   sectionJobPreferences: "Job preferences",
   sectionEmergencyContacts: "Emergency contacts",
@@ -438,6 +441,10 @@ const es: Record<keyof typeof en, string> = {
   quietIntro:
     "Complete esto una sola vez. Sus respuestas y firma llenarán automáticamente la Solicitud de Empleo, W-4, I-9 y WH-151. Cada casilla requerida en esos formularios.",
   quietTagline: "Un formulario corto. Nosotros llenamos el resto.",
+  sectionApplyingFrom: "¿Dónde solicita?",
+  quietApplyingFrom: "¿Desde qué estado está solicitando?",
+  quietApplyingFromHint:
+    "Elija la ubicación de Barak Group a la que solicita. Esto aparece primero en el correo de envío.",
   sectionAboutYou: "Sobre usted",
   sectionJobPreferences: "Preferencias de empleo",
   sectionEmergencyContacts: "Contactos de emergencia",

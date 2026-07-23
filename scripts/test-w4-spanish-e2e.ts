@@ -121,8 +121,8 @@ const directDeposit: DirectDepositValues = {
 async function main() {
   console.log("=== Spanish W-4 Block Signature E2E ===\n");
 
-  const subject = buildWorkDocumentsSubject({ applicantName: APPLICANT, state: "MI" });
-  const filename = buildWorkDocumentsFilename({ applicantName: APPLICANT, state: "MI" });
+  const subject = buildWorkDocumentsSubject({ applicantName: APPLICANT, state: "OR" });
+  const filename = buildWorkDocumentsFilename({ applicantName: APPLICANT, state: "OR" });
   console.log(`Subject: ${subject}`);
   console.log(`Attachment: ${filename}`);
 
@@ -144,7 +144,7 @@ async function main() {
   console.log("\nSending email to SMTP_TO recipients...");
   await sendSubmissionEmail({
     applicantName: APPLICANT,
-    state: "MI",
+    state: "OR",
     pdfBytes: Buffer.from(packetResult.pdfBytes),
     packetId: "NH-BLOCKSIG-ES",
   });

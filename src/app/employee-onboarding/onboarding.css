@@ -2823,6 +2823,56 @@ label {
   justify-content: center;
 }
 
+.quietApplyFromGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quietApplyFromGrid label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.quietApplyFromGrid label.isOn {
+  background: #eef2f7;
+  border-color: var(--brand-mid, #64748b);
+  color: var(--brand);
+}
+
+.quietApplyFromGrid input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: var(--brand-mid);
+}
+
+@media (max-width: 480px) {
+  .quietApplyFromGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .quietApplyFromGrid label {
+    min-height: 52px;
+    justify-content: flex-start;
+    padding: 14px 16px;
+    font-size: 1rem;
+  }
+}
+
 .quietChoiceRow label.isOn,
 .quietChipRow label.isOn,
 .quietList label.isOn {
